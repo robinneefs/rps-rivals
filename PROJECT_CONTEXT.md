@@ -228,6 +228,7 @@ Architecture rules:
 
 ## Open questions
 
+- Before the v2 release (user's note 2026-10-24): make the web game installable to the Android home screen as a PWA (manifest, icons, theme colour; no native wrapper for this route). Full note: `docs/release/PWA-INSTALL.md`.
 - Fighter art: better pack or AI-generated? (no longer blocks building: placeholders are in; real art swaps in under the same asset keys)
 - Overall aesthetic: the user is "not crazy about it yet" (cute chibi + neon '80s); parked, revisit later.
 - Art tools (researched 2026-10-10): best fit is **PixelLab** (pixel-art AI with character directions + animations, hosted MCP at https://api.pixellab.ai/mcp, Bearer API key, plans from ~$12/mo). Alternatives: Retro Diffusion (great look, Aseprite extension, $20-65 one-time, has API), Ludo, Scenario; Aseprite for hand cleanup. Claude's cloud sessions currently cannot reach api.pixellab.ai (built-in environment blocks it): needs a cloud environment that allows the domain plus the key as a secret, or run Claude Code locally with the MCP. User wants a more attractive pixel style with slightly bigger pixels.
