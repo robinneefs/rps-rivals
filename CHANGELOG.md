@@ -2,6 +2,11 @@
 
 Every build that goes online gets a new version number (in `apps/game/package.json`, shown small on the home screen) and an entry here. Version numbers follow semver: a new feature bumps the middle number (1.0.0 → 1.1.0), a fix-only build bumps the last (1.0.0 → 1.0.1). Each version that goes live is tagged `vX.Y.Z` with a GitHub release, made automatically from its entry here when it reaches the `production` branch.
 
+## 2.1.0 (2026-10-24)
+
+- **New joystick.** A new red ball-top joystick, drawn in all 8 directions; the right-hand directions mirror the left ones, so both sides look the same. The stick is drawn in front of everything else on the cabinet, the screen and the buttons included.
+- **No accidental diagonals.** Dragging the joystick with a finger or the mouse needs a clear push before it moves, and a swipe that is mostly up, down, left or right stays exactly that. Only a clearly diagonal drag tilts it diagonally.
+
 ## 2.0.0 (2026-10-24)
 
 The first build of the big overhaul: a new arcade cabinet, made for phones. (A work in progress on staging: the fighters, the other screens and the characters are still to come.)

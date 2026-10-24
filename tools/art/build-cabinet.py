@@ -113,14 +113,21 @@ def joystick() -> None:
     dark = (a[..., :3].max(axis=2) < 70) & (a[..., 3] > 128)
     size, bx, by = 560, 280, 430
     cells = {"ul": (0, 0), "l": (1, 0), "dl": (2, 0), "u": (0, 1), "c": (1, 1), "d": (2, 1)}
-    widths = []
+    def dark_in(r: int, c: int) -> tuple[np.ndarray, np.ndarray]:
+        return np.where(dark[r * H // 3 : (r + 1) * H // 3, c * W // 2 : (c + 1) * W // 2])
+
+    # the base's width, from the stick at rest; a leaning ball can stick out past the base's left
+    # edge, so each base is placed by its right edge, which is always in view
+    ys, xs = dark_in(1, 1)
+    base_w = xs.max() - xs.min() + 1
     frames = {}
     for name, (r, c) in cells.items():
         y0, x0 = r * H // 3, c * W // 2
         cell = a[y0 : (r + 1) * H // 3, x0 : (c + 1) * W // 2]
-        ys, xs = np.where(dark[y0 : (r + 1) * H // 3, x0 : (c + 1) * W // 2])
-        cx, bottom = (xs.min() + xs.max()) // 2, ys.max()
-        widths.append(xs.max() - xs.min() + 1)
+        ys, xs = dark_in(r, c)
+        # (the middle column leans only up and down, so there the base's own middle is exact)
+        cx = (xs.min() + xs.max()) // 2 if c == 1 else xs.max() - base_w // 2
+        bottom = ys.max()
         frame = np.zeros((size, size, 4), np.float32)
         top, left = by - bottom, bx - cx
         ch, cw = cell.shape[:2]
@@ -132,7 +139,7 @@ def joystick() -> None:
         frames[name] = frames[src][:, ::-1]
     for name, frame in frames.items():
         save(frame, f"joystick-{name}.webp")
-    print(f"joystick: frames {size} px square, base centre x {bx}, base bottom y {by}, base {round(np.mean(widths))} px wide")
+    print(f"joystick: frames {size} px square, base centre x {bx}, base bottom y {by}, base {base_w} px wide")
 
 
 def room() -> None:
