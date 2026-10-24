@@ -1,6 +1,6 @@
 # RPS Rivals: Project Context
 
-_Last updated: 2026-10-24_
+_Last updated: 2026-10-24 (handover)_
 
 This is the single source of truth for the project. **Any Claude working on this project: read this file first, and update it whenever a decision is made or something changes.** Keep edits small, add to the decision log, and bump the date above.
 
@@ -40,6 +40,38 @@ New art samples go in `docs/art-direction/` (their source in `sources/art-direct
 - Future plans and roadmap (Claude Doc, editable, made 2026-10-10): https://claude.ai/code/artifact/f1f3ff49-5ab1-4624-8d81-85bf111b8494 (every open decision, balancing thought and planned feature, each with a note on how to proceed, plus the suggested order of work). Tick items off there when they ship.
 - Architecture document: `docs/architecture/ARCHITECTURE.md` (diagrams redrawn with `node sources/architecture/diagrams.mjs`)
 - Online hosting options for step 5: `docs/architecture/ONLINE-OPTIONS.md` (free options compared; recommends a Cloudflare Durable Object)
+
+## Handover: v2 overhaul in progress (2026-10-24)
+
+**Read this first.** The game is mid-way through a big overhaul (v2). The user will go through the remaining work step by step themselves, so wait for their lead rather than pushing ahead.
+
+- **Plan of record:** the v2 overhaul plan (Claude Doc): https://claude.ai/artifact/JUf7K81V6a77gufHZZY2B8. It covers the look, phone fit, the 4-fighter roster with balance numbers, the match-flow redesign plus pacing panel, the asset list, the ChatGPT prompts and the order of work. Decisions made since are in the decision log at the bottom of this file (all 2026-10-24 entries).
+- **Where it is:** **v2.1.0 on staging** (`main`), https://robinneefs.github.io/rps-rivals/staging/. **Live (`production`) is still v1.3.0.** Publish only at the user's word.
+- **Done:**
+  - The new look's reference image is `docs/mockups/v2/0-vibe-fight.webp`: a glossy navy 90s cabinet with a pixel-art game on its screen.
+  - The cabinet is a page layer built from the user's ChatGPT art (`apps/game/src/cabinet/`). It fits upright phones with the browser bars showing and has big touch controls.
+  - The control panel layout and the 9-direction joystick (right side mirrored, dead zone, axis snapping) are approved by the user.
+  - The monitor is 288 x 360 with sharp scaling. The City Rooftop is the only stage.
+- **Art workflow:**
+  1. The user makes art in ChatGPT and uploads it.
+  2. Save the source in `art/source/`.
+  3. Run `python3 tools/art/build-cabinet.py` (Pillow + numpy) to make the game files.
+  - Backgrounds are flat #00FF00 for cabinet parts and #FF00FF for pixel art.
+  - The ChatGPT prompts (setup message, cabinet, marquee, buttons, joystick, room, stage, sprite sheets, portraits, effects) are in the chat history and in the plan doc's prompt section.
+- **Not done yet:**
+  - Sprite sheets for Brawler and Bruiser (prompts 7 and 8): 8 frames of 128 x 128, facing right, about 100 px tall. The fighters are still the old 64 px placeholders.
+  - Portraits and effects (prompts 9 and 10).
+  - Martial artist and Skater: first a line-up image, then their sheets.
+  - The characters in the rules: per-side damage and health in `@rps/core`, the server and protocol, a balance tool and test, a CPU that plays each fighter's best mix, and a select screen.
+  - The match-flow redesign: storyboard it first, then build it, then add a pacing page to the dev tuning panel.
+  - Redesigning the other screens. They were only minimally re-laid out; the user said not to polish them, since all of them get redesigned.
+  - More stages.
+  - Optionally, an installable web app (Add to Home Screen).
+- **Rules that still hold:**
+  - Every build that goes online gets a version bump and a `CHANGELOG.md` entry, using plain x.y.z numbers.
+  - The user has twice asked for changes to go straight to `main`. Before doing that, run lint, format, typecheck, the unit tests, the build and the e2e tests locally.
+  - In the cloud container, e2e needs Playwright pointed at `/opt/pw-browsers/chromium` through a temporary config. Don't commit that config.
+- **Dropped:** Android (2026-10-24). `apps/android` and `play-store/` stay untouched.
 
 ## Where things stand
 
