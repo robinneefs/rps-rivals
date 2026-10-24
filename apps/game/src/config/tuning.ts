@@ -191,6 +191,18 @@ export const tuning = {
     blackoutAlpha: 0.7,
     surgeAlpha: 0.1,
     surgeMs: 50,
+    /**
+     * The art sits recessed in the cabinet (cabinet units, read once at start): a dark seam round
+     * the edge, a shadow cast down by the top bezel, a softer one in from every side, and a
+     * vignette that darkens the corners.
+     */
+    seamPx: 1.5,
+    seamAlpha: 0.6,
+    topShadowPx: 12,
+    topShadowAlpha: 0.75,
+    edgeShadowPx: 14,
+    edgeShadowAlpha: 0.55,
+    vignetteAlpha: 0.35,
   },
   result: { delayAfterMatchMs: 400 },
   /** Online: how long "RIVAL LEFT" and other ending messages stay up before going home; lobby text blink. */
