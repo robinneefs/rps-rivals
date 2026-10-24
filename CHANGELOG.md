@@ -2,6 +2,17 @@
 
 Every build that goes online gets a new version number (in `apps/game/package.json`, shown small on the home screen) and an entry here. Version numbers follow semver: a new feature bumps the middle number (1.0.0 → 1.1.0), a fix-only build bumps the last (1.0.0 → 1.0.1). Each version that goes live is tagged `vX.Y.Z` with a GitHub release, made automatically from its entry here when it reaches the `production` branch.
 
+## 2.0.0 (2026-10-24)
+
+The first build of the big overhaul: a new arcade cabinet, made for phones. (A work in progress on staging: the fighters, the other screens and the characters are still to come.)
+
+- **A new cabinet.** The pixel cabinet is replaced by a painted, glossy 90s cabinet: navy body with red, yellow and blue stripes, a flame-lettered RPS RIVALS marquee that still flickers, a red ball joystick, and big pink, yellow and cyan ROCK, PAPER and SCISSORS buttons. Behind it, a neon arcade room. Only the game on the screen is pixel art now.
+- **Fits your phone.** The cabinet fills the width of an upright phone, even with the browser's address and tool bars showing, keeps clear of the notch and home bar, and refits when the bars slide in or out. On a computer it stands in the middle of the arcade room.
+- **Big touch controls.** The buttons and joystick are much bigger, and each reacts to its whole part of the control panel, so a thumb that lands next to a button still presses it. The buttons press in, your pick glows and the others dim. Drag the joystick in any of 8 directions; it flicks back when you let go.
+- **A bigger, taller screen.** The game screen is now 288 x 360 pixels (was 216 x 216), drawn so every pixel stays sharp and the same size on any screen. The CRT scanlines and glow are still there.
+- **A new stage.** Fights take place on a sunny city rooftop. The old Night Street, Sunny Field and Castle Roof stages are gone for now (they were made for the old screen).
+- **SCALING is gone** from Options: the new cabinet always sizes itself.
+
 ## 1.3.0 (2026-10-17)
 
 - **CPU is CPU again.** In a match against the computer it's called CPU everywhere again: the tags over the fighters, the VS card, "CPU HITS!", the HUD, "CPU WINS" and START GAME, VS CPU on the home menu. RIVAL is now only for online matches, and the ONLINE menu item now says VS RIVAL instead of VS FRIEND.
