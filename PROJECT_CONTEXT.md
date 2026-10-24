@@ -58,10 +58,17 @@ New art samples go in `docs/art-direction/` (their source in `sources/art-direct
   3. Run `python3 tools/art/build-cabinet.py` (Pillow + numpy) to make the game files.
   - Backgrounds are flat #00FF00 for cabinet parts and #FF00FF for pixel art.
   - The ChatGPT prompts (setup message, cabinet, marquee, buttons, joystick, room, stage, sprite sheets, portraits, effects) are in the chat history and in the plan doc's prompt section.
+- **Next session: try PixelLab for the sprite sheets (2026-10-24).** The user is starting a local Claude Code session to connect the PixelLab MCP (cloud sessions can't reach api.pixellab.ai).
+  - **Branch:** this work is on `claude/adoring-allen-ucjlmj`, not yet merged into `main`. Run `git fetch origin` and `git checkout claude/adoring-allen-ucjlmj` first.
+  - **Connect:** the user makes a free account at pixellab.ai and copies their API key. Then, in a terminal (not in a file in the repo): `claude mcp add --transport http pixellab https://api.pixellab.ai/mcp --header "Authorization: Bearer <API key>"`. Restart Claude Code and check `/mcp` lists `pixellab`. Never commit the key.
+  - **Free tier (third-party sources, unconfirmed):** about 40 fast generations, then 5 slow a day. Some tools cost far more than one generation (style-matched ones about 20). Check the balance before big jobs and spend it on a test first.
+  - **The test:** TAIKO only, from `art/source/fighters-lineup.webp` (left fighter): an idle frame and a rock frame, 128 x 128, facing right, about 100 px tall, transparent or #FF00FF background. Compare with what ChatGPT gives for the same frames, then the user decides: PixelLab for the sheets (maybe one paid month, about 12 USD), or stay with ChatGPT plus cleanup.
+  - **Character references:** `art/source/fighters-lineup.webp` is the master for TAIKO (left) and RIOT (right; keep her loose bob, not the buns from the mock-up). `docs/mockups/v2/7-combat-pick.webp` is the combat-screen layout reference. Bruiser: `docs/mockups/v2/0-vibe-fight.webp`.
+  - **Sheet contents per fighter (8 frames):** idle x 2, rock, paper, scissors, hurt, K.O., win.
 - **Not done yet:**
   - Sprite sheets for TAIKO, RIOT and the Bruiser: 8 frames of 128 x 128, facing right, about 100 px tall. The fighters are still the old 64 px placeholders.
   - Portraits and effects (prompts 9 and 10).
-  - Martial artist and Skater: first a line-up image, then their sheets.
+  - Skater: first a line-up image, then the sheet.
   - The characters in the rules: per-side damage and health in `@rps/core`, the server and protocol, a balance tool and test, a CPU that plays each fighter's best mix, and a select screen.
   - The match-flow redesign: storyboard it first, then build it, then add a pacing page to the dev tuning panel.
   - Redesigning the other screens. They were only minimally re-laid out; the user said not to polish them, since all of them get redesigned.
