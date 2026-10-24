@@ -129,6 +129,18 @@ export class CabinetView {
     img(this.root, BODY.src, { ...box(0, 0, BODY.width, BODY.height), pointerEvents: 'none' });
     const marquee = img(this.root, MARQUEE.src, box(MARQUEE.x, MARQUEE.y, MARQUEE.width, MARQUEE.height));
     this.flickerMarquee(marquee);
+    // shade over the art, so it looks set into the cabinet rather than pasted on
+    const m = tuning.marquee;
+    el('div', this.root, {
+      ...box(MARQUEE.x, MARQUEE.y, MARQUEE.width, MARQUEE.height),
+      pointerEvents: 'none',
+      boxShadow: [
+        `inset 0 0 0 ${m.seamPx}px rgba(0,0,0,${m.seamAlpha})`,
+        `inset 0 ${m.topShadowPx}px ${m.topShadowPx}px -${m.topShadowPx / 2}px rgba(0,0,0,${m.topShadowAlpha})`,
+        `inset 0 0 ${m.edgeShadowPx}px rgba(0,0,0,${m.edgeShadowAlpha})`,
+      ].join(', '),
+      background: `radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,${m.vignetteAlpha}) 100%)`,
+    });
 
     // the joystick: nine frames with the base in the same spot, one showing
     // drawn over everything else on the cabinet: the screen, the buttons and their glow

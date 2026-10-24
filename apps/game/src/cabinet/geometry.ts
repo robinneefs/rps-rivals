@@ -11,10 +11,10 @@ export const BODY = { width: 941, height: 2372, src: 'assets/cabinet/body.webp' 
 export const SCREEN = { x: 162, y: 322, width: 616, height: 767 } as const;
 
 export const MARQUEE = {
-  x: 104,
-  y: 44,
-  width: 733,
-  height: 165,
+  x: 101,
+  y: 43,
+  width: 739,
+  height: 180,
   src: 'assets/cabinet/marquee.webp',
 } as const;
 

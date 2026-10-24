@@ -20,7 +20,7 @@ STAGES = ROOT / "apps" / "game" / "public" / "assets" / "stages"
 
 # the body image's screen opening (magenta in the source) and empty marquee box, in cabinet units
 SCREEN = (162, 322, 616, 767)
-MARQUEE_BOX = (104, 44, 733, 165)
+MARQUEE_BOX = (101, 43, 739, 180)
 # how far the base is drawn on below the image, so tall phones never show the room under the cabinet
 BASE_EXTRA = 700
 BODY_SCALE = 2
