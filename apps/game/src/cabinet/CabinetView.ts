@@ -131,12 +131,14 @@ export class CabinetView {
     this.flickerMarquee(marquee);
 
     // the joystick: nine frames with the base in the same spot, one showing
-    const js = JOYSTICK.frame.size * JOYSTICK.scale;
-    const jx = JOYSTICK.x - JOYSTICK.frame.base.x * JOYSTICK.scale;
-    const jy = JOYSTICK.bottomY - JOYSTICK.frame.base.y * JOYSTICK.scale;
+    // drawn over everything else on the cabinet: the screen, the buttons and their glow
+    const js = JOYSTICK.baseWidth / JOYSTICK.frame.baseWidth;
+    const jx = JOYSTICK.x - JOYSTICK.frame.base.x * js;
+    const jy = JOYSTICK.baseBottomY - JOYSTICK.frame.base.y * js;
     for (const name of Object.values(STICK_FRAME)) {
       const frame = img(this.root, `assets/cabinet/joystick-${name}.webp`, {
-        ...box(jx, jy, js, js),
+        ...box(jx, jy, JOYSTICK.frame.size * js, JOYSTICK.frame.size * js),
+        zIndex: '10',
         visibility: name === 'c' ? 'visible' : 'hidden',
       });
       this.sticks.set(name, frame);
@@ -320,7 +322,12 @@ export class CabinetView {
     zone.addEventListener('pointermove', (e) => {
       if (!start) return;
       this.handlers.stick(
-        stickDirection(e.clientX - start.x, e.clientY - start.y, tuning.joystick.dragDeadzonePx),
+        stickDirection(
+          e.clientX - start.x,
+          e.clientY - start.y,
+          tuning.joystick.dragDeadzonePx,
+          tuning.joystick.axisSnapDeg,
+        ),
       );
     });
     zone.addEventListener('pointerup', end);

@@ -119,10 +119,12 @@ export const tuning = {
     shineStaggerMs: 110,
   },
   /**
-   * Joystick: a drag of dragDeadzonePx (CSS pixels) tilts it; let go, it springs back after
-   * springBackMs, flicks the other way for wobbleMs, and settles.
+   * Joystick: a drag must go dragDeadzonePx (CSS pixels) before it tilts at all; within
+   * axisSnapDeg of straight up, down, left or right it stays on that axis (no accidental
+   * diagonals). Let go, it springs back after springBackMs, flicks the other way for wobbleMs,
+   * and settles.
    */
-  joystick: { springBackMs: 90, dragDeadzonePx: 14, wobbleMs: 60 },
+  joystick: { springBackMs: 90, dragDeadzonePx: 18, axisSnapDeg: 30, wobbleMs: 60 },
   idle: { breatheEveryMs: 420 },
   intro: { fadeInMs: 500, holdMs: 1500, fadeOutMs: 500, fadeSteps: 4 },
   /** Screen changes: the CRT closes to a line (closeMs), the line shrinks to a dot (lineMs), it stays off (offMs), then back on; a frame every stepMs. */

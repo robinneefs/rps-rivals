@@ -44,11 +44,11 @@ export const BUTTON = {
 /** The joystick frames: the base is in the same spot in all nine, at `base` (file pixels). */
 export const JOYSTICK = {
   x: 225,
-  /** Where the bottom of the crop used in the approved preview lands. */
-  bottomY: 1306,
-  frame: { size: 598, base: { x: 299, y: 478 } },
-  /** Units per file pixel. */
-  scale: 0.645,
+  /** The bottom edge of the base, and its width (as approved in the preview, 2026-10-24). */
+  baseBottomY: 1271,
+  baseWidth: 151,
+  /** The art: square frames, the base's centre and bottom edge at `base`, `baseWidth` across. */
+  frame: { size: 560, base: { x: 280, y: 430 }, baseWidth: 245 },
 } as const;
 
 /** Tap zones: the whole control panel, split between the joystick and the three buttons. */
@@ -84,21 +84,22 @@ export function fitCabinet(area: { x: number; y: number; width: number; height: 
   };
 }
 
-/** The joystick direction for a drag of (dx, dy) CSS pixels: 8 ways, nothing inside the deadzone. */
-export function stickDirection(dx: number, dy: number, deadzone: number): { x: -1 | 0 | 1; y: -1 | 0 | 1 } {
+/**
+ * The joystick direction for a drag of (dx, dy) CSS pixels. Nothing inside the deadzone; past it,
+ * within axisSnapDeg of straight up, down, left or right counts as that direction alone, so an
+ * up swipe that leans a little never turns into up-left. Only a clearly diagonal drag is diagonal.
+ */
+export function stickDirection(
+  dx: number,
+  dy: number,
+  deadzone: number,
+  axisSnapDeg: number,
+): { x: -1 | 0 | 1; y: -1 | 0 | 1 } {
   if (Math.hypot(dx, dy) < deadzone) return { x: 0, y: 0 };
-  // eight 45 degree slices, centred on the axes and the diagonals
-  const slice = Math.round(Math.atan2(dy, dx) / (Math.PI / 4));
-  const dirs: [number, number][] = [
-    [1, 0],
-    [1, 1],
-    [0, 1],
-    [-1, 1],
-    [-1, 0],
-    [-1, -1],
-    [0, -1],
-    [1, -1],
-  ];
-  const [x, y] = dirs[((slice % 8) + 8) % 8]!;
-  return { x: x as -1 | 0 | 1, y: y as -1 | 0 | 1 };
+  const sign = (v: number) => (v > 0 ? 1 : -1) as -1 | 1;
+  // angle from the nearest horizontal, 0 (flat) to 90 (straight up or down)
+  const fromFlat = (Math.atan2(Math.abs(dy), Math.abs(dx)) * 180) / Math.PI;
+  if (fromFlat < axisSnapDeg) return { x: sign(dx), y: 0 };
+  if (fromFlat > 90 - axisSnapDeg) return { x: 0, y: sign(dy) };
+  return { x: sign(dx), y: sign(dy) };
 }

@@ -41,16 +41,23 @@ describe('fitCabinet', () => {
 });
 
 describe('stickDirection', () => {
+  const dir = (dx: number, dy: number) => stickDirection(dx, dy, 18, 30);
+
   it('does nothing inside the deadzone', () => {
-    expect(stickDirection(3, -4, 10)).toEqual({ x: 0, y: 0 });
+    expect(dir(10, -12)).toEqual({ x: 0, y: 0 });
   });
 
-  it('snaps to the 8 directions', () => {
-    expect(stickDirection(20, 0, 10)).toEqual({ x: 1, y: 0 });
-    expect(stickDirection(0, -20, 10)).toEqual({ x: 0, y: -1 });
-    expect(stickDirection(-20, 18, 10)).toEqual({ x: -1, y: 1 });
-    expect(stickDirection(-20, 3, 10)).toEqual({ x: -1, y: 0 });
-    expect(stickDirection(15, -16, 10)).toEqual({ x: 1, y: -1 });
+  it('snaps to straight directions and diagonals', () => {
+    expect(dir(30, 0)).toEqual({ x: 1, y: 0 });
+    expect(dir(0, -30)).toEqual({ x: 0, y: -1 });
+    expect(dir(-25, 25)).toEqual({ x: -1, y: 1 });
+    expect(dir(22, -20)).toEqual({ x: 1, y: -1 });
+  });
+
+  it('a swipe that leans a little stays on its axis', () => {
+    // 25 degrees off straight up / straight left: no diagonal
+    expect(dir(13, -28)).toEqual({ x: 0, y: -1 });
+    expect(dir(-28, 13)).toEqual({ x: -1, y: 0 });
   });
 });
 

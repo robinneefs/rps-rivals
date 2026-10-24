@@ -103,29 +103,36 @@ def buttons() -> None:
 
 
 def joystick() -> None:
+    """
+    The source has two columns: up-left / left / down-left, and up / centre / down. The right-hand
+    directions are the left ones mirrored, so both sides look exactly alike. Every frame puts the
+    base's centre and bottom edge on the same point, so swapping frames only moves the stick.
+    """
     a = key_green(rgba(SRC / "joystick.webp"))
-    n = a.shape[0] // 3
+    H, W = a.shape[:2]
     dark = (a[..., :3].max(axis=2) < 70) & (a[..., 3] > 128)
-    cells = {(r, c): (r * n, c * n) for r in range(3) for c in range(3)}
-    ref = dark[n : 2 * n, n : 2 * n][::2, ::2]
-    ys, xs = np.where(dark[n : 2 * n, n : 2 * n])
-    base_bottom, base_cx = ys.max(), round((xs.min() + xs.max()) / 2)
-    names = {(0, 0): "ul", (0, 1): "u", (0, 2): "ur", (1, 0): "l", (1, 1): "c", (1, 2): "r", (2, 0): "dl", (2, 1): "d", (2, 2): "dr"}
-    pad = 90
-    for (r, c), (y0, x0) in cells.items():
-        m = dark[y0 : y0 + n, x0 : x0 + n][::2, ::2]
-        best, shift = -1, (0, 0)
-        for dy in range(-40, 41):
-            for dx in range(-40, 41):
-                score = np.count_nonzero(np.roll(m, (dy, dx), axis=(0, 1)) & ref)
-                if score > best:
-                    best, shift = score, (dy, dx)
-        dy, dx = shift[0] * 2, shift[1] * 2
-        print(f"  {names[(r, c)]:>2}: moved {dx:+d}, {dy:+d}")
-        cell = np.zeros((n + 2 * pad, n + 2 * pad, 4), np.float32)
-        cell[pad + dy : pad + dy + n, pad + dx : pad + dx + n] = a[y0 : y0 + n, x0 : x0 + n]
-        save(cell, f"joystick-{names[(r, c)]}.webp")
-    print(f"joystick: frames {n + 2 * pad} px square, base centre x {base_cx + pad}, base bottom y {base_bottom + pad}")
+    size, bx, by = 560, 280, 430
+    cells = {"ul": (0, 0), "l": (1, 0), "dl": (2, 0), "u": (0, 1), "c": (1, 1), "d": (2, 1)}
+    widths = []
+    frames = {}
+    for name, (r, c) in cells.items():
+        y0, x0 = r * H // 3, c * W // 2
+        cell = a[y0 : (r + 1) * H // 3, x0 : (c + 1) * W // 2]
+        ys, xs = np.where(dark[y0 : (r + 1) * H // 3, x0 : (c + 1) * W // 2])
+        cx, bottom = (xs.min() + xs.max()) // 2, ys.max()
+        widths.append(xs.max() - xs.min() + 1)
+        frame = np.zeros((size, size, 4), np.float32)
+        top, left = by - bottom, bx - cx
+        ch, cw = cell.shape[:2]
+        sy0, sx0 = max(0, -top), max(0, -left)
+        sy1, sx1 = min(ch, size - top), min(cw, size - left)
+        frame[top + sy0 : top + sy1, left + sx0 : left + sx1] = cell[sy0:sy1, sx0:sx1]
+        frames[name] = frame
+    for name, src in {"ur": "ul", "r": "l", "dr": "dl"}.items():
+        frames[name] = frames[src][:, ::-1]
+    for name, frame in frames.items():
+        save(frame, f"joystick-{name}.webp")
+    print(f"joystick: frames {size} px square, base centre x {bx}, base bottom y {by}, base {round(np.mean(widths))} px wide")
 
 
 def room() -> None:
