@@ -65,6 +65,15 @@ New art samples go in `docs/art-direction/` (their source in `sources/art-direct
   - **The test:** TAIKO only, from `art/source/fighters-lineup.webp` (left fighter): an idle frame and a rock frame, 128 x 128, facing right, about 100 px tall, transparent or #FF00FF background. Compare with what ChatGPT gives for the same frames, then the user decides: PixelLab for the sheets (maybe one paid month, about 12 USD), or stay with ChatGPT plus cleanup.
   - **Character references:** `art/source/fighters-lineup.webp` is the master for TAIKO (left) and RIOT (right; keep her loose bob, not the buns from the mock-up). `docs/mockups/v2/7-combat-pick.webp` is the combat-screen layout reference. Bruiser: `docs/mockups/v2/0-vibe-fight.webp`.
   - **Sheet contents per fighter (8 frames):** idle x 2, rock, paper, scissors, hurt, K.O., win.
+  - **Outcome (2026-10-24): paused.** The user wasn't happy with the results and went back to ChatGPT. They subscribed to PixelLab Tier 1 (2000 generations a month, renews 2026-11-24, about 1868 left). The files are in `art/pixellab-test/`, plus the stage in `art/source/pixellab/stage-rooftop.png` and a per-piece prompt sheet in `art/pixellab-prompts.md`. Best result: `art/pixellab-test/combat-screen-v4-288x360.png`.
+  - **What was learned:**
+    - Putting pieces together loses nothing. Every pixel in the composites is identical to what PixelLab delivered, so messy pixels come from the generator, not from assembly.
+    - Shrinking the ChatGPT art (resized, `image_to_pixelart`, or `unzoom_image`) always looks like a scaled-down picture: thousands of colours and almost every pixel a lone one.
+    - PixelLab's Pro model drawing from scratch (with the line-up only as a design reference) gives real pixel art. But it's still speckled: about 22% lone pixels, broken outlines and near-duplicate colours. TAIKO came out at 116 px tall and RIOT at 118, not 100.
+    - Pro jobs with a transparent background can sit at about 60% for half an hour before finishing. Cancelled jobs aren't charged.
+    - Reference images make Pro copy their framing: it cut off the HUD, and copied padding as white frames or streaks. A stage with a fixed `palette` plus `max_colors` and no references came out cleanest (13 flat colours), but it ignored the requested layout.
+    - AI-drawn text always came out broken ("CRU", cut-off names). Keep text, numbers, health bars, round dots and YOU/CPU markers out of the art; the game already draws them in code with its pixel font.
+    - PixelLab's `correct_pixelart` smeared a finished picture (61 to 21,000 colours), and `inpaint_image` redrew the text it was asked to remove.
 - **Not done yet:**
   - Sprite sheets for TAIKO, RIOT and the Bruiser: 8 frames of 128 x 128, facing right, about 100 px tall. The fighters are still the old 64 px placeholders.
   - Portraits and effects (prompts 9 and 10).
