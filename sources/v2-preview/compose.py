@@ -33,14 +33,14 @@ btn=[bt.crop((c-180,120,c+180,390)) for c in (293,767,1245)]
 lab=[bt.crop((c-210,810,c+210,910)) for c in (291,768,1247)]
 BW=148
 bwid=BW*S
-for i,cx in enumerate((382,562,742)):
+for i,cx in enumerate((395,555,715)):
     b=btn[i]; b=b.resize((bwid,round(b.height*bwid/b.width)),Image.LANCZOS)
     cab.alpha_composite(b,(cx*S-bwid//2,1258*S-b.height))
     l=lab[i]; lw=round(l.width*bwid/360*0.62); l=l.resize((lw,round(l.height*lw/l.width)),Image.LANCZOS)
     cab.alpha_composite(l,(cx*S-lw//2,1258*S))
 jy=key(Image.open(I+'5.webp')).crop((418+30,418+40,836-30,836-30))
 jw=round(150/0.65)*S; jy=jy.resize((jw,round(jy.height*jw/jy.width)),Image.LANCZOS)
-cab.alpha_composite(jy,(203*S-jw//2,1306*S-jy.height))
+cab.alpha_composite(jy,(225*S-jw//2,1306*S-jy.height))
 cab.save('scratchpad/cabinet-full.png')
 room=Image.open(I+'6.webp').convert('RGB')
 def phone(Wc,Hc,name):
