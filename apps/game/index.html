@@ -42,16 +42,17 @@
         -webkit-user-select: none;
         user-select: none;
       }
-      #game,
+      /* the cabinet (cabinet/CabinetView.ts) is painted art, scaled smoothly; the game canvas in
+         its screen is shrunk from a whole-number blow-up of the pixel art, smoothly too */
+      #cabinet img {
+        -webkit-touch-callout: none;
+      }
       #game canvas {
         display: block;
-        image-rendering: pixelated;
-        image-rendering: crisp-edges;
       }
     </style>
   </head>
   <body>
-    <div id="game"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

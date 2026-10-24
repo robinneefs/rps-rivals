@@ -4,10 +4,11 @@ import { FONT_SIZES, Tex } from '../assets/keys';
 import { generatePlaceholders } from '../assets/placeholders';
 import { registerPixelFont } from '../assets/pixelFont';
 import { palette } from '../config/palette';
+import { STAGES, stageTexture } from '../config/stages';
 import { getContext } from './context';
 import { SceneKey } from './keys';
 
-/** Loads assets (with a pixel loading bar), builds placeholder art and fonts, then starts the cabinet. */
+/** Loads assets (with a pixel loading bar), builds placeholder art and fonts, then starts the logo. */
 export class BootScene extends Phaser.Scene {
   constructor() {
     super(SceneKey.boot);
@@ -28,7 +29,7 @@ export class BootScene extends Phaser.Scene {
     });
     // Real art: load sprite sheets here under the keys in assets/keys.ts; their placeholders are then skipped.
     this.load.image(Tex.logo, 'assets/logo.png');
-    this.load.image(Tex.marquee, 'assets/marquee.png');
+    for (const stage of STAGES) if (stage.image) this.load.image(stageTexture(stage.id), stage.image);
     // sound effects and music (made by tools/audio/make-audio.mjs)
     for (const { key, urls } of audioFiles()) this.load.audio(key, urls);
   }
@@ -36,7 +37,6 @@ export class BootScene extends Phaser.Scene {
   create(): void {
     for (const size of FONT_SIZES) registerPixelFont(this, size);
     generatePlaceholders(this);
-    this.scene.launch(SceneKey.cabinet);
     this.scene.launch(SceneKey.transition);
     getContext(this).flow.toLogo();
     this.scene.stop();

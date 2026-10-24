@@ -11,8 +11,8 @@ export const tuning = {
     badgePopMs: 200,
     badgePopFromPx: 10,
     badgeOutPx: 48,
-    badgeY: 104,
-    clashY: 76,
+    badgeY: 216,
+    clashY: 150,
     flyAtMs: 300,
     loserFlyMs: 480,
     loserSpinMs: 70,
@@ -24,8 +24,8 @@ export const tuning = {
      * ("YOU HIT!", "RIVAL HITS!") at verdictY, both in the winner's colour. A tie: "CLASH!" and
      * "NO DAMAGE". While the badges fly each carries its owner's name, ownerGapPx above it.
      */
-    ruleY: 32,
-    verdictY: 42,
+    ruleY: 74,
+    verdictY: 86,
     hitLineDelayMs: 140,
     ownerGapPx: 10,
     /** The damage number hops up damageHopPx, then falls damageFallPx over damageFallMs. */
@@ -110,7 +110,6 @@ export const tuning = {
    */
   /** Buttons: press and lock-in timings; a glint sweeps them every shineGapMs (frames shineFrameMs apart). */
   buttons: {
-    pressDepthPx: 6,
     releaseMs: 80,
     lockFlashes: 2,
     lockFlashMs: 45,
@@ -119,8 +118,11 @@ export const tuning = {
     shineFrameMs: 50,
     shineStaggerMs: 110,
   },
-  /** Joystick: on release it springs back, overshoots by `wobble` of a full tilt, and settles (wobbleMs a step). */
-  joystick: { springBackMs: 90, tiltPx: { x: 9, y: 6 }, dragDeadzonePx: 6, wobble: 0.35, wobbleMs: 60 },
+  /**
+   * Joystick: a drag of dragDeadzonePx (CSS pixels) tilts it; let go, it springs back after
+   * springBackMs, flicks the other way for wobbleMs, and settles.
+   */
+  joystick: { springBackMs: 90, dragDeadzonePx: 14, wobbleMs: 60 },
   idle: { breatheEveryMs: 420 },
   intro: { fadeInMs: 500, holdMs: 1500, fadeOutMs: 500, fadeSteps: 4 },
   /** Screen changes: the CRT closes to a line (closeMs), the line shrinks to a dot (lineMs), it stays off (offMs), then back on; a frame every stepMs. */

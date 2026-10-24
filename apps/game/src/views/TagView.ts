@@ -9,7 +9,7 @@ import { PixelText } from './PixelText';
 
 const SIDES = ['p1', 'p2'] as const;
 /** Just above the fighters' heads: the name, the arrow under it, and the pick chip on top (y = its top edge). */
-const TAG = { nameY: 93, arrowY: 101, chipY: 73, chipLowY: 91 } as const;
+const TAG = { nameY: 231, arrowY: 239, chipY: 211, chipLowY: 229 } as const;
 
 /**
  * Over each fighter's head: a "YOU" / "RIVAL" tag in the side's colour with an arrow pointing down

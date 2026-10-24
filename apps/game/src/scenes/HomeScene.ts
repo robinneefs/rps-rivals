@@ -25,12 +25,12 @@ export class HomeScene extends Phaser.Scene {
     lights.select(null);
     const cx = MONITOR.width / 2;
     addMenuBackdrop(this);
-    new FighterView(this, 'p1', 46, 206);
-    new FighterView(this, 'p2', 170, 206);
+    new FighterView(this, 'p1', 84, 318);
+    new FighterView(this, 'p2', 204, 318);
 
     // the Android app gets QUIT; the items then sit a little closer so the fighters stay clear
     const quit = isNativeApp() ? quitApp : undefined;
-    const menu = new MenuView(this, homeMenu(flow, quit), 14, input, audio, undefined, quit ? 2 : undefined);
+    const menu = new MenuView(this, homeMenu(flow, quit), 70, input, audio, undefined, quit ? 2 : undefined);
     this.add.rectangle(0, menu.bottom + 5, MONITOR.width, 13, palette.panel).setOrigin(0);
     new PixelText(this, cx, menu.bottom + 8, 'STICK MOVES - BUTTON SELECTS', {
       color: palette.lilac,

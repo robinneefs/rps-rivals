@@ -2,15 +2,6 @@ import type Phaser from 'phaser';
 import { css, fighterColors, palette } from '../../config/palette';
 import { STAGES, stageTexture } from '../../config/stages';
 import { FighterFrames, Tex } from '../keys';
-import {
-  BUTTON_FRAME,
-  BUTTON_RING,
-  paintButtonRings,
-  paintButtons,
-  paintCabinet,
-  paintJoystickBall,
-  paintRoomTile,
-} from './cabinet';
 import { FIGHTER_FRAME, paintFighter } from './fighters';
 import { BADGE, PICK_CHIP, paintBadges, paintPickChips } from './icons';
 import { paintKoLetters } from './koLetters';
@@ -33,40 +24,10 @@ export function generatePlaceholders(scene: Phaser.Scene): void {
     tex.refresh();
   };
 
-  add(Tex.room, paintRoomTile());
-  add(Tex.cabinet, paintCabinet());
   add(Tex.menuBackdrop, paintMenuBackdrop());
   add(Tex.menuStripes, paintMenuStripes());
-  for (const stage of STAGES) add(stageTexture(stage.id), stage.paint());
-  add(Tex.joystickBall, paintJoystickBall());
+  for (const stage of STAGES) if (stage.paint) add(stageTexture(stage.id), stage.paint());
   add(Tex.koLetters, paintKoLetters());
-  add(Tex.buttons, paintButtons(), (tex) => {
-    (['rock', 'paper', 'scissors'] as const).forEach((m, row) =>
-      BUTTON_FRAME.states.forEach((state, i) =>
-        tex.add(
-          `${m}-${state}`,
-          0,
-          i * BUTTON_FRAME.width,
-          row * BUTTON_FRAME.height,
-          BUTTON_FRAME.width,
-          BUTTON_FRAME.height,
-        ),
-      ),
-    );
-  });
-  add(Tex.buttonRings, paintButtonRings(), (tex) => {
-    (['rock', 'paper', 'scissors'] as const).forEach((m, row) => {
-      for (let f = 0; f < BUTTON_RING.frames; f++)
-        tex.add(
-          `${m}-${f}`,
-          0,
-          f * BUTTON_RING.width,
-          row * BUTTON_RING.height,
-          BUTTON_RING.width,
-          BUTTON_RING.height,
-        );
-    });
-  });
   add(Tex.badges, paintBadges(), (tex) =>
     BADGE.moves.forEach((m, row) =>
       BADGE.states.forEach((state, i) =>
