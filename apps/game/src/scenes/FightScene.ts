@@ -47,7 +47,7 @@ export class FightScene extends Phaser.Scene {
     const tags = new TagView(this, names);
     const hud = new HudView(this, hudNames(session, setup), session.rules.startHealth);
     const clash = new ClashView(this, names, session.me);
-    const banner = new BannerView(this, 64);
+    const banner = new BannerView(this, 124);
     /** Online, the rival left or the connection dropped: the match is over without a result. */
     let endedEarly = false;
 

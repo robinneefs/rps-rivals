@@ -378,7 +378,7 @@ export class LobbyScene extends Phaser.Scene {
    * follows window resizes and is removed with the scene.
    */
   private codeField(x: number, y: number, w: number, h: number): HTMLInputElement {
-    const { scaler } = getContext(this);
+    const { cabinet } = getContext(this);
     const field = document.createElement('input');
     Object.assign(field, {
       type: 'text',
@@ -408,17 +408,16 @@ export class LobbyScene extends Phaser.Scene {
       cursor: 'pointer',
     } satisfies Partial<CSSStyleDeclaration>);
     const place = () => {
-      const l = scaler.layout;
-      const zoom = scaler.zoom;
-      const canvas = this.game.canvas.getBoundingClientRect();
-      field.style.left = `${canvas.left + window.scrollX + (l.cabinetX + MONITOR.x + x) * zoom}px`;
-      field.style.top = `${canvas.top + window.scrollY + (l.cabinetY + MONITOR.y + y) * zoom}px`;
-      field.style.width = `${w * zoom}px`;
-      field.style.height = `${h * zoom}px`;
+      const at = cabinet.monitorToPage(x, y);
+      const k = cabinet.monitorScale;
+      field.style.left = `${at.x}px`;
+      field.style.top = `${at.y}px`;
+      field.style.width = `${w * k}px`;
+      field.style.height = `${h * k}px`;
     };
     place();
     document.body.appendChild(field);
-    const off = scaler.onChange(place);
+    const off = cabinet.onResize(place);
     // on a desktop the keys type straight away; a phone opens its keyboard when the boxes are tapped
     if (window.matchMedia('(pointer: fine)').matches) field.focus({ preventScroll: true });
     this.events.once('shutdown', () => {

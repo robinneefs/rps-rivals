@@ -5,8 +5,8 @@ import { tuning } from '../config/tuning';
  * CRT look for the monitor: a WebGL post-effect on each monitor camera. Bright colours bleed a
  * soft glow into their neighbours (phosphor bloom), the edges darken (vignette), the corners round
  * off like curved glass, and a faint bright band rolls slowly down the screen. It works on whole
- * native pixels, so the pixel art itself is never warped or blurred. Fine scanlines are drawn
- * by a CSS overlay at device resolution (see CrtOverlay), since the canvas is at native size.
+ * monitor pixels, so the pixel art itself is never warped or blurred. Fine scanlines are drawn
+ * by an overlay at device resolution (see CrtOverlay).
  */
 const FRAG = `
 #define SHADER_NAME RPS_CRT_FS
@@ -23,6 +23,8 @@ uniform float uRoll;
 uniform float uCrt;
 uniform float uSplit;
 uniform float uWarp;
+// canvas pixels per monitor pixel (the cameras zoom in by this much)
+uniform float uPixel;
 
 varying vec2 outTexCoord;
 
@@ -32,12 +34,12 @@ void main() {
     gl_FragColor = texture2D(uMainSampler, outTexCoord);
     return;
   }
-  vec2 px = 1.0 / uResolution;
+  vec2 px = uPixel / uResolution;
 
   // impact warp: rows wobble sideways in whole pixels, a rippling band of them
   vec2 uv = outTexCoord;
   if (uWarp > 0.0) {
-    float row = floor(local.y * uViewport.w);
+    float row = floor(local.y * uViewport.w / uPixel);
     uv.x += floor(uWarp * sin(row * 0.35 + uTime * 60.0) + 0.5) * px.x;
   }
   vec4 base = texture2D(uMainSampler, uv);
@@ -106,6 +108,7 @@ export class CrtPipeline extends Phaser.Renderer.WebGL.Pipelines.PostFXPipeline 
     this.set1f('uCrt', screenFx.crt ? 1 : 0);
     this.set1f('uSplit', screenFx.split);
     this.set1f('uWarp', screenFx.warp);
+    this.set1f('uPixel', cam?.zoom ?? 1);
     this.bindAndDraw(target);
   }
 }

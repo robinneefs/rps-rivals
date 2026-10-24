@@ -10,13 +10,13 @@ import { shade } from '../assets/placeholders/PixelBuffer';
 import { frameRect } from '../util/gfx';
 import { PixelText } from './PixelText';
 
-const BAR = { y: 6, w: 88, h: 12, inset: 6 } as const;
+const BAR = { y: 6, w: 116, h: 12, inset: 6 } as const;
 const PIP = { y: 23, size: 5, gap: 3 } as const;
 /** Where the timer's first second is centred; later seconds drift down from here. */
 const TIMER = { x: MONITOR.width / 2, y: 15 } as const;
 const MAX_FONT = 7;
 /** "PICK YOUR MOVE" sits on the floor under the fighters, the arrows to the buttons below it. */
-const PROMPT = { y: 186, arrowsY: 204 } as const;
+const PROMPT = { y: 326, arrowsY: 343 } as const;
 
 interface BarState {
   shown: number; // what the bar shows now (animates toward the target)

@@ -1,28 +1,11 @@
-// Fixed pixel geometry of the arcade cabinet (native pixels, decided 2026-10-10).
-export const CABINET = { width: 270, height: 472 } as const;
-
 /**
- * The monitor inside the cabinet: every monitor scene draws in this 216 x 216 space.
- * Experiment (rebrand branch): square screen; the 72 px it gives up went to the marquee above it.
+ * The monitor: every monitor scene draws in this 288 x 360 space (4:5, v2.0). The cabinet round it
+ * is a page layer now, laid out in cabinet/geometry.ts.
  */
-export const MONITOR = { x: 27, y: 116, width: 216, height: 216 } as const;
-
-/** The marquee band at the top of the cabinet: its art (assets/marquee.png) sits in `art`, with a bezel all around it. */
-export const MARQUEE = { y: 0, height: 104, art: { x: 18, y: 13, width: 234, height: 78 } } as const;
-
-export const PANEL = { y: 344, height: 128 } as const;
-
-/** Cabinet buttons (centre x) and joystick on the control panel, in cabinet pixels. */
-export const BUTTONS = {
-  y: PANEL.y + 50,
-  x: { rock: 112, paper: 170, scissors: 228 },
-  radius: { x: 22, y: 15 },
-} as const;
-
-export const JOYSTICK = { x: 44, y: PANEL.y + 58 } as const;
+export const MONITOR = { width: 288, height: 360 } as const;
 
 /** Where the fighters stand on the monitor. */
 export const STAGE = {
-  floorY: 180,
-  fighterX: { p1: 84, p2: 132 },
+  floorY: 318,
+  fighterX: { p1: 120, p2: 168 },
 } as const;

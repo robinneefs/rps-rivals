@@ -4,26 +4,23 @@ import { useScreenShader } from '../fx/crt';
 import { getContext } from './context';
 
 /**
- * Places a scene's main camera over the cabinet's monitor, so the scene draws in its own
- * 216 x 216 space wherever the cabinet sits in the window. Follows window resizes and the
- * cabinet shake.
+ * Sets a scene's main camera up for the monitor: the scene draws in its own 288 x 360 space, and
+ * the camera blows each pixel up to the cabinet's render scale (see CabinetView.renderScale).
+ * Follows window resizes.
  */
 export function useMonitorCamera(scene: Phaser.Scene): Phaser.Cameras.Scene2D.Camera {
-  const { scaler, cabinetShake } = getContext(scene);
+  const { cabinet } = getContext(scene);
   const cam = scene.cameras.main;
   const place = () => {
-    const l = scaler.layout;
-    const o = cabinetShake.offset;
-    cam.setViewport(
-      l.cabinetX + MONITOR.x + o.x,
-      l.cabinetY + MONITOR.y + o.y,
-      MONITOR.width,
-      MONITOR.height,
-    );
+    const k = cabinet.renderScale;
+    cam
+      .setViewport(0, 0, MONITOR.width * k, MONITOR.height * k)
+      .setOrigin(0)
+      .setZoom(k);
   };
   place();
   useScreenShader(cam);
-  const offs = [scaler.onChange(place), cabinetShake.onMove(place)];
-  scene.events.once('shutdown', () => offs.forEach((off) => off()));
+  const off = cabinet.onResize(place);
+  scene.events.once('shutdown', off);
   return cam;
 }

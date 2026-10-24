@@ -6,7 +6,7 @@ declare global {
     __rps: {
       scenes: () => string[];
       phase: () => string | null;
-      scale: () => number;
+      renderScale: () => number;
       music: () => string | null;
       version: string;
     };
@@ -15,7 +15,6 @@ declare global {
 
 const scenes = (page: Page) => page.evaluate(() => window.__rps.scenes());
 const phase = (page: Page) => page.evaluate(() => window.__rps.phase());
-const scale = (page: Page) => page.evaluate(() => window.__rps.scale());
 
 /**
  * A fake clock that only moves when the test runs it. A plain install() also lets real time flow,
@@ -98,38 +97,32 @@ test('buttons mashed while the game is still loading never freeze it', async ({ 
   expect(errors).toEqual([]);
 });
 
-test('scaling fills the height by default; options switches it and remembers', async ({ page }) => {
+test('the cabinet fits an upright phone and its buttons work by touch', async ({ browser }) => {
+  // an iPhone with Safari's bars showing
+  const ctx = await browser.newContext({
+    viewport: { width: 390, height: 664 },
+    deviceScaleFactor: 3,
+    hasTouch: true,
+    isMobile: true,
+  });
+  const page = await ctx.newPage();
   await pausedClock(page);
   await page.goto('http://localhost:5174/');
   await untilScene(page, 'Logo');
-  await page.keyboard.press('Digit1'); // skip the logo
+
+  // the whole screen and control panel are on the page
+  const screen = await page.locator('#game').boundingBox();
+  const rock = await page.locator('[data-button="rock"]').boundingBox();
+  expect(screen && rock).toBeTruthy();
+  expect(screen!.x).toBeGreaterThanOrEqual(0);
+  expect(screen!.x + screen!.width).toBeLessThanOrEqual(390);
+  expect(rock!.y + rock!.height).toBeLessThanOrEqual(664 + 1);
+  expect(await page.evaluate(() => window.__rps.renderScale())).toBe(3);
+
+  // a tap on the ROCK part of the panel is a button press (skips the logo)
+  await page.touchscreen.tap(rock!.x + rock!.width / 2, rock!.y + rock!.height / 2);
   await untilScene(page, 'Home');
-  expect(await scale(page)).toBeCloseTo(1000 / 472, 3); // 600 x 1000 window: fills the height
-
-  await page.keyboard.press('ArrowDown'); // ONLINE
-  await page.keyboard.press('ArrowDown'); // HOW TO PLAY
-  await page.keyboard.press('ArrowDown'); // OPTIONS
-  await page.keyboard.press('Enter');
-  await untilScene(page, 'Options');
-
-  await page.keyboard.press('Enter'); // SCALING: FILL HEIGHT -> PIXEL PERFECT
-  await run(page, 100);
-  expect(await scale(page)).toBe(2); // whole-number 2x
-
-  await page.reload();
-  await untilScene(page, 'Logo');
-  expect(await scale(page)).toBe(2);
-
-  await page.keyboard.press('Digit1');
-  await untilScene(page, 'Home');
-  await page.keyboard.press('ArrowUp'); // wraps round to OPTIONS
-  await page.keyboard.press('Enter');
-  await untilScene(page, 'Options');
-  await page.keyboard.press('ArrowRight'); // flips back to FILL HEIGHT
-  await run(page, 100);
-  expect(await scale(page)).toBeCloseTo(1000 / 472, 3);
-  await page.keyboard.press('Escape');
-  await untilScene(page, 'Home');
+  await ctx.close();
 });
 
 test('music: the menu loop on home and the fight loop in a match', async ({ page }) => {

@@ -1,17 +1,5 @@
-import { VOLUME_MAX, type ScalingMode, type Settings } from '../platform/settings';
+import { VOLUME_MAX, type Settings } from '../platform/settings';
 import type { MenuItem } from './MenuItem';
-
-/** Shown names of the scaling modes (the tag on the SCALING item). */
-export const SCALING_LABEL: Record<ScalingMode, string> = {
-  pixelPerfect: 'PIXEL PERFECT',
-  fillHeight: 'FILL HEIGHT',
-};
-
-/** Two lines under the menu saying what the current mode does. */
-export const SCALING_HINT: Record<ScalingMode, [string, string]> = {
-  pixelPerfect: ['SHARPEST: EVERY PIXEL', 'THE SAME SIZE'],
-  fillHeight: ['BIGGER: FILLS THE SCREEN', 'PIXELS MAY BE A BIT UNEVEN'],
-};
 
 /** Under the menu while the cursor is on a sound item. */
 export const SOUND_HINT: [string, string] = ['STICK LEFT / RIGHT', 'CHANGES THE VOLUME'];
@@ -32,15 +20,11 @@ export const VIBRATION_HINT: [string, string] = ['THE PHONE BUZZES WITH', 'EVERY
 
 export type VolumeId = 'music' | 'sfx';
 
-/**
- * SCALING is left out of the Android app (it always fills the screen); VIBRATION is only listed on
- * a device that can vibrate.
- */
+/** VIBRATION is only listed on a device that can vibrate. */
 export const optionsMenu = (
   settings: Settings,
-  show: { scaling: boolean; vibration: boolean },
+  show: { vibration: boolean },
   actions: {
-    cycleScaling: () => void;
     toggleCrt: () => void;
     toggleVibration: () => void;
     toggleSound: () => void;
@@ -48,17 +32,6 @@ export const optionsMenu = (
     back: () => void;
   },
 ): MenuItem[] => [
-  ...(show.scaling
-    ? [
-        {
-          id: 'scaling',
-          label: 'SCALING',
-          tag: SCALING_LABEL[settings.scaling],
-          enabled: true,
-          onSelect: actions.cycleScaling,
-        },
-      ]
-    : []),
   {
     id: 'crt',
     label: 'CRT SCREEN',

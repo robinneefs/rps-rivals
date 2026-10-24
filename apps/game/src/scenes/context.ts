@@ -1,10 +1,10 @@
 import { Emitter, type Move } from '@rps/core';
 import type Phaser from 'phaser';
 import type { AudioService } from '../audio/AudioService';
+import type { CabinetView } from '../cabinet/CabinetView';
 import type { CabinetShake } from '../fx/cabinetShake';
 import type { InputRouter } from '../input/InputRouter';
 import type { Haptics } from '../platform/haptics';
-import type { PixelScaler } from '../platform/PixelScaler';
 import type { SettingsStore } from '../platform/settings';
 import type { SceneFlow } from './flow';
 
@@ -31,7 +31,8 @@ export class CabinetLights {
 /** The services every scene gets. Built once in main.ts; no global singletons. */
 export interface GameContext {
   input: InputRouter;
-  scaler: PixelScaler;
+  /** The cabinet round the monitor (a page layer): its size, buttons and joystick. */
+  cabinet: CabinetView;
   settings: SettingsStore;
   flow: SceneFlow;
   lights: CabinetLights;

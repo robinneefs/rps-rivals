@@ -3,9 +3,6 @@
 // loaded under the same keys replace it without touching any view.
 export const Tex = {
   logo: 'logo',
-  marquee: 'marquee',
-  room: 'room',
-  cabinet: 'cabinet',
   /** The menus' backdrop and its drifting stripes (fight stages are in config/stages.ts). */
   menuBackdrop: 'menu-backdrop',
   menuStripes: 'menu-stripes',
@@ -14,9 +11,6 @@ export const Tex = {
   badges: 'move-badges',
   /** Small move symbols over the fighters' heads while picking (your pick, the rival's "?"). */
   pickChips: 'pick-chips',
-  buttons: 'cabinet-buttons',
-  buttonRings: 'cabinet-button-rings',
-  joystickBall: 'joystick-ball',
   dither: 'dither',
   /** The K.O. banner's letters. */
   koLetters: 'ko-letters',

@@ -1,6 +1,5 @@
 export const SceneKey = {
   boot: 'Boot',
-  cabinet: 'Cabinet',
   logo: 'Logo',
   home: 'Home',
   options: 'Options',

@@ -1,26 +1,24 @@
 import type { PixelBuffer } from '../assets/placeholders/PixelBuffer';
-import { paintCastle } from '../assets/placeholders/stages/castle';
-import { paintField } from '../assets/placeholders/stages/field';
-import { paintStreet } from '../assets/placeholders/stages/street';
 
 /**
  * The fight stages. Each match is fought on one of these, picked at random (see stageFor).
- * To add a stage: write a painter in assets/placeholders/stages/ and add a line here.
- * To remove one: delete its line. Real art can replace a placeholder by loading an image
- * under the stage's texture key (stageTexture) in BootScene.
+ * A stage is a 288 x 360 picture: a file in public/assets/stages/ (made from the ChatGPT art by
+ * tools/art/build-cabinet.py) or, for a placeholder, a painter in assets/placeholders/stages/.
+ * To add one: add a line here. The v1 stages (Night Street, Sunny Field, Castle Roof) were drawn
+ * for the old 216 x 216 monitor and left with v2.0; new art for more stages is still to come.
  */
 export interface StageDef {
   /** Short and unique; also used in the texture key and the ?stage= test link. */
   id: string;
   name: string;
-  /** Paints the 216x216 placeholder backdrop. The fighters stand at STAGE.floorY. */
-  paint: () => PixelBuffer;
+  /** The picture, loaded at boot. The fighters stand at STAGE.floorY. */
+  image?: string;
+  /** Or a placeholder painted in code. */
+  paint?: () => PixelBuffer;
 }
 
 export const STAGES: readonly StageDef[] = [
-  { id: 'street', name: 'Night Street', paint: paintStreet },
-  { id: 'field', name: 'Sunny Field', paint: paintField },
-  { id: 'castle', name: 'Castle Roof', paint: paintCastle },
+  { id: 'rooftop', name: 'City Rooftop', image: 'assets/stages/rooftop.png' },
 ];
 
 export const stageTexture = (id: string): string => `stage-${id}`;

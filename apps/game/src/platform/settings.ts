@@ -1,22 +1,9 @@
 import { Emitter } from '@rps/core';
 
-/**
- * How the cabinet is scaled to the window.
- * - `pixelPerfect`: largest whole-number scale, every pixel the same size.
- * - `fillHeight`: the cabinet fills the window (vertically on a desktop), so the scale can be a
- *   fraction. Still nearest-neighbour, but some rows and columns of pixels come out one device
- *   pixel wider than others. The default (user's call, 2026-10-10): a deliberate exception to
- *   pixel-perfect rule 2; players who want every pixel even pick Pixel perfect in Options.
- */
-export type ScalingMode = 'pixelPerfect' | 'fillHeight';
-
-export const SCALING_MODES: readonly ScalingMode[] = ['pixelPerfect', 'fillHeight'];
-
 /** Volumes are steps from 0 (off) to VOLUME_MAX. */
 export const VOLUME_MAX = 10;
 
 export interface Settings {
-  scaling: ScalingMode;
   /** Sound off altogether (music and effects); the volumes are kept for when it's back on. */
   muted: boolean;
   musicVolume: number;
@@ -28,7 +15,6 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  scaling: 'fillHeight',
   muted: false,
   musicVolume: 6,
   sfxVolume: 8,
@@ -76,9 +62,6 @@ function load(store: KeyValueStore | null): Settings {
     if (!raw) return DEFAULT_SETTINGS;
     const saved = JSON.parse(raw) as Partial<Settings>;
     return {
-      scaling: SCALING_MODES.includes(saved.scaling as ScalingMode)
-        ? (saved.scaling as ScalingMode)
-        : DEFAULT_SETTINGS.scaling,
       muted: typeof saved.muted === 'boolean' ? saved.muted : DEFAULT_SETTINGS.muted,
       musicVolume: volume(saved.musicVolume, DEFAULT_SETTINGS.musicVolume),
       sfxVolume: volume(saved.sfxVolume, DEFAULT_SETTINGS.sfxVolume),
@@ -110,9 +93,4 @@ export function browserStore(): KeyValueStore | null {
   } catch {
     return null;
   }
-}
-
-/** The scaling mode after this one (the options menu flips through them). */
-export function nextScalingMode(mode: ScalingMode): ScalingMode {
-  return SCALING_MODES[(SCALING_MODES.indexOf(mode) + 1) % SCALING_MODES.length] ?? DEFAULT_SETTINGS.scaling;
 }

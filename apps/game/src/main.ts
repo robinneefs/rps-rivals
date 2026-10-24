@@ -1,15 +1,16 @@
 import { defaultRules, defaultTimings } from '@rps/core';
 import Phaser from 'phaser';
 import { AudioService } from './audio/AudioService';
+import { CabinetView } from './cabinet/CabinetView';
+import { SCREEN } from './cabinet/geometry';
+import { MONITOR } from './config/layout';
 import { palette } from './config/palette';
 import { tuning } from './config/tuning';
 import { InputRouter } from './input/InputRouter';
 import { deviceHaptics, Haptics } from './platform/haptics';
-import { hookBackButton, isNativeApp, onAppActive } from './platform/native';
-import { PixelScaler } from './platform/PixelScaler';
-import { browserStore, SettingsStore, type ScalingMode, type Settings } from './platform/settings';
+import { hookBackButton, onAppActive } from './platform/native';
+import { browserStore, SettingsStore } from './platform/settings';
 import { BootScene } from './scenes/BootScene';
-import { CabinetScene } from './scenes/CabinetScene';
 import { CabinetShake } from './fx/cabinetShake';
 import { registerCrt, screenFx } from './fx/crt';
 import { CrtOverlay } from './fx/crtOverlay';
@@ -27,23 +28,42 @@ import { TransitionScene } from './scenes/TransitionScene';
 import { VERSION } from './version';
 
 const settings = new SettingsStore(browserStore());
-// the Android app always fills the screen (Options has no SCALING there)
-const scalingOf = (s: Settings): ScalingMode => (isNativeApp() ? 'fillHeight' : s.scaling);
-const scaler = new PixelScaler(scalingOf(settings.value));
-const { width, height } = scaler.layout;
+const input = new InputRouter();
+const cabinetShake = new CabinetShake();
+const lights = new CabinetLights();
+// made once the game exists; the joystick only clicks after a first touch anyway
+let audio: AudioService | null = null;
+const cabinet = new CabinetView(
+  {
+    press: (m) => input.pressButton(m),
+    release: (m) => input.releaseButton(m),
+    stick: (t) => input.setStick(t.x, t.y),
+    stickClick: () => audio?.play('stickClick'),
+  },
+  cabinetShake,
+);
+input.on('button', (e) => cabinet.setDown(e.move, e.down));
+input.on('stick', (t) => cabinet.setTilt(t));
+lights.onChange((m) => cabinet.setSelected(m));
+
+/** The canvas: renderScale canvas pixels per monitor pixel, shrunk smoothly to the screen opening. */
+const canvasSize = () => {
+  const k = cabinet.renderScale;
+  return { width: MONITOR.width * k, height: MONITOR.height * k, zoom: SCREEN.width / (MONITOR.width * k) };
+};
+const size = canvasSize();
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,
-  parent: 'game',
-  backgroundColor: palette.room,
+  parent: cabinet.screen,
+  backgroundColor: palette.black,
   pixelArt: true,
   roundPixels: true,
   antialias: false,
-  scale: { mode: Phaser.Scale.NONE, width, height, zoom: scaler.zoom },
-  // order = draw order: cabinet at the bottom, monitor screens above it, the wipe on top
+  scale: { mode: Phaser.Scale.NONE, width: size.width, height: size.height, zoom: size.zoom },
+  // order = draw order: the monitor screens, the wipe on top
   scene: [
     BootScene,
-    CabinetScene,
     LogoScene,
     HomeScene,
     OptionsScene,
@@ -54,26 +74,38 @@ const game = new Phaser.Game({
     TransitionScene,
   ],
 });
-
-const audio = new AudioService(game, settings);
+// pixelArt makes the canvas scale blocky; it is shrunk here, so let the browser smooth it
+const smoothCanvas = () => {
+  Object.assign(game.canvas.style, { imageRendering: 'auto', display: 'block' });
+};
+audio = new AudioService(game, settings);
 const flow = new SceneFlow(game, audio);
-const cabinetShake = new CabinetShake();
 const haptics = new Haptics(deviceHaptics(), () => settings.value.vibration, tuning.haptics);
-const input = new InputRouter();
 setContext(game, {
   input,
-  scaler,
+  cabinet,
   settings,
   flow,
-  lights: new CabinetLights(),
+  lights,
   audio,
   cabinetShake,
   haptics,
 });
+cabinet.onResize(() => {
+  const s = canvasSize();
+  game.scale.resize(s.width, s.height);
+  game.scale.setZoom(s.zoom);
+  smoothCanvas();
+});
+// the cabinet rattles on the game's clock (slow motion and a paused game hold it too)
+game.events.on(Phaser.Core.Events.STEP, (time: number) =>
+  cabinetShake.tick(time, tuning.cabinet.shakeStepMs),
+);
 
 // the CRT screen: a shader on the monitor cameras (WebGL) plus the scanline overlay in the page
-const crtOverlay = new CrtOverlay(game.canvas, scaler, cabinetShake);
+const crtOverlay = new CrtOverlay(cabinet);
 game.events.once(Phaser.Core.Events.READY, () => {
+  smoothCanvas();
   const webgl = registerCrt(game);
   const apply = (on: boolean) => {
     screenFx.crt = on;
@@ -94,12 +126,6 @@ hookBackButton(
 onAppActive((active) => {
   game.events.emit(active ? Phaser.Core.Events.VISIBLE : Phaser.Core.Events.HIDDEN);
   game.events.emit(active ? Phaser.Core.Events.FOCUS : Phaser.Core.Events.BLUR);
-});
-
-settings.onChange((s) => scaler.setMode(scalingOf(s)));
-scaler.onChange((l) => {
-  game.scale.resize(l.width, l.height);
-  game.scale.setZoom(scaler.zoom);
 });
 
 // Dev tuning panel (npm run dev only; never in a release build). Toggle with the ` key.
@@ -128,7 +154,7 @@ if (import.meta.env.DEV) {
 (window as unknown as { __rps: object }).__rps = {
   scenes: () => game.scene.getScenes(true).map((s) => s.scene.key),
   phase: () => flow.activeSession?.snapshot().phase ?? null,
-  scale: () => scaler.layout.scale,
+  renderScale: () => cabinet.renderScale,
   music: () => audio.music,
   version: VERSION,
 };
