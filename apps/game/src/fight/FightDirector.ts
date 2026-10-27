@@ -1,4 +1,4 @@
-import { opponentOf, type MatchState, type Move, type Side } from '@rps/core';
+import { opponentOf, seededRng, type MatchState, type Move, type Rng, type Side } from '@rps/core';
 import type Phaser from 'phaser';
 import { HIT_SFX, type SfxPlayer } from '../audio/sounds';
 import { STAGE } from '../config/layout';
@@ -15,6 +15,7 @@ import type { ClashView } from '../views/ClashView';
 import type { FighterView } from '../views/FighterView';
 import type { HudView } from '../views/HudView';
 import type { TagView } from '../views/TagView';
+import { chooseChoreography } from './choreography';
 
 export interface FightViews {
   fighters: Record<Side, FighterView>;
@@ -36,6 +37,8 @@ export class FightDirector {
   private turns = 0;
   /** "ROUND 1" waits for the VS card; a phase change cancels it. */
   private introStep: Phaser.Time.TimerEvent | null = null;
+  /** Separate cosmetic randomness, shared by both online clients and independent of damage/SFX. */
+  private readonly choreographyRng: Rng;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -54,6 +57,7 @@ export class FightDirector {
       vibrate: (shakePx: number | 'ko') => void;
     },
   ) {
+    this.choreographyRng = seededRng(session.stageSeed() ^ 0x7461696b);
     this.offs.push(
       session.on('phase', this.onPhase),
       session.on('locked', ({ side }) => {
@@ -102,7 +106,7 @@ export class FightDirector {
         };
         if (e.round === 1) {
           // who is who before anything happens: the VS card, then the round
-          tags.showTags(true);
+          tags.showTags(tagged);
           banner.showVs(this.labels);
           this.introStep = this.scene.time.delayedCall(tuning.identity.vsCardMs, showTitle);
         } else {
@@ -145,7 +149,7 @@ export class FightDirector {
         if (loser) {
           const winner = opponentOf(loser);
           fighters[loser].pose('ko');
-          fighters[loser].setOffset(-tuning.reveal.lungePx);
+          fighters[loser].setOffset(tuning.reveal.guardStepPx - tuning.reveal.recoilPx);
           fighters[winner].pose('win');
           fighters[winner].setOffset(0);
           clash.hide();
@@ -184,18 +188,20 @@ export class FightDirector {
     });
 
     const outcome = e.outcome;
+    const action = chooseChoreography(outcome, this.choreographyRng);
     at(r.strikeAtMs, () => {
-      for (const side of ['p1', 'p2'] as const) {
-        fighters[side].pose(e.picks[side]);
-        const lunges = outcome.kind === 'tie' || outcome.winner === side;
-        fighters[side].setOffset(lunges ? r.lungePx : 0);
-        if (lunges) this.dust(side);
-      }
+      fighters[action.attacker].attack(action.attack);
+      fighters[action.attacker].setOffset(r.lungePx);
+      fighters[action.defender].setOffset(r.guardStepPx);
+      if (action.reaction === 'block') fighters[action.defender].block();
+      this.dust(action.attacker);
     });
 
     at(r.impactAtMs, () => {
       clash.collide(outcome);
       if (outcome.kind === 'tie') {
+        fighters[action.defender].block();
+        fighters[action.defender].setOffset(r.guardStepPx - r.recoilPx);
         shake(this.scene, this.scene.cameras.main, 1, tuning.shake.durationMs / 2);
         this.hooks.vibrate(1);
         this.sfx.play('clash');
@@ -203,7 +209,7 @@ export class FightDirector {
       }
       const loser = fighters[outcome.loser];
       loser.pose('hurt');
-      loser.setOffset(-r.lungePx / 2);
+      loser.setOffset(r.guardStepPx - r.recoilPx);
       flash(this.scene, loser.sprite, tuning.flash.frames, tuning.flash.frameMs);
       this.sfx.play(HIT_SFX[e.picks[outcome.winner]], { detune: (Math.random() - 0.5) * 80 });
       this.sparks(outcome.loser, e.picks[outcome.winner], outcome.damage);
@@ -242,7 +248,7 @@ export class FightDirector {
     const s = tuning.sparks;
     const away = loser === 'p2' ? 1 : -1;
     const c = moveColors[move];
-    burst(this.scene, STAGE.fighterX[loser] - away * 8, STAGE.floorY - 34, {
+    burst(this.scene, STAGE.fighterX[loser] - away * 8, STAGE.floorY - 55, {
       count: s.countByDamage[damage] ?? 10,
       colors: [palette.white, c.main, c.main, c.shade],
       angleDeg: away === 1 ? -35 : -145,

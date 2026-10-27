@@ -1,0 +1,29 @@
+{
+  "title": "Ready to Rival",
+  "version": 1,
+  "bpm": 160,
+  "key": "D major",
+  "bars": 32,
+  "durationSeconds": 48,
+  "sampleRate": 44100,
+  "channels": 2,
+  "peakDbFS": -1.1103466040620245,
+  "rmsDbFS": -16.35640132101924,
+  "seamSampleDelta": [
+    0.000029264017939567566,
+    0.0000032783718779683113
+  ],
+  "sections": [
+    "0:00 Hook / picked riff",
+    "0:12 Harmony variation",
+    "0:24 Arpeggio bridge",
+    "0:36 Full-band reprise"
+  ],
+  "sources": [
+    "tools/audio/synth.mjs",
+    "tools/audio/make-menu-riff.mjs"
+  ],
+  "originalComposition": true,
+  "externalSamples": false,
+  "installedInGame": false
+}

@@ -103,44 +103,9 @@ def buttons() -> None:
 
 
 def joystick() -> None:
-    """
-    The source has two columns: up-left / left / down-left, and up / centre / down. The right-hand
-    directions are the left ones mirrored, so both sides look exactly alike. Every frame puts the
-    base's centre and bottom edge on the same point, so swapping frames only moves the stick.
-    """
-    a = key_green(rgba(SRC / "joystick.webp"))
-    H, W = a.shape[:2]
-    dark = (a[..., :3].max(axis=2) < 70) & (a[..., 3] > 128)
-    size, bx, by = 560, 280, 430
-    cells = {"ul": (0, 0), "l": (1, 0), "dl": (2, 0), "u": (0, 1), "c": (1, 1), "d": (2, 1)}
-    def dark_in(r: int, c: int) -> tuple[np.ndarray, np.ndarray]:
-        return np.where(dark[r * H // 3 : (r + 1) * H // 3, c * W // 2 : (c + 1) * W // 2])
-
-    # the base's width, from the stick at rest; a leaning ball can stick out past the base's left
-    # edge, so each base is placed by its right edge, which is always in view
-    ys, xs = dark_in(1, 1)
-    base_w = xs.max() - xs.min() + 1
-    frames = {}
-    for name, (r, c) in cells.items():
-        y0, x0 = r * H // 3, c * W // 2
-        cell = a[y0 : (r + 1) * H // 3, x0 : (c + 1) * W // 2]
-        ys, xs = dark_in(r, c)
-        # (the middle column leans only up and down, so there the base's own middle is exact)
-        cx = (xs.min() + xs.max()) // 2 if c == 1 else xs.max() - base_w // 2
-        bottom = ys.max()
-        frame = np.zeros((size, size, 4), np.float32)
-        top, left = by - bottom, bx - cx
-        ch, cw = cell.shape[:2]
-        sy0, sx0 = max(0, -top), max(0, -left)
-        sy1, sx1 = min(ch, size - top), min(cw, size - left)
-        frame[top + sy0 : top + sy1, left + sx0 : left + sx1] = cell[sy0:sy1, sx0:sx1]
-        frames[name] = frame
-    for name, src in {"ur": "ul", "r": "l", "dr": "dl"}.items():
-        frames[name] = frames[src][:, ::-1]
-    for name, frame in frames.items():
-        save(frame, f"joystick-{name}.webp")
-    print(f"joystick: frames {size} px square, base centre x {bx}, base bottom y {by}, base {base_w} px wide")
-
+    """Use the current generated component kit: nine independent poses, no mirrored frames."""
+    from runpy import run_path
+    run_path(str(ROOT / "tools/art/prepare-joystick.py"), run_name="__main__")
 
 def room() -> None:
     Image.open(SRC / "room.webp").convert("RGB").save(OUT / "room.webp", quality=82, method=6)

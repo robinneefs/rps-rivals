@@ -1,0 +1,15 @@
+{
+  "pageErrors": [],
+  "checks": [
+    "online: desktop rendered and input passed",
+    "create: desktop rendered and input passed",
+    "join: desktop rendered and input passed",
+    "win: desktop rendered and input passed",
+    "loss: desktop rendered and input passed",
+    "online: phone rendered and input passed",
+    "create: phone rendered and input passed",
+    "join: phone rendered and input passed",
+    "win: phone rendered and input passed",
+    "loss: phone rendered and input passed"
+  ]
+}

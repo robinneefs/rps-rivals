@@ -1,17 +1,21 @@
 import { isRoomCode, randomRoomCode, ROOM_CODE_LENGTH, ROOM_CODE_LETTERS, type JoinError } from '@rps/core';
 import Phaser from 'phaser';
-import { Tex } from '../assets/keys';
-import { MONITOR } from '../config/layout';
 import { palette } from '../config/palette';
 import { tuning } from '../config/tuning';
 import type { Action } from '../input/InputRouter';
 import { lobbyMenu } from '../menus/lobbyMenu';
 import { connectOnline } from '../session/createSession';
 import type { OnlineSession } from '../session/OnlineSession';
-import { frameRect } from '../util/gfx';
 import { MenuView } from '../views/MenuView';
-import { PixelText } from '../views/PixelText';
-import { addMenuBackdrop } from '../views/MenuBackdrop';
+import {
+  menuBackdrop,
+  menuPanel,
+  menuTitle,
+  menuRow,
+  MenuText,
+  menuColors,
+  menuLayout,
+} from '../views/MenuStyle';
 import { getContext } from './context';
 import { SceneKey } from './keys';
 import { useMonitorCamera } from './monitor';
@@ -57,8 +61,8 @@ export class LobbyScene extends Phaser.Scene {
 
   create(): void {
     useMonitorCamera(this);
-    addMenuBackdrop(this);
-    this.add.tileSprite(0, 0, MONITOR.width, MONITOR.height, Tex.dither).setOrigin(0);
+    menuBackdrop(this);
+    menuPanel(this, 47, 180);
     this.events.once('shutdown', () => {
       if (!this.handedOff) this.session?.dispose();
       this.session = null;
@@ -69,71 +73,50 @@ export class LobbyScene extends Phaser.Scene {
   }
 
   private title(text: string): void {
-    new PixelText(this, MONITOR.width / 2, 26, text, {
-      size: 3,
-      color: palette.cyan,
-      align: 'center',
-      outline: palette.ink,
-      shadow: palette.shadow,
-    });
+    menuTitle(this, text);
   }
 
-  /** Two centred lines of status text, e.g. "WAITING FOR" / "YOUR RIVAL". */
+  /** Two lines reserved inside the panel for connection and validation status. */
   private statusLines(y: number): (lines: [string, string], color?: number) => void {
-    const cx = MONITOR.width / 2;
-    // a dark band so the text stays readable over the stage art
-    this.add.rectangle(0, y - 5, MONITOR.width, 27, palette.panel).setOrigin(0);
-    const rows = [0, 1].map(
-      (i) =>
-        new PixelText(this, cx, y + i * 10, '', {
-          color: palette.lilac,
-          align: 'center',
-          shadow: palette.ink,
-        }),
-    );
-    return (lines, color = palette.lilac) =>
+    const rows = [0, 1].map((i) => new MenuText(this, 95, y + i * 14, '', menuColors.cyan));
+    return (lines, color = menuColors.cyan) =>
       lines.forEach((line, i) => rows[i]?.setText(line).setColor(color));
   }
 
   private hint(lines: string[]): void {
-    const y = MONITOR.height - 18 - (lines.length - 1) * 10;
-    this.add.rectangle(0, y - 5, MONITOR.width, lines.length * 10 + 7, palette.panel).setOrigin(0);
-    lines.forEach(
-      (line, i) =>
-        new PixelText(this, MONITOR.width / 2, y + i * 10, line, {
-          color: palette.lilac,
-          align: 'center',
-          shadow: palette.ink,
-        }),
-    );
+    const top = 206 - (lines.length - 1) * 14;
+    lines.forEach((line, i) => new MenuText(this, 95, top + i * 14, line, menuColors.cyan));
   }
 
-  /**
-   * A tappable button on the monitor. Phones have no Esc key, so the create and join screens need
-   * one to get back to the lobby menu.
-   */
+  /** Full-width, native-height button with the same generous hit area as Options. */
   private tapButton(y: number, label: string, onTap: () => void): void {
-    const w = 80;
-    const h = 17;
-    const x = Math.round((MONITOR.width - w) / 2);
     const gfx = this.add.graphics();
+    const text = new MenuText(this, menuLayout.rowX + 15, y + 6, label, menuColors.cream, 'left');
     const paint = (down: boolean) => {
       gfx.clear();
-      gfx.fillStyle(palette.ink).fillRect(x - 1, y - 1, w + 2, h + 2);
-      gfx.fillStyle(down ? palette.select : palette.panel).fillRect(x, y, w, h);
-      frameRect(gfx, x, y, w, h, down ? palette.pink : palette.panelEdge);
+      menuRow(gfx, menuLayout.rowX, y, menuLayout.rowWidth, down);
+      text.setColor(down ? menuColors.ink : menuColors.cream);
     };
     paint(false);
-    new PixelText(this, MONITOR.width / 2, y + 5, label, { color: palette.text, align: 'center' });
+    let pressed = false;
     this.add
-      .zone(x, y, w, h)
+      .zone(menuLayout.rowX, y, menuLayout.rowWidth, 24)
       .setOrigin(0)
       .setInteractive({ useHandCursor: true })
-      .on('pointerdown', () => paint(true))
-      .on('pointerout', () => paint(false))
-      .on('pointerup', () => {
+      .on('pointerover', () => paint(true))
+      .on('pointerdown', () => {
+        pressed = true;
+        paint(true);
+      })
+      .on('pointerout', () => {
+        pressed = false;
         paint(false);
-        onTap();
+      })
+      .on('pointerup', () => {
+        const activate = pressed;
+        pressed = false;
+        paint(false);
+        if (activate) onTap();
       });
   }
 
@@ -169,11 +152,11 @@ export class LobbyScene extends Phaser.Scene {
     const menu = new MenuView(
       this,
       lobbyMenu({ create: () => this.toMode('create'), join: () => this.toMode('join'), back: home }),
-      72,
+      65,
       input,
       audio,
     );
-    this.hint(['PLAY A FRIEND ON ANOTHER DEVICE:', 'ONE CREATES A ROOM, THE', 'OTHER JOINS WITH ITS CODE']);
+    this.hint(['PLAY ON TWO DEVICES', 'ONE CREATES A ROOM', 'THE OTHER JOINS']);
     this.listen((a) => {
       if (a.type !== 'back' || leaving) return;
       audio.play('menuBack');
@@ -182,19 +165,23 @@ export class LobbyScene extends Phaser.Scene {
   }
 
   private showCreate(): void {
-    const cx = MONITOR.width / 2;
+    const cx = menuLayout.centerX;
     this.title('NEW ROOM');
-    new PixelText(this, cx, 70, 'ROOM CODE', { color: palette.gold, align: 'center', shadow: palette.ink });
-    const code = new PixelText(this, cx, 86, '', {
-      size: 4,
-      color: palette.text,
-      align: 'center',
-      outline: palette.ink,
-      shadow: palette.shadow,
+    new MenuText(this, cx, 65, 'ROOM CODE', menuColors.cyan);
+    const codeTiles = this.add.graphics();
+    const codeLetters = Array.from({ length: ROOM_CODE_LENGTH }, (_, i) => {
+      const x = menuLayout.centerX - 69 + i * 36;
+      codeTiles.fillStyle(menuColors.ink).fillRect(x + 2, 88, 30, 34);
+      codeTiles.fillStyle(menuColors.gold).fillRect(x, 86, 30, 34);
+      codeTiles.fillStyle(0xfff2ad).fillRect(x, 86, 30, 1);
+      return new MenuText(this, x + 15, 98, '', menuColors.ink);
     });
+    const code = {
+      setText: (value: string) => codeLetters.forEach((letter, i) => letter.setText(value[i] ?? '')),
+    };
     const status = this.statusLines(132);
-    this.hint(['TELL YOUR RIVAL THE CODE']);
-    this.tapButton(160, 'CANCEL', () => this.toMode('menu'));
+    this.hint(['SHARE THIS CODE']);
+    this.tapButton(173, 'CANCEL', () => this.toMode('menu'));
 
     let tries = 0;
     const open = () => {
@@ -229,32 +216,23 @@ export class LobbyScene extends Phaser.Scene {
   }
 
   private showJoin(): void {
-    const cx = MONITOR.width / 2;
+    const cx = menuLayout.centerX;
     this.title('JOIN ROOM');
-    new PixelText(this, cx, 70, 'ENTER THE CODE', {
-      color: palette.gold,
-      align: 'center',
-      shadow: palette.ink,
-    });
+    new MenuText(this, cx, 65, 'ENTER THE CODE', menuColors.cyan);
     const status = this.statusLines(132);
-    this.hint(['TAP THE BOXES TO TYPE', 'OR PICK LETTERS WITH THE STICK']);
-    this.tapButton(160, 'BACK', () => this.toMode('menu'));
+    this.hint(['TYPE OR USE THE STICK']);
+    this.tapButton(173, 'BACK', () => this.toMode('menu'));
 
     // four letter boxes; -1 = empty
     const slots: number[] = Array.from({ length: ROOM_CODE_LENGTH }, () => -1);
     const box = { w: 30, h: 34, gap: 6, y: 86 };
     const left = Math.round(
-      (MONITOR.width - (ROOM_CODE_LENGTH * box.w + (ROOM_CODE_LENGTH - 1) * box.gap)) / 2,
+      menuLayout.centerX - (ROOM_CODE_LENGTH * box.w + (ROOM_CODE_LENGTH - 1) * box.gap) / 2,
     );
     const gfx = this.add.graphics();
     const letters = slots.map(
       (_, i) =>
-        new PixelText(this, left + i * (box.w + box.gap) + box.w / 2, box.y + 7, '', {
-          size: 3,
-          color: palette.text,
-          align: 'center',
-          shadow: palette.shadow,
-        }),
+        new MenuText(this, left + i * (box.w + box.gap) + box.w / 2, box.y + 12, '', menuColors.cream),
     );
     let cursor = 0;
     let joining = false;
@@ -267,10 +245,10 @@ export class LobbyScene extends Phaser.Scene {
         const x = left + i * (box.w + box.gap);
         const on = i === cursor && !joining;
         gfx.fillStyle(palette.ink).fillRect(x - 1, box.y - 1, box.w + 2, box.h + 2);
-        gfx.fillStyle(on ? palette.select : palette.panel).fillRect(x, box.y, box.w, box.h);
-        frameRect(gfx, x, box.y, box.w, box.h, on ? palette.pink : palette.panelEdge);
-        if (on && blinkOn) gfx.fillStyle(palette.gold).fillRect(x + 6, box.y + box.h - 5, box.w - 12, 2);
-        letters[i]?.setText(ROOM_CODE_LETTERS[letter] ?? '');
+        gfx.fillStyle(on ? menuColors.gold : menuColors.panel).fillRect(x, box.y, box.w, box.h);
+        gfx.fillStyle(on ? 0xfff2ad : menuColors.edge).fillRect(x, box.y, box.w, 1);
+        if (on && blinkOn) gfx.fillStyle(menuColors.ink).fillRect(x + 6, box.y + box.h - 5, box.w - 12, 2);
+        letters[i]?.setText(ROOM_CODE_LETTERS[letter] ?? '').setColor(on ? menuColors.ink : menuColors.cream);
       });
     };
     const blink = this.time.addEvent({
@@ -343,6 +321,7 @@ export class LobbyScene extends Phaser.Scene {
           this.session = null;
           joining = false;
           status(['', '']);
+          syncField();
           draw();
         }
         return;

@@ -1,0 +1,198 @@
+{
+  "scale": 0.25906735751295334,
+  "anchor": [
+    64,
+    124
+  ],
+  "audit": [
+    {
+      "name": "idle0",
+      "source": {
+        "id": 1,
+        "count": 64133,
+        "left": 66,
+        "top": 18,
+        "right": 382,
+        "bottom": 403
+      },
+      "placed": {
+        "left": 23,
+        "top": 24,
+        "width": 82,
+        "height": 100
+      },
+      "anchor": [
+        64,
+        124
+      ]
+    },
+    {
+      "name": "idle1",
+      "source": {
+        "id": 3,
+        "count": 61576,
+        "left": 476,
+        "top": 39,
+        "right": 787,
+        "bottom": 403
+      },
+      "placed": {
+        "left": 24,
+        "top": 29,
+        "width": 81,
+        "height": 95
+      },
+      "anchor": [
+        64,
+        124
+      ]
+    },
+    {
+      "name": "rock",
+      "source": {
+        "id": 2,
+        "count": 62940,
+        "left": 868,
+        "top": 34,
+        "right": 1227,
+        "bottom": 403
+      },
+      "placed": {
+        "left": 20,
+        "top": 28,
+        "width": 93,
+        "height": 96
+      },
+      "anchor": [
+        64,
+        124
+      ]
+    },
+    {
+      "name": "paper",
+      "source": {
+        "id": 4,
+        "count": 59956,
+        "left": 76,
+        "top": 440,
+        "right": 404,
+        "bottom": 820
+      },
+      "placed": {
+        "left": 22,
+        "top": 25,
+        "width": 85,
+        "height": 99
+      },
+      "anchor": [
+        64,
+        124
+      ]
+    },
+    {
+      "name": "scissors",
+      "source": {
+        "id": 5,
+        "count": 64792,
+        "left": 461,
+        "top": 445,
+        "right": 835,
+        "bottom": 818
+      },
+      "placed": {
+        "left": 21,
+        "top": 27,
+        "width": 97,
+        "height": 97
+      },
+      "anchor": [
+        64,
+        124
+      ]
+    },
+    {
+      "name": "hurt",
+      "source": {
+        "id": 6,
+        "count": 61883,
+        "left": 853,
+        "top": 458,
+        "right": 1236,
+        "bottom": 817
+      },
+      "placed": {
+        "left": 1,
+        "top": 31,
+        "width": 99,
+        "height": 93
+      },
+      "anchor": [
+        64,
+        124
+      ]
+    },
+    {
+      "name": "ko",
+      "source": {
+        "id": 9,
+        "count": 28184,
+        "left": 19,
+        "top": 1136,
+        "right": 452,
+        "bottom": 1228
+      },
+      "placed": {
+        "left": 8,
+        "top": 100,
+        "width": 112,
+        "height": 24
+      },
+      "anchor": [
+        64,
+        124
+      ]
+    },
+    {
+      "name": "win",
+      "source": {
+        "id": 7,
+        "count": 56029,
+        "left": 497,
+        "top": 826,
+        "right": 797,
+        "bottom": 1232
+      },
+      "placed": {
+        "left": 25,
+        "top": 19,
+        "width": 78,
+        "height": 105
+      },
+      "anchor": [
+        64,
+        124
+      ]
+    },
+    {
+      "name": "kick",
+      "source": {
+        "id": 8,
+        "count": 49971,
+        "left": 840,
+        "top": 874,
+        "right": 1228,
+        "bottom": 1232
+      },
+      "placed": {
+        "left": 0,
+        "top": 31,
+        "width": 101,
+        "height": 93
+      },
+      "anchor": [
+        64,
+        124
+      ]
+    }
+  ]
+}

@@ -13,7 +13,6 @@ import { browserStore, SettingsStore } from './platform/settings';
 import { BootScene } from './scenes/BootScene';
 import { CabinetShake } from './fx/cabinetShake';
 import { registerCrt, screenFx } from './fx/crt';
-import { CrtOverlay } from './fx/crtOverlay';
 import { CabinetLights, setContext } from './scenes/context';
 import { FightScene } from './scenes/FightScene';
 import { SceneFlow } from './scenes/flow';
@@ -46,11 +45,12 @@ input.on('button', (e) => cabinet.setDown(e.move, e.down));
 input.on('stick', (t) => cabinet.setTilt(t));
 lights.onChange((m) => cabinet.setSelected(m));
 
-/** The canvas: renderScale canvas pixels per monitor pixel, shrunk smoothly to the screen opening. */
-const canvasSize = () => {
-  const k = cabinet.renderScale;
-  return { width: MONITOR.width * k, height: MONITOR.height * k, zoom: SCREEN.width / (MONITOR.width * k) };
-};
+/** One framebuffer pixel is one game pixel; the browser enlarges with nearest sampling. */
+const canvasSize = () => ({
+  width: MONITOR.width,
+  height: MONITOR.height,
+  zoom: SCREEN.width / MONITOR.width,
+});
 const size = canvasSize();
 
 const game = new Phaser.Game({
@@ -74,9 +74,9 @@ const game = new Phaser.Game({
     TransitionScene,
   ],
 });
-// pixelArt makes the canvas scale blocky; it is shrunk here, so let the browser smooth it
-const smoothCanvas = () => {
-  Object.assign(game.canvas.style, { imageRendering: 'auto', display: 'block' });
+// Preserve the native pixel grid when fitting the cabinet opening.
+const fitCanvas = () => {
+  Object.assign(game.canvas.style, { imageRendering: 'pixelated', display: 'block' });
 };
 audio = new AudioService(game, settings);
 const flow = new SceneFlow(game, audio);
@@ -95,21 +95,19 @@ cabinet.onResize(() => {
   const s = canvasSize();
   game.scale.resize(s.width, s.height);
   game.scale.setZoom(s.zoom);
-  smoothCanvas();
+  fitCanvas();
 });
 // the cabinet rattles on the game's clock (slow motion and a paused game hold it too)
 game.events.on(Phaser.Core.Events.STEP, (time: number) =>
   cabinetShake.tick(time, tuning.cabinet.shakeStepMs),
 );
 
-// the CRT screen: a shader on the monitor cameras (WebGL) plus the scanline overlay in the page
-const crtOverlay = new CrtOverlay(cabinet);
+// CRT effects run inside the native framebuffer, never as a finer DOM overlay.
 game.events.once(Phaser.Core.Events.READY, () => {
-  smoothCanvas();
-  const webgl = registerCrt(game);
+  fitCanvas();
+  registerCrt(game);
   const apply = (on: boolean) => {
     screenFx.crt = on;
-    crtOverlay.setVisible(webgl && on);
   };
   apply(settings.value.crt);
   settings.onChange((s) => apply(s.crt));
@@ -130,6 +128,9 @@ onAppActive((active) => {
 
 // Dev tuning panel (npm run dev only; never in a release build). Toggle with the ` key.
 if (import.meta.env.DEV) {
+  if (new URLSearchParams(location.search).has('menuReview')) {
+    void import('./dev/menuReview').then(({ mountMenuReview }) => mountMenuReview(game, flow));
+  }
   void import('./dev/tuningPanel').then(({ mountTuningPanel }) =>
     mountTuningPanel({
       groups: [

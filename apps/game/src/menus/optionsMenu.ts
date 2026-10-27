@@ -13,7 +13,7 @@ export const soundTag = (muted: boolean): string => (muted ? 'OFF' : 'ON');
 export const onOffTag = (on: boolean): string => (on ? 'ON' : 'OFF');
 
 /** Under the menu while the cursor is on CRT SCREEN. */
-export const CRT_HINT: [string, string] = ['SCANLINES AND A SOFT GLOW', 'LIKE AN OLD ARCADE TUBE'];
+export const CRT_HINT: [string, string] = ['GLOW AND CURVED CORNERS', 'LIKE AN OLD ARCADE TUBE'];
 
 /** Under the menu while the cursor is on VIBRATION. */
 export const VIBRATION_HINT: [string, string] = ['THE PHONE BUZZES WITH', 'EVERY SCREEN SHAKE'];

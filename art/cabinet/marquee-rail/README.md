@@ -1,0 +1,11 @@
+# Matching lower marquee rail — 2026-10-25
+
+## Approved colour revision
+
+`generated-purple.png` is the approved colour-only revision generated with the built-in ChatGPT image tool. The export script now uses this source. Revision prompt: Keep the bottom rail's shape, thickness, bevel, wear, placement, crop and transparency; change only its colour to match the top rail. Main face: darker, desaturated purple-indigo/navy, with a narrow subtle blue upper-bevel highlight and a small local blue reflection on the right. Avoid saturated cobalt across the broad face. Preserve the top rail, cabinet sides, blank interior and dark fascia; no new details or text.
+
+User requested a real raised lower border matching the top. Generated with the built-in ChatGPT image-generation tool, using `art/cabinet/marquee-v2/cabinet-opening.png` as the local edit target.
+
+Prompt: Precise local cabinet-art edit. Keep the reference composition, framing, proportions and side trims. Edit only the lower edge of the marquee: give it one distinct raised horizontal blue metal bezel rail matching the top blue rail in construction: same thickness, beveled upper highlight, cobalt blue face, navy lower shadow, rounded end joins and small worn paint chips. Place it immediately below the dark marquee opening, around77%–83% of the image height, across the inner uprights. Remove the old yellow decorative stripe and thin double blue lines. Below the new bar, keep plain dark navy fascia and no second bar. Preserve the top rail, vertical side trim, blank marquee interior and exterior transparency. No logo, text, characters or marquee illustration.
+
+`generated.png` retains the generated edit. `tools/art/prepare-marquee-rail.mjs` extracts only the lower section and fits its rail thickness to the existing top bezel. Output: `apps/game/public/assets/cabinet/marquee-bottom-rail.webp` (1466 ×110). `MARQUEE_RAIL` places it at(104,202.5), size733 ×55 cabinet units. It renders over the original cabinet body and under the existing marquee illustration, preserving the original pixels everywhere else. The previous yellow stripe/double lines are covered by the new rail/fascia patch. The centered marquee crop, its top/bottom inset shadows and flicker remain in place.

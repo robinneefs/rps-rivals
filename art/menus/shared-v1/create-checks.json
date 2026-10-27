@@ -1,0 +1,7 @@
+{
+  "pageErrors": [],
+  "checks": [
+    "create: desktop rendered and input passed",
+    "create: phone rendered and input passed"
+  ]
+}

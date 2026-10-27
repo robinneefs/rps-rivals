@@ -3,12 +3,14 @@ import { MONITOR } from '../config/layout';
 import { tuning } from '../config/tuning';
 import type { CabinetShake } from '../fx/cabinetShake';
 import type { StickTilt } from '../input/InputRouter';
+import { addCabinetEngravings } from './engraving';
 import {
   BODY,
   BUTTON,
   fitCabinet,
   JOYSTICK,
   MARQUEE,
+  MARQUEE_RAIL,
   PANEL,
   SCREEN,
   stickDirection,
@@ -127,16 +129,39 @@ export class CabinetView {
     Object.assign(this.screen.style, { background: '#000', overflow: 'hidden' });
     this.screen.id = 'game';
     img(this.root, BODY.src, { ...box(0, 0, BODY.width, BODY.height), pointerEvents: 'none' });
-    const marquee = img(this.root, MARQUEE.src, box(MARQUEE.x, MARQUEE.y, MARQUEE.width, MARQUEE.height));
+    img(
+      this.root,
+      MARQUEE_RAIL.src,
+      box(MARQUEE_RAIL.x, MARQUEE_RAIL.y, MARQUEE_RAIL.width, MARQUEE_RAIL.height),
+    );
+    const marqueeWindow = el('div', this.root, {
+      ...box(MARQUEE.x, MARQUEE.y, MARQUEE.width, MARQUEE.height),
+      overflow: 'hidden',
+      pointerEvents: 'none',
+      background: '#10172d',
+    });
+    marqueeWindow.id = 'marquee';
+    const marquee = img(marqueeWindow, MARQUEE.src, {
+      // Slight overscan prevents a fractional CSS-scale seam inside the clipped opening.
+      ...box(
+        -MARQUEE.bleed,
+        -MARQUEE.bleed,
+        MARQUEE.width + MARQUEE.bleed * 2,
+        MARQUEE.height + MARQUEE.bleed * 2,
+      ),
+      objectFit: 'cover',
+      objectPosition: 'center',
+    });
     this.flickerMarquee(marquee);
     // shade over the art, so it looks set into the cabinet rather than pasted on
     const m = tuning.marquee;
-    el('div', this.root, {
-      ...box(MARQUEE.x, MARQUEE.y, MARQUEE.width, MARQUEE.height),
+    el('div', marqueeWindow, {
+      ...box(0, 0, MARQUEE.width, MARQUEE.height),
       pointerEvents: 'none',
       boxShadow: [
         `inset 0 0 0 ${m.seamPx}px rgba(0,0,0,${m.seamAlpha})`,
         `inset 0 ${m.topShadowPx}px ${m.topShadowPx}px -${m.topShadowPx / 2}px rgba(0,0,0,${m.topShadowAlpha})`,
+        `inset 0 -${m.bottomShadowPx}px ${m.bottomShadowPx}px -${m.bottomShadowPx / 2}px rgba(0,0,0,${m.bottomShadowAlpha})`,
         `inset 0 0 ${m.edgeShadowPx}px rgba(0,0,0,${m.edgeShadowAlpha})`,
       ].join(', '),
       background: `radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,${m.vignetteAlpha}) 100%)`,
@@ -153,6 +178,7 @@ export class CabinetView {
         zIndex: '10',
         visibility: name === 'c' ? 'visible' : 'hidden',
       });
+      frame.dataset.joystickFrame = name;
       this.sticks.set(name, frame);
     }
 
@@ -191,6 +217,7 @@ export class CabinetView {
       opacity: '0',
     });
 
+    addCabinetEngravings(this.root);
     this.tapZones();
     this.scheduleShine();
 
@@ -212,9 +239,8 @@ export class CabinetView {
   }
 
   /**
-   * Sharp scaling: the game draws each monitor pixel as a block of renderScale x renderScale canvas
-   * pixels (the smallest whole number at least as big as the screen), and the browser shrinks the
-   * canvas smoothly to fit. The pixels stay crisp and all come out the same size.
+   * Integer enlargement used by the art preview's grid verifier. Normal gameplay renders into
+   * a native MONITOR-sized framebuffer and enlarges that canvas with nearest sampling.
    */
   get renderScale(): number {
     return Math.min(6, Math.max(1, Math.ceil(this.screenSize.deviceWidth / MONITOR.width - 0.05)));

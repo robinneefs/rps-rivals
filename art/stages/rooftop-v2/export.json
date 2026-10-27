@@ -1,0 +1,15 @@
+{
+  "stage": [
+    192,
+    240
+  ],
+  "hudSafeRows": [0, 47],
+  "baseClearRows": [0, 71],
+  "clouds": [
+    576,
+    64
+  ],
+  "cloudY": 52,
+  "skyColour": "#0066fe",
+  "cloudStepMs": 200
+}

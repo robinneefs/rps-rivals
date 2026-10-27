@@ -1,0 +1,6 @@
+Thaleah Fat by Rick Hoppmann / Tiny Worlds.
+https://tinyworlds.itch.io/free-pixel-font-thaleah
+Licensed CC-BY4.0, full licence retained in CC-BY-4.0.txt.
+Unmodified source from attributed mirror:
+https://raw.githubusercontent.com/topheman/bevy-rust-wasm-experiments/master/assets/ThaleahFat.ttf
+Retrieved2026-10-26. Research only: native16px has7px capitals, too small here without2x enlargement, so excluded from the native1x shortlist.

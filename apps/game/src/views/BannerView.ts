@@ -23,7 +23,7 @@ export class BannerView {
     private readonly y: number,
   ) {
     this.text = new PixelText(scene, MONITOR.width / 2, y, '', {
-      size: 3,
+      size: 2,
       color: palette.gold,
       align: 'center',
       outline: palette.ink,
@@ -47,7 +47,7 @@ export class BannerView {
       p1: name('p1'),
       p2: name('p2'),
       mid: new PixelText(scene, MONITOR.width / 2, y, 'VS', {
-        size: 3,
+        size: 2,
         color: palette.gold,
         align: 'center',
         outline: palette.ink,

@@ -1,27 +1,32 @@
 import type { PixelBuffer } from '../assets/placeholders/PixelBuffer';
 
-/**
- * The fight stages. Each match is fought on one of these, picked at random (see stageFor).
- * A stage is a 288 x 360 picture: a file in public/assets/stages/ (made from the ChatGPT art by
- * tools/art/build-cabinet.py) or, for a placeholder, a painter in assets/placeholders/stages/.
- * To add one: add a line here. The v1 stages (Night Street, Sunny Field, Castle Roof) were drawn
- * for the old 216 x 216 monitor and left with v2.0; new art for more stages is still to come.
- */
+/** The single temporary rooftop stage, authored at the native 192 x 240 resolution. */
 export interface StageDef {
   /** Short and unique; also used in the texture key and the ?stage= test link. */
   id: string;
   name: string;
   /** The picture, loaded at boot. The fighters stand at STAGE.floorY. */
   image?: string;
+  /** Solid sky behind the transparent city layer. Keep the health-bar area clear for the HUD. */
+  sky?: number;
+  /** Native-size, horizontally repeating cloud strip, always behind the city. */
+  clouds?: { image: string; y: number; height: number; stepMs: number };
   /** Or a placeholder painted in code. */
   paint?: () => PixelBuffer;
 }
 
 export const STAGES: readonly StageDef[] = [
-  { id: 'rooftop', name: 'City Rooftop', image: 'assets/stages/rooftop.png' },
+  {
+    id: 'rooftop',
+    name: 'City Rooftop',
+    image: 'assets/stages/rooftop-v2-192.png',
+    sky: 0x0066fe,
+    clouds: { image: 'assets/stages/rooftop-clouds-576.png', y: 52, height: 64, stepMs: 200 },
+  },
 ];
 
 export const stageTexture = (id: string): string => `stage-${id}`;
+export const stageCloudTexture = (id: string): string => `stage-${id}-clouds`;
 
 /**
  * The stage for a match. `seed` comes from the session (both online players get the same one);

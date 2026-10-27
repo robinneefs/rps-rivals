@@ -1,0 +1,72 @@
+{
+  "screen": {
+    "width": 192,
+    "height": 240
+  },
+  "drawOrder": [
+    "background",
+    "character",
+    "logo",
+    "paint-streak",
+    "labels",
+    "arrow"
+  ],
+  "character": {
+    "id": "riot",
+    "image": "native/riot.png",
+    "x": 0,
+    "y": 0,
+    "width": 192,
+    "height": 240,
+    "replaceable": true
+  },
+  "logo": {
+    "x": 6,
+    "y": 2,
+    "width": 128,
+    "height": 64
+  },
+  "paint": {
+    "x": 0,
+    "y": 140,
+    "width": 192,
+    "height": 100
+  },
+  "menu": {
+    "labels": [
+      "PLAY VERSUS CPU",
+      "PLAY ONLINE",
+      "OPTIONS"
+    ],
+    "x": 18,
+    "ys": [
+      170,
+      191,
+      211
+    ],
+    "labelCell": [
+      176,
+      20
+    ],
+    "arrowX": 3,
+    "arrowOffsetY": 3
+  },
+  "background": {
+    "atlas": "native/background-sheet.json",
+    "frames": [
+      0,
+      1,
+      2,
+      3,
+      2,
+      1
+    ],
+    "frameMs": 140,
+    "focalPoint": [
+      110,
+      95
+    ],
+    "motion": "radial pulse from a single generated source; no frame-to-frame AI redraw"
+  },
+  "notes": "Home-screen kit only. Character is static; menu/character/title/background are independent. Runtime preview uses true integer native pixels."
+}

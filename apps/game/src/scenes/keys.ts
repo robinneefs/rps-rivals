@@ -8,10 +8,14 @@ export const SceneKey = {
   fight: 'Fight',
   result: 'Result',
   transition: 'Transition',
+  artPreview: 'ArtPreview',
+  sheetPreview: 'SheetPreview',
 } as const;
 
 /** Scenes drawn on the monitor (stopped and started by SceneFlow). */
 export const MONITOR_SCENES = [
+  SceneKey.artPreview,
+  SceneKey.sheetPreview,
   SceneKey.logo,
   SceneKey.home,
   SceneKey.options,

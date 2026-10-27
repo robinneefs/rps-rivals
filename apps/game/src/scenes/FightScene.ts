@@ -2,7 +2,7 @@ import { opponentOf, type Side } from '@rps/core';
 import Phaser from 'phaser';
 import { STAGE } from '../config/layout';
 import { palette } from '../config/palette';
-import { stageFor, stageTexture } from '../config/stages';
+import { stageFor } from '../config/stages';
 import { tuning } from '../config/tuning';
 import { FightDirector } from '../fight/FightDirector';
 import { BannerView } from '../views/BannerView';
@@ -10,6 +10,7 @@ import { ClashView } from '../views/ClashView';
 import { FighterView } from '../views/FighterView';
 import { HudView } from '../views/HudView';
 import { TagView } from '../views/TagView';
+import { addStage } from '../views/StageView';
 import { getContext } from './context';
 import type { FightData } from './flow';
 import { SceneKey } from './keys';
@@ -37,7 +38,7 @@ export class FightScene extends Phaser.Scene {
     useMonitorCamera(this);
     // ?stage=<id> in the address forces a stage, for trying one out
     const stage = stageFor(session.stageSeed(), new URLSearchParams(window.location.search).get('stage'));
-    this.add.image(0, 0, stageTexture(stage.id)).setOrigin(0);
+    addStage(this, stage);
 
     const fighters = {
       p1: new FighterView(this, 'p1', STAGE.fighterX.p1, STAGE.floorY),
@@ -47,7 +48,7 @@ export class FightScene extends Phaser.Scene {
     const tags = new TagView(this, names);
     const hud = new HudView(this, hudNames(session, setup), session.rules.startHealth);
     const clash = new ClashView(this, names, session.me);
-    const banner = new BannerView(this, 124);
+    const banner = new BannerView(this, 90);
     /** Online, the rival left or the connection dropped: the match is over without a result. */
     let endedEarly = false;
 

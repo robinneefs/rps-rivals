@@ -3,6 +3,7 @@
 // loaded under the same keys replace it without touching any view.
 export const Tex = {
   logo: 'logo',
+  logoSheen: 'logo-sheen',
   /** The menus' backdrop and its drifting stripes (fight stages are in config/stages.ts). */
   menuBackdrop: 'menu-backdrop',
   menuStripes: 'menu-stripes',
@@ -16,9 +17,12 @@ export const Tex = {
   koLetters: 'ko-letters',
 } as const;
 
-/** Frames every fighter sheet provides (64 px tall fighters, facing right). */
+/** Frames every fighter sheet provides (Taiko in 128 x 128 cells, facing right). */
 export const FighterFrames = ['idle0', 'idle1', 'rock', 'paper', 'scissors', 'hurt', 'ko', 'win'] as const;
 export type FighterFrame = (typeof FighterFrames)[number];
+/** The real Taiko atlas also contains a kick; legacy placeholder sheets keep their original frames. */
+export type FighterPose = FighterFrame | 'kick';
+export type FighterAttack = 'punch' | 'kick';
 
 /** Pixel font sizes: 5x7 glyphs drawn at whole multiples (pixel-perfect rule 5); 5 to 7 are for the big timer. */
 export const Fonts = {

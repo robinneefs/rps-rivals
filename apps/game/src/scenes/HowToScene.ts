@@ -15,15 +15,15 @@ import { useMonitorCamera } from './monitor';
  * move's name and damage go.
  */
 const RING: readonly { move: Move; x: number; y: number; label: 'right' | 'below' }[] = [
-  { move: 'rock', x: 108, y: 46, label: 'right' },
-  { move: 'scissors', x: 160, y: 90, label: 'below' },
-  { move: 'paper', x: 56, y: 90, label: 'below' },
+  { move: 'rock', x: 96, y: 46, label: 'right' },
+  { move: 'scissors', x: 148, y: 90, label: 'below' },
+  { move: 'paper', x: 44, y: 90, label: 'below' },
 ];
 /** Arrows between the badges (from, to), in the same order: each ends at the move it beats. */
 const ARROWS: readonly [number, number, number, number][] = [
-  [128, 58, 145, 72],
-  [136, 90, 80, 90],
-  [71, 72, 88, 58],
+  [116, 58, 133, 72],
+  [124, 90, 68, 90],
+  [59, 72, 76, 58],
 ];
 
 /** A one-card How to play: the circle of which move beats which and how hard each hits, then the few rules. Any button goes back. */

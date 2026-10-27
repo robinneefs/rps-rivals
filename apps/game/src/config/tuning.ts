@@ -10,9 +10,9 @@ export const tuning = {
      */
     badgePopMs: 200,
     badgePopFromPx: 10,
-    badgeOutPx: 48,
-    badgeY: 216,
-    clashY: 150,
+    badgeOutPx: 24,
+    badgeY: 102,
+    clashY: 96,
     flyAtMs: 300,
     loserFlyMs: 480,
     loserSpinMs: 70,
@@ -24,8 +24,8 @@ export const tuning = {
      * ("YOU HIT!", "RIVAL HITS!") at verdictY, both in the winner's colour. A tie: "CLASH!" and
      * "NO DAMAGE". While the badges fly each carries its owner's name, ownerGapPx above it.
      */
-    ruleY: 74,
-    verdictY: 86,
+    ruleY: 52,
+    verdictY: 65,
     hitLineDelayMs: 140,
     ownerGapPx: 10,
     /** The damage number hops up damageHopPx, then falls damageFallPx over damageFallMs. */
@@ -40,7 +40,10 @@ export const tuning = {
     recoverAtMs: 1400,
     /** Badges, verdict and damage number are cleared away. */
     clearAtMs: 1550,
-    lungePx: 4,
+    /** Close the wider idle gap for contact, then step back on recovery. */
+    lungePx: 14,
+    guardStepPx: 12,
+    recoilPx: 2,
   },
   hitPause: { byDamage: { 10: 50, 15: 70, 20: 90 } as Record<number, number> },
   shake: { byDamage: { 10: 2, 15: 3, 20: 4 } as Record<number, number>, durationMs: 280, koPx: 5 },
@@ -74,13 +77,7 @@ export const tuning = {
     sizePx: 3,
   },
   dust: { count: 5, speedMin: 12, speedMax: 30, gravity: -20, lifeMs: 360, sizePx: 3 },
-  /**
-   * HUD. Timer: the first second is drawn at font size timerBaseSize, and each next second
-   * timerGrowPerTick sizes bigger and timerDriftPx lower (towards the middle). Gold from
-   * timerWarnMs (the ticks start there too), red, shaking and tilting by timerTiltDeg from
-   * timerRedMs (harder in the last second). Each new second pops one size up for timerPopMs.
-   * At 0 a red 0 drops timerSlamDropPx and slams down in timerSlamMs, then holds timerSlamHoldMs.
-   */
+  /** HUD health animation and fixed-size timer. Ticks start at timerWarnMs; red from timerRedMs. */
   hud: {
     drainMs: 600,
     trailDelayMs: 120,
@@ -89,15 +86,6 @@ export const tuning = {
     lowPulseMs: 260,
     timerWarnMs: 3000,
     timerRedMs: 2000,
-    timerBaseSize: 4,
-    timerGrowPerTick: 1,
-    timerDriftPx: 9,
-    timerTiltDeg: 4,
-    timerPopMs: 90,
-    timerShakePx: 1,
-    timerShakeEveryMs: 40,
-    timerSlamDropPx: 10,
-    timerSlamMs: 160,
     timerSlamHoldMs: 450,
     /** The hurt fighter's bar flashes white hitFlashes times, hitFlashMs per flash and per gap. */
     hitFlashes: 3,
@@ -124,9 +112,9 @@ export const tuning = {
    * diagonals). Let go, it springs back after springBackMs, flicks the other way for wobbleMs,
    * and settles.
    */
-  joystick: { springBackMs: 90, dragDeadzonePx: 18, axisSnapDeg: 30, wobbleMs: 60 },
+  joystick: { springBackMs: 90, dragDeadzonePx: 28, axisSnapDeg: 30, wobbleMs: 60 },
   idle: { breatheEveryMs: 420 },
-  intro: { fadeInMs: 500, holdMs: 1500, fadeOutMs: 500, fadeSteps: 4 },
+  intro: { delayMs: 180, popMs: 650, holdMs: 1400, sheenDelayMs: 160, sheenMs: 900 },
   /** Screen changes: the CRT closes to a line (closeMs), the line shrinks to a dot (lineMs), it stays off (offMs), then back on; a frame every stepMs. */
   transitions: { closeMs: 120, lineMs: 80, offMs: 60, stepMs: 20 },
   /** Menus; the backdrop's diagonal stripes move one pixel every stripeStepMs. */
@@ -140,14 +128,14 @@ export const tuning = {
   identity: {
     vsCardMs: 850,
     vsSlideMs: 220,
-    tagRounds: 1,
+    tagRounds: 0,
     bobPx: 1,
     bobMs: 320,
     blinkTimes: 3,
     blinkMs: 110,
   },
   /** "PICK YOUR MOVE" and, for the first arrowTurns picks of a match, "▼ PRESS A BUTTON ▼" under it. */
-  prompt: { arrowTurns: 3 },
+  prompt: { arrowTurns: 1 },
   /**
    * The whole cabinet rattles against the room: on a K.O., on a hit of bigHitDamage or more,
    * and once when the pick timer runs out. It moves to a new offset every shakeStepMs.
@@ -165,15 +153,21 @@ export const tuning = {
   /**
    * CRT screen (Options > CRT SCREEN): glow is how much bright colours bleed, vignette darkens the
    * edges, cornerRadius rounds the corners (fraction of the screen), roll is the slow bright band.
-   * Scanlines: a dark line scanlineThickness of each pixel row tall, at scanlineAlpha.
+   * Native shader: alternating dark rows at scanlineAlpha and a subtle RGB phosphorMask.
+   * scanlineThickness is retained for the unused legacy device-resolution overlay.
    */
   crt: {
-    glow: 0.9,
-    vignette: 0.45,
-    cornerRadius: 0.06,
-    roll: 0.035,
+    glow: 1.15,
+    /** Midtone lift after the scanline/mask loss; keeps black/white endpoints intact. */
+    gamma: 0.85,
+    vignette: 0.4,
+    cornerRadius: 0.08,
+    roll: 0.095,
+    /** Small one-native-pixel channel fringe, separate from the strong K.O. split. */
+    colorFringe: 0.12,
     scanlineThickness: 0.35,
-    scanlineAlpha: 0.28,
+    scanlineAlpha: 0.12,
+    phosphorMask: 0.055,
     /** Impact effects (on even with the CRT look off): colour split on a K.O., row warp on big hits. */
     koSplitPx: 3,
     koSplitMs: 900,
@@ -200,6 +194,8 @@ export const tuning = {
     seamAlpha: 0.6,
     topShadowPx: 12,
     topShadowAlpha: 0.75,
+    bottomShadowPx: 12,
+    bottomShadowAlpha: 0.75,
     edgeShadowPx: 14,
     edgeShadowAlpha: 0.55,
     vignetteAlpha: 0.35,

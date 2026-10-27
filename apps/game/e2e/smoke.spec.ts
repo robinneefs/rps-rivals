@@ -3,6 +3,7 @@ import pkg from '../package.json' with { type: 'json' };
 
 declare global {
   interface Window {
+    __homeBuzzes: number[][];
     __rps: {
       scenes: () => string[];
       phase: () => string | null;
@@ -13,7 +14,7 @@ declare global {
   }
 }
 
-const scenes = (page: Page) => page.evaluate(() => window.__rps.scenes());
+const scenes = (page: Page) => page.evaluate(() => window.__rps?.scenes() ?? []);
 const phase = (page: Page) => page.evaluate(() => window.__rps.phase());
 
 /**
@@ -36,6 +37,20 @@ async function run(page: Page, ms: number): Promise<void> {
 
 /** Runs the clock until a screen is showing and its wipe has finished (input is ignored mid-wipe). */
 async function untilScene(page: Page, key: string, maxMs = 5000): Promise<void> {
+  const active = await scenes(page);
+  if (active.length === 0 || active.includes('Boot')) {
+    // Asset loading uses real I/O. Keep it out of the scene's simulated-time budget.
+    await expect
+      .poll(
+        async () => {
+          await run(page, 50);
+          const loaded = await scenes(page);
+          return loaded.length > 0 && !loaded.includes('Boot');
+        },
+        { timeout: 15_000 },
+      )
+      .toBe(true);
+  }
   for (let t = 0; t < maxMs && !(await scenes(page)).includes(key); t += 50) await run(page, 50);
   expect(await scenes(page)).toContain(key);
   await run(page, 300);
@@ -48,8 +63,7 @@ test('boots to the logo, the home menu, and plays an exchange against the CPU', 
 
   await pausedClock(page);
   await page.goto('http://localhost:5174/');
-  await run(page, 300);
-  expect(await scenes(page)).toContain('Logo');
+  await untilScene(page, 'Logo'); // wait for the larger artwork preload, rather than a fixed delay
 
   await untilScene(page, 'Home'); // the logo leaves on its own (about 2.7s)
 
@@ -69,6 +83,129 @@ test('boots to the logo, the home menu, and plays an exchange against the CPU', 
   expect(errors).toEqual([]);
 });
 
+test('native Taiko and Riot assets load and a complete CPU match can be replayed', async ({
+  page,
+}, testInfo) => {
+  const errors: string[] = [];
+  const assets = new Set<string>();
+  page.on('pageerror', (e) => errors.push(e.message));
+  page.on('response', (response) => {
+    if (response.ok()) assets.add(new URL(response.url()).pathname);
+  });
+  await pausedClock(page);
+  await page.goto('http://localhost:5174/');
+  await untilScene(page, 'Home');
+  expect(assets.has('/assets/taiko.png')).toBe(true);
+  expect(assets.has('/assets/taiko.json')).toBe(true);
+  expect(assets.has('/assets/riot.png')).toBe(true);
+  expect(assets.has('/assets/riot.json')).toBe(true);
+  expect(assets.has('/assets/stages/rooftop-v2-192.png')).toBe(true);
+  expect(assets.has('/assets/stages/rooftop-clouds-576.png')).toBe(true);
+  await page.keyboard.press('Enter');
+  await untilScene(page, 'Fight');
+  await run(page, 1800);
+  await page.keyboard.press('Backquote'); // hide the development tuning panel for the art capture
+  await page.screenshot({ path: testInfo.outputPath('riot-in-game.png') });
+  // Auto-picks exercise ties, hits, round transitions and the KO animation without changing rules.
+  await untilScene(page, 'Result', 180_000);
+  await page.keyboard.press('Enter');
+  await untilScene(page, 'Fight');
+  expect(await phase(page)).toBe('roundIntro');
+  expect(errors).toEqual([]);
+});
+
+test('layered home art loads, options wrap correctly, and returning home restores input', async ({
+  page,
+}, testInfo) => {
+  const errors: string[] = [];
+  const assets = new Set<string>();
+  page.on('pageerror', (e) => errors.push(e.message));
+  page.on('response', (r) => {
+    if (r.ok()) assets.add(new URL(r.url()).pathname);
+  });
+  await pausedClock(page);
+  await page.goto('http://localhost:5174/');
+  await untilScene(page, 'Home');
+  for (const name of [
+    'background-sheet.png',
+    'riot-sheet.png',
+    'logo.png',
+    'paint-streak.png',
+    'labels.png',
+    'manifest.json',
+  ])
+    expect(assets.has(`/assets/menus/action/${name}`)).toBe(true);
+  await run(page, 1800); // let the staggered entrance settle before the art capture
+  await page.keyboard.press('Backquote');
+  await page.screenshot({ path: testInfo.outputPath('action-home.png') });
+  // Up wraps from the CPU choice to Options; returning must discard the old subscription/lock.
+  for (let i = 0; i < 2; i++) {
+    await page.keyboard.press('ArrowUp');
+    await page.keyboard.press('Enter');
+    await untilScene(page, 'Options');
+    await page.keyboard.press('Escape');
+    for (let t = 0; t < 5000 && !(await scenes(page)).includes('Home'); t += 50) await run(page, 50);
+    expect(await scenes(page)).toContain('Home');
+    await page.keyboard.press('Enter'); // confirm while the opening wipe is still busy
+    await run(page, 300);
+    expect(await scenes(page)).toContain('Home');
+  }
+  await page.keyboard.press('Enter');
+  await untilScene(page, 'Fight');
+  expect(errors).toEqual([]);
+});
+
+test('home entrance gives six light phone ticks, and skip/reduced-motion/vibration-off suppress them', async ({
+  browser,
+}) => {
+  for (const mode of ['normal', 'skip', 'reduced', 'off'] as const) {
+    const ctx = await browser.newContext({
+      viewport: { width: 390, height: 664 },
+      isMobile: true,
+      hasTouch: true,
+      reducedMotion: mode === 'reduced' ? 'reduce' : 'no-preference',
+    });
+    const page = await ctx.newPage();
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await page.addInitScript((off) => {
+      window.__homeBuzzes = [];
+      Object.defineProperty(navigator, 'vibrate', {
+        configurable: true,
+        writable: true,
+        value: (pattern: number | number[]) => {
+          window.__homeBuzzes.push(typeof pattern === 'number' ? [pattern] : [...pattern]);
+          return true;
+        },
+      });
+      if (off) localStorage.setItem('rps-fighter.settings', JSON.stringify({ vibration: false }));
+    }, mode === 'off');
+    await pausedClock(page);
+    await page.goto('http://localhost:5174/');
+    await expect
+      .poll(
+        async () => {
+          if (errors.length) throw new Error(errors.join('\n'));
+          return page.evaluate(() => Boolean(window.__rps));
+        },
+        { timeout: 10000 },
+      )
+      .toBe(true);
+    await untilScene(page, 'Logo');
+    await page.keyboard.press('Digit1');
+    await untilScene(page, 'Home');
+    if (mode === 'skip') {
+      await page.keyboard.press('Enter');
+      await untilScene(page, 'Fight');
+    }
+    await run(page, 1800);
+    const buzzes = await page.evaluate(() => window.__homeBuzzes);
+    expect(buzzes).toHaveLength(mode === 'normal' ? 6 : 0);
+    if (mode === 'normal') expect(buzzes.every((p) => p.length === 1 && p[0] === 12)).toBe(true);
+    await ctx.close();
+  }
+});
+
 test('the build shows the version from package.json', async ({ page }) => {
   await page.goto('http://localhost:5174/');
   expect(await page.evaluate(() => window.__rps.version)).toBe(pkg.version);
@@ -77,10 +214,9 @@ test('the build shows the version from package.json', async ({ page }) => {
 test('the logo can be skipped with any button', async ({ page }) => {
   await pausedClock(page);
   await page.goto('http://localhost:5174/');
-  await run(page, 300);
+  await untilScene(page, 'Logo');
   await page.keyboard.press('Digit1');
-  await run(page, 400);
-  expect(await scenes(page)).toContain('Home');
+  await untilScene(page, 'Home');
 });
 
 test('buttons mashed while the game is still loading never freeze it', async ({ page }) => {
@@ -110,6 +246,7 @@ test('the cabinet fits an upright phone and its buttons work by touch', async ({
   await page.goto('http://localhost:5174/');
   await untilScene(page, 'Logo');
 
+  await page.keyboard.press('Backquote'); // development controls must not intercept monitor/cabinet taps
   // the whole screen and control panel are on the page
   const screen = await page.locator('#game').boundingBox();
   const rock = await page.locator('[data-button="rock"]').boundingBox();
@@ -117,11 +254,25 @@ test('the cabinet fits an upright phone and its buttons work by touch', async ({
   expect(screen!.x).toBeGreaterThanOrEqual(0);
   expect(screen!.x + screen!.width).toBeLessThanOrEqual(390);
   expect(rock!.y + rock!.height).toBeLessThanOrEqual(664 + 1);
-  expect(await page.evaluate(() => window.__rps.renderScale())).toBe(3);
+  const canvas = page.locator('#game canvas');
+  await expect(canvas).toHaveAttribute('width', '192');
+  await expect(canvas).toHaveAttribute('height', '240');
+  expect(await canvas.evaluate((el) => getComputedStyle(el).imageRendering)).toBe('pixelated');
 
   // a tap on the ROCK part of the panel is a button press (skips the logo)
   await page.touchscreen.tap(rock!.x + rock!.width / 2, rock!.y + rock!.height / 2);
   await untilScene(page, 'Home');
+  // The painted home labels are touch targets on the actual monitor, not DOM overlay buttons.
+  const homeCanvas = await canvas.boundingBox();
+  await page.touchscreen.tap(
+    homeCanvas!.x + homeCanvas!.width * 0.5,
+    homeCanvas!.y + homeCanvas!.height * (220 / 240),
+  );
+  await untilScene(page, 'Options');
+  await page.keyboard.press('Escape');
+  await untilScene(page, 'Home');
+  await page.touchscreen.tap(rock!.x + rock!.width / 2, rock!.y + rock!.height / 2);
+  await untilScene(page, 'Fight');
   await ctx.close();
 });
 

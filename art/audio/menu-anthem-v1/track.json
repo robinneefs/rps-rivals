@@ -1,0 +1,41 @@
+{
+  "title": "One More Round",
+  "bpm": 168,
+  "bars": 32,
+  "key": "E minor",
+  "sampleRate": 44100,
+  "channels": 2,
+  "durationSeconds": 45.714285714285715,
+  "peakDbFS": -1.1103466040620245,
+  "rmsDbFS": -14.353104904618965,
+  "seamSampleDelta": [
+    0.002880796790122986,
+    0.002881297841668129
+  ],
+  "sections": [
+    {
+      "at": 0,
+      "label": "Main hook"
+    },
+    {
+      "at": 11.428571428571429,
+      "label": "Hook doubled"
+    },
+    {
+      "at": 22.857142857142858,
+      "label": "Lighter return"
+    },
+    {
+      "at": 34.285714285714285,
+      "label": "Final hook"
+    }
+  ],
+  "originalComposition": true,
+  "externalSamples": false,
+  "sources": [
+    "tools/audio/make-menu-anthem.mjs",
+    "tools/audio/synth.mjs",
+    "tools/audio/music-mix.mjs"
+  ],
+  "approvedMenuTheme": true
+}

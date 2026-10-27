@@ -1,0 +1,10 @@
+{
+  "title": "One More Round",
+  "key": "music.menu",
+  "master": "menu-anthem-v1.wav",
+  "files": [
+    "menu-one-more-round.ogg",
+    "menu-one-more-round.mp3"
+  ],
+  "originalMenuPreserved": true
+}

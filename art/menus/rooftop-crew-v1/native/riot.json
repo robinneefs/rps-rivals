@@ -1,0 +1,52 @@
+{
+  "frames": {
+    "idle0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 112,
+        "h": 160
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 112,
+        "h": 160
+      },
+      "sourceSize": {
+        "w": 112,
+        "h": 160
+      }
+    },
+    "idle1": {
+      "frame": {
+        "x": 112,
+        "y": 0,
+        "w": 112,
+        "h": 160
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 112,
+        "h": 160
+      },
+      "sourceSize": {
+        "w": 112,
+        "h": 160
+      }
+    }
+  },
+  "meta": {
+    "image": "riot.png",
+    "size": {
+      "w": 224,
+      "h": 160
+    },
+    "scale": "1"
+  }
+}

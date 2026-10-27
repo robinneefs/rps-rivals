@@ -1,0 +1,114 @@
+{
+  "screen": {
+    "width": 192,
+    "height": 240
+  },
+  "sky": "#0874ff",
+  "characters": [
+    {
+      "name": "taiko",
+      "height": 132,
+      "count": 4,
+      "x": 43,
+      "y": 185,
+      "phaseMs": 0
+    },
+    {
+      "name": "anchor",
+      "height": 142,
+      "count": 4,
+      "x": 100,
+      "y": 185,
+      "phaseMs": 1500
+    },
+    {
+      "name": "riot",
+      "height": 110,
+      "count": 2,
+      "x": 158,
+      "y": 185,
+      "phaseMs": 2700
+    }
+  ],
+  "characterCell": {
+    "width": 112,
+    "height": 160,
+    "origin": [
+      56,
+      156
+    ]
+  },
+  "drawOrder": [
+    "sky",
+    "clouds",
+    "background",
+    "taiko",
+    "anchor",
+    "riot",
+    "logo",
+    "menu"
+  ],
+  "logo": {
+    "x": 8,
+    "y": 2,
+    "width": 176,
+    "height": 44
+  },
+  "clouds": {
+    "width": 384,
+    "height": 64,
+    "y": 45,
+    "stepMs": 240
+  },
+  "menu": {
+    "x": 16,
+    "y": 184,
+    "width": 160,
+    "height": 50,
+    "labels": [
+      "PLAY VERSUS CPU",
+      "PLAY ONLINE",
+      "OPTIONS"
+    ]
+  },
+  "loops": {
+    "standing": [
+      {
+        "frame": 0,
+        "ms": 1400
+      },
+      {
+        "frame": 1,
+        "ms": 650
+      },
+      {
+        "frame": 0,
+        "ms": 1800
+      },
+      {
+        "frame": 2,
+        "ms": 130
+      },
+      {
+        "frame": 0,
+        "ms": 1400
+      },
+      {
+        "frame": 3,
+        "ms": 700
+      }
+    ],
+    "seated": [
+      {
+        "frame": 0,
+        "ms": 2000
+      },
+      {
+        "frame": 1,
+        "ms": 900
+      }
+    ]
+  },
+  "excluded": "Riot source bottom two poses have clipped hanging shoes. Only complete upper two exported.",
+  "policy": "nearest resampling, binary alpha, shared source scale per character, no per-frame normalization"
+}

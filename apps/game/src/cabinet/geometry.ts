@@ -7,15 +7,26 @@ import type { Move } from '@rps/core';
  */
 export const BODY = { width: 941, height: 2372, src: 'assets/cabinet/body.webp' } as const;
 
-/** The opening the monitor canvas fills (4:5, the game's 288 x 360). */
+/** The opening the monitor canvas fills (4:5, the game's 192 x 240). */
 export const SCREEN = { x: 162, y: 322, width: 616, height: 767 } as const;
 
 export const MARQUEE = {
-  x: 101,
-  y: 43,
-  width: 739,
-  height: 180,
-  src: 'assets/cabinet/marquee.webp',
+  // Fill through to the inner uprights and the top/bottom rails; center stays at x470.5.
+  x: 104,
+  y: 46,
+  width: 733,
+  height: 161,
+  bleed: 1,
+  src: 'assets/cabinet/marquee-v4.webp',
+} as const;
+
+/** Local artwork patch: a raised bottom bezel matching the top rail, including the fascia below. */
+export const MARQUEE_RAIL = {
+  x: 104,
+  y: 202.5,
+  width: 733,
+  height: 55,
+  src: 'assets/cabinet/marquee-bottom-rail.webp',
 } as const;
 
 /**
@@ -41,7 +52,7 @@ export const BUTTON = {
   labelScale: 0.2548,
 } as const;
 
-/** The joystick frames: the base is in the same spot in all nine, at `base` (file pixels). */
+/** Nine independent joystick sprites: shared plate/ball lighting and equal 12-degree physical tilts. */
 export const JOYSTICK = {
   x: 225,
   /** The bottom edge of the base, and its width (as approved in the preview, 2026-10-24). */

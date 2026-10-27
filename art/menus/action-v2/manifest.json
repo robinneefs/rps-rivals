@@ -1,0 +1,102 @@
+{
+  "screen": {
+    "width": 192,
+    "height": 240
+  },
+  "drawOrder": [
+    "background",
+    "character",
+    "logo",
+    "paint-streak",
+    "labels",
+    "arrow"
+  ],
+  "character": {
+    "id": "riot",
+    "image": "native/riot.png",
+    "x": 0,
+    "y": 0,
+    "width": 192,
+    "height": 240,
+    "replaceable": true
+  },
+  "characterLoop": {
+    "frames": [
+      0,
+      1,
+      0,
+      2,
+      0
+    ],
+    "durations": [
+      2000,
+      240,
+      160,
+      260,
+      180
+    ],
+    "atlas": "native/riot-sheet.json"
+  },
+  "logo": {
+    "x": 6,
+    "y": 2,
+    "width": 128,
+    "height": 64
+  },
+  "paint": {
+    "x": -16,
+    "y": 142,
+    "width": 224,
+    "height": 120
+  },
+  "menu": {
+    "labels": [
+      "PLAY VERSUS CPU",
+      "PLAY ONLINE",
+      "OPTIONS"
+    ],
+    "x": 8,
+    "ys": [
+      176,
+      196,
+      216
+    ],
+    "labelCell": [
+      176,
+      20
+    ],
+    "arrowX": 28,
+    "arrowOffsetY": 3,
+    "labelWidths": [
+      100,
+      74,
+      48
+    ]
+  },
+  "defaultFont": "m6x11-native-16",
+  "fontSizes": [
+    14,
+    16,
+    18,
+    20
+  ],
+  "defaultFontSize": 16,
+  "background": {
+    "atlas": "native/background-sheet.json",
+    "frames": [
+      0,
+      1,
+      2,
+      3,
+      2,
+      1
+    ],
+    "frameMs": 140,
+    "focalPoint": [
+      110,
+      95
+    ],
+    "motion": "radial pulse from a single generated source; no frame-to-frame AI redraw"
+  },
+  "notes": "Home-screen kit only. Character is static; menu/character/title/background are independent. Runtime preview uses true integer native pixels."
+}

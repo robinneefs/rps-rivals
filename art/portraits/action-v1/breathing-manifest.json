@@ -1,0 +1,111 @@
+{
+  "characterLoop": {
+    "frames": [
+      0,
+      1,
+      0,
+      2,
+      0
+    ],
+    "durations": [
+      2000,
+      240,
+      160,
+      260,
+      180
+    ]
+  },
+  "characters": [
+    {
+      "id": "taiko",
+      "atlas": "native/taiko-sheet.json",
+      "image": "native/taiko-sheet.png"
+    },
+    {
+      "id": "anchor",
+      "atlas": "native/anchor-sheet.json",
+      "image": "native/anchor-sheet.png"
+    }
+  ],
+  "generation": "Built-in image_gen edits of each original rest portrait; prompts saved beside source frames.",
+  "audit": [
+    {
+      "character": "taiko",
+      "phase": "rest",
+      "source": [
+        1122,
+        1402
+      ],
+      "native": [
+        192,
+        240
+      ],
+      "opaque": 24889
+    },
+    {
+      "character": "taiko",
+      "phase": "inhale",
+      "source": [
+        1122,
+        1402
+      ],
+      "native": [
+        192,
+        240
+      ],
+      "opaque": 24983
+    },
+    {
+      "character": "taiko",
+      "phase": "exhale",
+      "source": [
+        1122,
+        1402
+      ],
+      "native": [
+        192,
+        240
+      ],
+      "opaque": 24828
+    },
+    {
+      "character": "anchor",
+      "phase": "rest",
+      "source": [
+        1122,
+        1402
+      ],
+      "native": [
+        192,
+        240
+      ],
+      "opaque": 26689
+    },
+    {
+      "character": "anchor",
+      "phase": "inhale",
+      "source": [
+        1122,
+        1402
+      ],
+      "native": [
+        192,
+        240
+      ],
+      "opaque": 26736
+    },
+    {
+      "character": "anchor",
+      "phase": "exhale",
+      "source": [
+        1122,
+        1402
+      ],
+      "native": [
+        192,
+        240
+      ],
+      "opaque": 26688
+    }
+  ]
+}

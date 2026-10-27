@@ -1,7 +1,6 @@
 import type { Side } from '@rps/core';
 import type Phaser from 'phaser';
-import { Tex, type FighterFrame } from '../assets/keys';
-import { FIGHTER_FRAME } from '../assets/placeholders/fighters';
+import { Tex, type FighterAttack, type FighterPose } from '../assets/keys';
 import { tuning } from '../config/tuning';
 import { snap } from '../util/snap';
 
@@ -11,6 +10,7 @@ export class FighterView {
   private readonly shadow: Phaser.GameObjects.Rectangle;
   private idle = true;
   private breath = 0;
+  private frame: FighterPose = 'idle0';
 
   constructor(
     scene: Phaser.Scene,
@@ -18,11 +18,10 @@ export class FighterView {
     private readonly homeX: number,
     floorY: number,
   ) {
-    this.shadow = scene.add.rectangle(homeX, floorY, 30, 3, 0x050014).setOrigin(0.5, 0.5);
+    this.shadow = scene.add.rectangle(homeX, floorY, 40, 4, 0x050014).setOrigin(0.5, 0.5);
     this.sprite = scene.add.sprite(homeX, floorY + 1, side === 'p1' ? Tex.fighterP1 : Tex.fighterP2, 'idle0');
-    // feet on the floor; p2 is the same art mirrored (flipping keeps the pixel grid)
-    const footX = side === 'p1' ? FIGHTER_FRAME.footX : FIGHTER_FRAME.width - 1 - FIGHTER_FRAME.footX;
-    this.sprite.setDisplayOrigin(footX, FIGHTER_FRAME.height).setFlipX(side === 'p2');
+    // Shared foot origin; right-facing source art is mirrored for p2 on the pixel grid.
+    this.sprite.setDisplayOrigin(64, 124).setFlipX(side === 'p2');
     const timer = scene.time.addEvent({
       delay: tuning.idle.breatheEveryMs,
       loop: true,
@@ -40,9 +39,19 @@ export class FighterView {
     return this.side === 'p1' ? 1 : -1;
   }
 
-  pose(frame: FighterFrame): void {
+  pose(frame: FighterPose): void {
+    this.frame = frame;
     this.idle = frame === 'idle0' || frame === 'idle1';
     this.sprite.setFrame(frame);
+    this.placeShadow();
+  }
+
+  attack(kind: FighterAttack): void {
+    this.pose(kind === 'punch' ? 'rock' : 'kick');
+  }
+
+  block(): void {
+    this.pose('paper');
   }
 
   toIdle(): void {
@@ -53,6 +62,12 @@ export class FighterView {
   /** Steps toward (+) or away from (-) the opponent by whole pixels. */
   setOffset(px: number): void {
     this.sprite.x = snap(this.homeX + px * this.facing);
-    this.shadow.x = this.sprite.x;
+    this.placeShadow();
+  }
+
+  private placeShadow(): void {
+    // The kick's planted foot sits behind the common pose anchor.
+    this.shadow.x = this.sprite.x - (this.frame === 'kick' ? 27 * this.facing : 0);
+    this.shadow.setSize(this.frame === 'kick' ? 18 : 40, 4);
   }
 }

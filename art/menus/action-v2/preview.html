@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RPS Rivals — Action menu layers</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #240c29;
+      color: #fff3de;
+      font: 16px system-ui;
+    }
+    main {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      max-width: 1100px;
+      margin: auto;
+    }
+    canvas {
+      image-rendering: pixelated;
+      outline: 2px solid #ff4277;
+      width: 576px;
+      height: 720px;
+    }
+    aside {
+      max-width: 340px;
+    }
+    h1 {
+      font-size: 26px;
+      margin: 0 0 12px;
+    }
+    p {
+      line-height: 1.5;
+      color: #e6bcd0;
+    }
+    label {
+      display: block;
+      margin: 16px 0;
+    }
+    select,
+    input,
+    button {
+      font: inherit;
+    }
+    select,
+    button {
+      padding: 8px;
+      background: #421543;
+      color: #fff3de;
+      border: 1px solid #ff4277;
+    }
+    a {
+      color: #ffdb65;
+    }
+  </style>
+  <main>
+    <canvas width="192" height="240" aria-label="Layered action menu preview"></canvas>
+    <aside>
+      <h1>Riot — action menu</h1>
+      <p>
+        Native <b>192 × 240</b> artwork inspector. The
+        <a href="http://127.0.0.1:5181/">playable game menu</a> is now implemented separately.
+      </p>
+      <label><input id="animate" type="checkbox" checked /> Animate speed lines</label>
+      <label><input id="breathe" type="checkbox" checked /> Animate Riot's breathing</label>
+      <label
+        >Hold character
+        <select id="character-frame">
+          <option value="0">Rest</option>
+          <option value="1">Inhale</option>
+          <option value="2">Exhale</option>
+        </select></label
+      >
+      <label
+        >Logo export
+        <select id="logo-export">
+          <option value="logo">Balanced · crisp 2× prefilter</option>
+          <option value="logo-soft">Previous soft · 32 colours</option>
+          <option value="logo-filtered">Filtered · full colour</option>
+          <option value="logo-nearest">Previous nearest export</option>
+        </select></label
+      >
+      <label
+        >Font size
+        <select id="font-size">
+          <option value="spleen">Spleen · native 24px / 15px capitals</option>
+          <option value="tamzen-bold">Tamzen Bold · native 20px</option>
+          <option value="tamzen">Tamzen Regular · native 20px</option>
+          <option value="m6x11" selected>m6x11 · native 16px</option>
+          <option value="spleen16">Spleen · native 16px</option>
+          <option value="bitmap">Game bitmap · exact 2× blocks</option>
+          <option value="14">14px</option>
+          <option value="16">Pixelify 16px · previous</option>
+          <option value="18">18px</option>
+          <option value="20">20px · previous</option>
+        </select></label
+      >
+      <label
+        >Inspect
+        <select id="view">
+          <option value="all">Assembled menu</option>
+          <option value="background">Animated background</option>
+          <option value="character">Character only</option>
+          <option value="logo">Logo only</option>
+          <option value="menu">Paint + menu lettering</option>
+          <option value="paint">Paint streak only</option>
+        </select></label
+      >
+      <label
+        >Selection
+        <select id="selected">
+          <option>PLAY VERSUS CPU</option>
+          <option>PLAY ONLINE</option>
+          <option>OPTIONS</option>
+        </select></label
+      >
+      <label>Hold background frame <input id="hold" type="range" min="0" max="3" value="0" /></label>
+      <p>
+        Four exported background frames expand the same speed-line shapes around the action's focal point. The
+        loop moves out and back without regenerating or flashing the colours.
+      </p>
+      <p>
+        Riot, logo, painted backplate, lettering and arrow are separate. The character occupies a replaceable
+        full-screen layer; text isn't baked into any artwork.
+      </p>
+      <p>
+        Use the layer selector to inspect transparency. Menu selection here is a visual demonstration, not
+        game navigation.
+      </p>
+      <p id="status">Loading…</p>
+      <a href="manifest.json">Layer and animation contract</a>
+    </aside>
+  </main>
+  <script type="module">
+    const manifest = await fetch('manifest.json').then((r) => r.json());
+    const assets = [
+      'background-sheet',
+      'riot-sheet',
+      'logo',
+      'logo-filtered',
+      'logo-soft',
+      'logo-nearest',
+      'paint-streak',
+      'labels',
+      'labels-14',
+      'labels-bitmap',
+      'labels-spleen',
+      'labels-spleen16',
+      'labels-tamzen-bold',
+      'labels-tamzen',
+      'labels-m6x11',
+      'labels-16',
+      'labels-18',
+      'labels-20',
+      'arrow',
+    ];
+    const images = Object.fromEntries(
+      await Promise.all(
+        assets.map(async (name) => {
+          const image = new Image();
+          image.src = `native/${name}.png`;
+          await image.decode();
+          return [name, image];
+        }),
+      ),
+    );
+    const canvas = document.querySelector('canvas'),
+      ctx = canvas.getContext('2d'),
+      animate = document.querySelector('#animate'),
+      view = document.querySelector('#view'),
+      selected = document.querySelector('#selected'),
+      hold = document.querySelector('#hold');
+    ctx.imageSmoothingEnabled = false;
+    function fit() {
+      const s = Math.max(1, Math.min(3, Math.floor((innerWidth - 52) / 192)));
+      canvas.style.width = `${s * 192}px`;
+      canvas.style.height = `${s * 240}px`;
+    }
+    fit();
+    addEventListener('resize', fit);
+    const breathe = document.querySelector('#breathe'),
+      characterFrame = document.querySelector('#character-frame'),
+      logoExport = document.querySelector('#logo-export');
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      animate.checked = false;
+      breathe.checked = false;
+    }
+    function breathAt(t) {
+      const loop = manifest.characterLoop;
+      let left = t % loop.durations.reduce((a, b) => a + b, 0);
+      for (let i = 0; i < loop.frames.length; i++) {
+        if (left < loop.durations[i]) return loop.frames[i];
+        left -= loop.durations[i];
+      }
+      return 0;
+    }
+    window.renderMenuAt = function (t) {
+      const mode = view.value,
+        frame =
+          window.captureMotion || animate.checked
+            ? manifest.background.frames[
+                Math.floor(t / manifest.background.frameMs) % manifest.background.frames.length
+              ]
+            : Number(hold.value);
+      ctx.fillStyle = '#361039';
+      ctx.fillRect(0, 0, 192, 240);
+      if (mode === 'all' || mode === 'background')
+        ctx.drawImage(images['background-sheet'], frame * 192, 0, 192, 240, 0, 0, 192, 240);
+      if (mode === 'all' || mode === 'character') {
+        const pose = window.captureMotion || breathe.checked ? breathAt(t) : Number(characterFrame.value);
+        ctx.drawImage(
+          images['riot-sheet'],
+          pose * 192,
+          0,
+          192,
+          240,
+          manifest.character.x,
+          manifest.character.y,
+          192,
+          240,
+        );
+      }
+      if (mode === 'all' || mode === 'logo')
+        ctx.drawImage(images[logoExport.value], manifest.logo.x, manifest.logo.y);
+      if (mode === 'all' || mode === 'menu' || mode === 'paint')
+        ctx.drawImage(images['paint-streak'], manifest.paint.x, manifest.paint.y);
+      if (mode === 'all' || mode === 'menu') {
+        for (let i = 0; i < 3; i++) {
+          const row = i * 2 + (i === selected.selectedIndex ? 1 : 0);
+          ctx.drawImage(
+            images[`labels-${document.querySelector('#font-size').value}`],
+            0,
+            row * 20,
+            176,
+            20,
+            manifest.menu.x,
+            manifest.menu.ys[i],
+            176,
+            20,
+          );
+        }
+        ctx.drawImage(
+          images.arrow,
+          manifest.menu.arrowX,
+          manifest.menu.ys[selected.selectedIndex] + manifest.menu.arrowOffsetY,
+        );
+      }
+    };
+    window.menuReady = true;
+    hold.addEventListener('input', () => {
+      animate.checked = false;
+      window.renderMenuAt(0);
+    });
+    characterFrame.addEventListener('change', () => {
+      breathe.checked = false;
+      window.renderMenuAt(0);
+    });
+    addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        selected.selectedIndex = (selected.selectedIndex + (e.key === 'ArrowDown' ? 1 : 2)) % 3;
+      }
+    });
+    canvas.addEventListener('click', (e) => {
+      const r = canvas.getBoundingClientRect(),
+        y = ((e.clientY - r.top) * 240) / r.height;
+      if (y > 165)
+        selected.selectedIndex = Math.min(2, Math.max(0, Math.round((y - manifest.menu.ys[0] - 8) / 23)));
+    });
+    let elapsed = 0,
+      last = performance.now();
+    function tick(now) {
+      if (!document.hidden && (animate.checked || breathe.checked)) elapsed += Math.min(now - last, 100);
+      last = now;
+      window.renderMenuAt(elapsed);
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+    document.querySelector('#status').textContent =
+      'Exact integer enlargement · nearest sampling · independent layers';
+  </script>
+</html>

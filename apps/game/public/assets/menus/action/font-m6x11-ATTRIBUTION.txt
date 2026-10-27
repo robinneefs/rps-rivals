@@ -1,0 +1,6 @@
+m6x11 by Daniel Linssen.
+https://managore.itch.io/m6x11
+Creator's terms: free to use with attribution. Recommended sizes16,32,48etc.
+Unmodified TTF obtained from the attributed mirror:
+https://raw.githubusercontent.com/blinry/wurst-day-ever/master/m6x11.ttf
+Retrieved2026-10-26. This study uses16px only, with source mask verified binary before styling.

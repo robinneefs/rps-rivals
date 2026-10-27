@@ -4,9 +4,9 @@ import { tuning } from '../config/tuning';
 /**
  * CRT look for the monitor: a WebGL post-effect on each monitor camera. Bright colours bleed a
  * soft glow into their neighbours (phosphor bloom), the edges darken (vignette), the corners round
- * off like curved glass, and a faint bright band rolls slowly down the screen. It works on whole
- * monitor pixels, so the pixel art itself is never warped or blurred. Fine scanlines are drawn
- * by an overlay at device resolution (see CrtOverlay).
+ * off like curved glass, alternating scanlines and an RGB mask texture the image, and a faint
+ * bright band rolls slowly down the screen. It works on whole
+ * monitor pixels in the native framebuffer. No finer device-resolution overlay is applied.
  */
 const FRAG = `
 #define SHADER_NAME RPS_CRT_FS
@@ -20,6 +20,10 @@ uniform float uGlow;
 uniform float uVignette;
 uniform float uCorner;
 uniform float uRoll;
+uniform float uScanline;
+uniform float uMask;
+uniform float uGamma;
+uniform float uFringe;
 uniform float uCrt;
 uniform float uSplit;
 uniform float uWarp;
@@ -55,6 +59,11 @@ void main() {
     return;
   }
 
+  // Mix a little neighbouring red/blue at one whole native pixel, retaining the sharp base.
+  // The stronger combat split remains independent and keeps its existing behaviour.
+  base.r = mix(base.r, texture2D(uMainSampler, uv + vec2(px.x, 0.0)).r, uFringe);
+  base.b = mix(base.b, texture2D(uMainSampler, uv - vec2(px.x, 0.0)).b, uFringe);
+
   // phosphor glow: the average of 9 taps spread over a 5x5 neighbourhood, only its bright part,
   // added on top (9 reads, not 25, so it stays cheap on slow GPUs)
   vec3 sum = vec3(0.0);
@@ -62,7 +71,25 @@ void main() {
     for (int j = -1; j <= 1; j++)
       sum += texture2D(uMainSampler, uv + vec2(float(i), float(j)) * 2.0 * px).rgb;
   sum /= 9.0;
-  vec3 col = base.rgb + max(sum - 0.3, 0.0) * uGlow;
+  // Broader phosphor bloom, bounded by remaining channel headroom. Protect highlights
+  // further so pale skin and face patches retain their differences at stronger glow settings.
+  float highlight = max(base.r, max(base.g, base.b));
+  float detailGuard = 1.0 - 0.55 * smoothstep(0.65, 0.95, highlight);
+  vec3 col = base.rgb + max(sum - 0.45, 0.0) * uGlow * (1.0 - base.rgb) * detailGuard;
+
+  // Native-grid tube texture: alternating dark rows and a restrained RGB phosphor mask.
+  // No subpixel overlay or resampling of the artwork/text.
+  vec2 cell = floor(local * uViewport.zw / uPixel);
+  col *= 1.0 - uScanline * mod(cell.y, 2.0);
+  float stripe = mod(cell.x, 3.0);
+  vec3 mask = stripe < 1.0 ? vec3(1.0, 1.0-uMask, 1.0-uMask)
+    : stripe < 2.0 ? vec3(1.0-uMask, 1.0, 1.0-uMask)
+    : vec3(1.0-uMask, 1.0-uMask, 1.0);
+  col *= mask;
+
+  // Lift midtones to compensate for scanline/mask losses without additive white clipping.
+  // Black and white remain fixed endpoints, preserving detail in pale artwork.
+  col = pow(clamp(col, 0.0, 1.0), vec3(uGamma));
 
   // vignette: darker towards the edges
   vec2 c = local - 0.5;
@@ -70,11 +97,12 @@ void main() {
 
   // rounded corners, like the curved glass of a tube
   vec2 d = max(abs(c) - (0.5 - uCorner), 0.0);
-  col *= 1.0 - smoothstep(0.8, 1.0, length(d) / uCorner);
 
-  // a faint brighter band rolling slowly down the screen
+  // A broad, soft light band rolling down the screen, bounded by remaining highlight headroom.
   float band = 1.0 - abs(fract(local.y + uTime * 0.12) - 0.5) * 2.0;
-  col += uRoll * smoothstep(0.92, 1.0, band);
+  col += (1.0 - col) * uRoll * smoothstep(0.74, 1.0, band);
+  // Apply the glass mask last so the rolling light cannot illuminate the cut-off corners.
+  col *= 1.0 - smoothstep(0.8, 1.0, length(d) / uCorner);
 
   gl_FragColor = vec4(col, base.a);
 }
@@ -105,6 +133,10 @@ export class CrtPipeline extends Phaser.Renderer.WebGL.Pipelines.PostFXPipeline 
     this.set1f('uVignette', c.vignette);
     this.set1f('uCorner', c.cornerRadius);
     this.set1f('uRoll', c.roll);
+    this.set1f('uScanline', c.scanlineAlpha);
+    this.set1f('uMask', c.phosphorMask);
+    this.set1f('uGamma', c.gamma);
+    this.set1f('uFringe', c.colorFringe);
     this.set1f('uCrt', screenFx.crt ? 1 : 0);
     this.set1f('uSplit', screenFx.split);
     this.set1f('uWarp', screenFx.warp);

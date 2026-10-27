@@ -75,7 +75,9 @@ export function audioFiles(): { key: string; urls: string[] }[] {
   for (const key of MUSIC)
     files.push({
       key: musicFileKey(key),
-      urls: ['ogg', 'mp3'].map((ext) => `assets/audio/music/${key}.${ext}`),
+      urls: ['ogg', 'mp3'].map(
+        (ext) => `assets/audio/music/${key === 'menu' ? 'menu-one-more-round' : key}.${ext}`,
+      ),
     });
   return files;
 }

@@ -1,0 +1,132 @@
+{
+  "frames": {
+    "cpu-normal": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 176,
+        "h": 20
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 176,
+        "h": 20
+      },
+      "sourceSize": {
+        "w": 176,
+        "h": 20
+      }
+    },
+    "cpu-selected": {
+      "frame": {
+        "x": 0,
+        "y": 20,
+        "w": 176,
+        "h": 20
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 176,
+        "h": 20
+      },
+      "sourceSize": {
+        "w": 176,
+        "h": 20
+      }
+    },
+    "online-normal": {
+      "frame": {
+        "x": 0,
+        "y": 40,
+        "w": 176,
+        "h": 20
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 176,
+        "h": 20
+      },
+      "sourceSize": {
+        "w": 176,
+        "h": 20
+      }
+    },
+    "online-selected": {
+      "frame": {
+        "x": 0,
+        "y": 60,
+        "w": 176,
+        "h": 20
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 176,
+        "h": 20
+      },
+      "sourceSize": {
+        "w": 176,
+        "h": 20
+      }
+    },
+    "options-normal": {
+      "frame": {
+        "x": 0,
+        "y": 80,
+        "w": 176,
+        "h": 20
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 176,
+        "h": 20
+      },
+      "sourceSize": {
+        "w": 176,
+        "h": 20
+      }
+    },
+    "options-selected": {
+      "frame": {
+        "x": 0,
+        "y": 100,
+        "w": 176,
+        "h": 20
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 176,
+        "h": 20
+      },
+      "sourceSize": {
+        "w": 176,
+        "h": 20
+      }
+    }
+  },
+  "meta": {
+    "image": "labels.png",
+    "size": {
+      "w": 176,
+      "h": 120
+    },
+    "scale": "1"
+  }
+}

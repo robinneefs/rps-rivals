@@ -1,0 +1,213 @@
+{
+  "source": "source/components.png",
+  "sourceCrops": {
+    "base": {
+      "region": [
+        0,
+        0,
+        1000,
+        752
+      ],
+      "alphaBounds": [
+        86,
+        132,
+        921,
+        669
+      ]
+    },
+    "ball": {
+      "region": [
+        1000,
+        0,
+        1650,
+        752
+      ],
+      "alphaBounds": [
+        116,
+        190,
+        525,
+        595
+      ]
+    },
+    "shaft": {
+      "region": [
+        1650,
+        0,
+        2092,
+        752
+      ],
+      "alphaBounds": [
+        88,
+        182,
+        227,
+        605
+      ]
+    }
+  },
+  "frameSize": [
+    560,
+    560
+  ],
+  "baseWidth": 245,
+  "baseBottom": 430,
+  "pivot": [
+    288.0120627261761,
+    339.00663449939685
+  ],
+  "sharedBaseHash": "8deab8f5a06e416c6965025a445ad6221c64d480264b12b412ee2cf5deaa3ef2",
+  "fixedBasePixelsCompared": 27722,
+  "basePixelDifferences": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "rightIsMirroredLeft": false,
+  "ballShape": "same supersampled circle in every frame",
+  "projection": {
+    "height": 0.78,
+    "depth": 0.55
+  },
+  "poses": [
+    {
+      "direction": "ul",
+      "tiltDegrees": 12,
+      "ballCenter": [
+        260.9611616965796,
+        183.74489527580297
+      ],
+      "ballDiameter": 128,
+      "projectedOffset": [
+        -27.050901029596503,
+        -11.741739223593868
+      ],
+      "physicalLateralTravel": 38.25575111046772,
+      "mirrored": false
+    },
+    {
+      "direction": "u",
+      "tiltDegrees": 12,
+      "ballCenter": [
+        288.0120627261761,
+        177.58222773132383
+      ],
+      "ballDiameter": 128,
+      "projectedOffset": [
+        0.0,
+        -17.904406768073017
+      ],
+      "physicalLateralTravel": 38.25575111046772,
+      "mirrored": false
+    },
+    {
+      "direction": "ur",
+      "tiltDegrees": 12,
+      "ballCenter": [
+        315.0629637557726,
+        183.74489527580297
+      ],
+      "ballDiameter": 128,
+      "projectedOffset": [
+        27.050901029596503,
+        -11.741739223593868
+      ],
+      "physicalLateralTravel": 38.25575111046772,
+      "mirrored": false
+    },
+    {
+      "direction": "l",
+      "tiltDegrees": 12,
+      "ballCenter": [
+        249.7563116157084,
+        198.62289084208106
+      ],
+      "ballDiameter": 128,
+      "projectedOffset": [
+        -38.25575111046771,
+        3.13625634268422
+      ],
+      "physicalLateralTravel": 38.25575111046772,
+      "mirrored": false
+    },
+    {
+      "direction": "c",
+      "tiltDegrees": 0,
+      "ballCenter": [
+        288.0120627261761,
+        195.48663449939684
+      ],
+      "ballDiameter": 128,
+      "projectedOffset": [
+        0.0,
+        0.0
+      ],
+      "physicalLateralTravel": 0.0,
+      "mirrored": false
+    },
+    {
+      "direction": "r",
+      "tiltDegrees": 12,
+      "ballCenter": [
+        326.2678138366438,
+        198.62289084208106
+      ],
+      "ballDiameter": 128,
+      "projectedOffset": [
+        38.25575111046771,
+        3.13625634268422
+      ],
+      "physicalLateralTravel": 38.25575111046772,
+      "mirrored": false
+    },
+    {
+      "direction": "dl",
+      "tiltDegrees": 12,
+      "ballCenter": [
+        260.9611616965796,
+        213.50088640835915
+      ],
+      "ballDiameter": 128,
+      "projectedOffset": [
+        -27.050901029596503,
+        18.014251908962308
+      ],
+      "physicalLateralTravel": 38.25575111046772,
+      "mirrored": false
+    },
+    {
+      "direction": "d",
+      "tiltDegrees": 12,
+      "ballCenter": [
+        288.0120627261761,
+        219.6635539528383
+      ],
+      "ballDiameter": 128,
+      "projectedOffset": [
+        0.0,
+        24.176919453441457
+      ],
+      "physicalLateralTravel": 38.25575111046772,
+      "mirrored": false
+    },
+    {
+      "direction": "dr",
+      "tiltDegrees": 12,
+      "ballCenter": [
+        315.0629637557726,
+        213.50088640835915
+      ],
+      "ballDiameter": 128,
+      "projectedOffset": [
+        27.050901029596503,
+        18.014251908962308
+      ],
+      "physicalLateralTravel": 38.25575111046772,
+      "mirrored": false
+    }
+  ]
+}

@@ -1,11 +1,9 @@
 import Phaser from 'phaser';
-import { Tex } from '../assets/keys';
-import { MONITOR } from '../config/layout';
 import { palette } from '../config/palette';
 import { tuning } from '../config/tuning';
 import { resultMenu } from '../menus/resultMenu';
 import { MenuView } from '../views/MenuView';
-import { PixelText } from '../views/PixelText';
+import { menuBackdrop, menuPanel, menuTitle, MenuText, menuColors } from '../views/MenuStyle';
 import { getContext } from './context';
 import type { ResultData } from './flow';
 import { SceneKey } from './keys';
@@ -27,34 +25,18 @@ export class ResultScene extends Phaser.Scene {
     const { flow, input, audio } = getContext(this);
     const { session, setup, winner, state } = this.result;
     useMonitorCamera(this);
-    const cx = MONITOR.width / 2;
+
     const won = winner === session.me;
     audio.play(won ? 'winJingle' : 'loseJingle');
 
-    // dithered darkening (a checkerboard of ink pixels), not a smooth alpha overlay
-    this.add.tileSprite(0, 0, MONITOR.width, 156, Tex.dither).setOrigin(0);
-    new PixelText(this, cx, 26, won ? 'YOU WIN!' : `${session.opponentName} WINS`, {
-      size: 3,
-      color: won ? palette.gold : palette.pink,
-      align: 'center',
-      outline: palette.ink,
-      shadow: won ? 0xb3165f : palette.shadow,
-    });
-    // left player's rounds first, so online both players see the same score
-    new PixelText(this, cx, 58, `${state.roundsWon.p1} - ${state.roundsWon.p2}`, {
-      size: 2,
-      color: palette.text,
-      align: 'center',
-      shadow: palette.ink,
-    });
-    new PixelText(this, cx, 76, 'ROUNDS', { color: palette.cyan, align: 'center' });
-
-    // online: who asked for a rematch, or why the match can't go on (blank for a CPU match)
-    const note = new PixelText(this, cx, 142, '', {
-      color: palette.lilac,
-      align: 'center',
-      shadow: palette.ink,
-    });
+    menuBackdrop(this);
+    menuPanel(this, 47, 180);
+    menuTitle(this, won ? 'YOU WIN!' : session.opponentName + ' WINS');
+    new MenuText(this, 95, 59, 'FINAL SCORE', menuColors.cyan);
+    new MenuText(this, 95, 80, state.roundsWon.p1 + ' - ' + state.roundsWon.p2, menuColors.gold);
+    new MenuText(this, 95, 99, 'ROUNDS');
+    // Status remains visible while the online rematch handshake is pending.
+    const note = new MenuText(this, 95, 204, '', menuColors.cyan);
 
     let leaving = false;
     let asked = false;
@@ -74,10 +56,9 @@ export class ResultScene extends Phaser.Scene {
           flow.toHome();
         },
       }),
-      96,
+      129,
       input,
       audio,
-      112,
     );
     const ended = (text: string) => {
       if (leaving) return;
