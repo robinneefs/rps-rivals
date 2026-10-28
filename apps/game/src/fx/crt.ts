@@ -6,9 +6,9 @@ import { tuning } from '../config/tuning';
  * soft glow into their neighbours (phosphor bloom), the edges darken (vignette), the corners round
  * off like curved glass, alternating scanlines and an RGB mask texture the image, and a faint
  * bright band rolls slowly down the screen. It works on whole
- * monitor pixels in the native framebuffer. No finer device-resolution overlay is applied.
+ * display pixels after the native framebuffer is enlarged (with a native fallback).
  */
-const FRAG = `
+export const CRT_FRAGMENT = `
 #define SHADER_NAME RPS_CRT_FS
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
@@ -34,6 +34,10 @@ uniform float uSplit;
 uniform float uWarp;
 // canvas pixels per monitor pixel (the cameras zoom in by this much)
 uniform float uPixel;
+uniform float uPitch;
+uniform float uThickness;
+uniform float uFlash;
+uniform float uMono;
 
 varying vec2 outTexCoord;
 
@@ -49,16 +53,18 @@ void main() {
   vec2 uv = outTexCoord;
   if (uWarp > 0.0) {
     float row = floor(local.y * uViewport.w / uPixel);
-    uv.x += floor(uWarp * sin(row * 0.35 + uTime * 60.0) + 0.5) * px.x;
+    uv.x += (uWarp * sin(row * 0.35 + uTime * 60.0)) * px.x;
   }
   vec4 base = texture2D(uMainSampler, uv);
 
   // colour split: red and blue pulled apart sideways (the K.O. hit)
   if (uSplit > 0.0) {
-    float s = floor(uSplit + 0.5) * px.x;
+    float s = uSplit * px.x;
     base.r = texture2D(uMainSampler, uv + vec2(s, 0.0)).r;
     base.b = texture2D(uMainSampler, uv - vec2(s, 0.0)).b;
   }
+  base.rgb = mix(base.rgb, vec3(dot(base.rgb, vec3(0.299, 0.587, 0.114))), uMono);
+  base.rgb = mix(base.rgb, vec3(1.0), uFlash);
   if (uCrt < 0.5) {
     gl_FragColor = base;
     return;
@@ -82,11 +88,10 @@ void main() {
   float detailGuard = 1.0 - 0.55 * smoothstep(0.65, 0.95, highlight);
   vec3 col = base.rgb + max(sum - 0.45, 0.0) * uGlow * (1.0 - base.rgb) * detailGuard;
 
-  // Native-grid tube texture: alternating dark rows and a restrained RGB phosphor mask.
-  // No subpixel overlay or resampling of the artwork/text.
-  vec2 cell = floor(local * uViewport.zw / uPixel);
-  col *= 1.0 - uScanline * mod(cell.y, 2.0);
-  float stripe = mod(cell.x, 3.0);
+  // Display-resolution tube texture, independent of the artwork pixel grid.
+  vec2 cell = local * uViewport.zw / max(uPitch, 1.0);
+  col *= 1.0 - uScanline * smoothstep(1.0 - uThickness - 0.08, 1.0 - uThickness + 0.08, fract(cell.y));
+  float stripe = mod(floor(cell.x), 3.0);
   vec3 mask = stripe < 1.0 ? vec3(1.0, 1.0-uMask, 1.0-uMask)
     : stripe < 2.0 ? vec3(1.0-uMask, 1.0, 1.0-uMask)
     : vec3(1.0-uMask, 1.0-uMask, 1.0);
@@ -107,7 +112,7 @@ void main() {
   float band = 1.0 - abs(fract(local.y + uRollPhase) - 0.5) * 2.0;
   col += (1.0 - col) * uRoll * smoothstep(0.74, 1.0, band);
   // Apply the glass mask last so the rolling light cannot illuminate the cut-off corners.
-  col *= 1.0 - smoothstep(0.8, 1.0, length(d) / uCorner);
+  col *= 1.0 - smoothstep(0.8, 1.0, length(d) / max(uCorner, 0.0001));
 
   gl_FragColor = vec4(col, base.a);
 }
@@ -119,11 +124,11 @@ export const CRT_PIPELINE = 'RpsCrt';
  * What the monitor shader shows right now, shared by every monitor camera: the CRT look (the
  * player's setting) and the impact effects, which pulse up and fade (see screenPulse).
  */
-export const screenFx = { crt: true, split: 0, warp: 0 };
+export const screenFx = { crt: true, split: 0, warp: 0, flash: 0, mono: 0, presentation: false };
 
 export class CrtPipeline extends Phaser.Renderer.WebGL.Pipelines.PostFXPipeline {
   constructor(game: Phaser.Game) {
-    super({ game, name: CRT_PIPELINE, fragShader: FRAG });
+    super({ game, name: CRT_PIPELINE, fragShader: CRT_FRAGMENT });
   }
 
   override onDraw(target: Phaser.Renderer.WebGL.RenderTarget): void {
@@ -145,9 +150,13 @@ export class CrtPipeline extends Phaser.Renderer.WebGL.Pipelines.PostFXPipeline 
     this.set1f('uMask', c.phosphorMask);
     this.set1f('uGamma', c.gamma);
     this.set1f('uFringe', c.colorFringe);
-    this.set1f('uCrt', screenFx.crt ? 1 : 0);
-    this.set1f('uSplit', screenFx.split);
-    this.set1f('uWarp', screenFx.warp);
+    this.set1f('uPitch', c.texturePitch);
+    this.set1f('uThickness', c.scanlineThickness);
+    this.set1f('uFlash', screenFx.presentation ? 0 : screenFx.flash);
+    this.set1f('uMono', screenFx.presentation ? 0 : screenFx.mono);
+    this.set1f('uCrt', screenFx.crt && !screenFx.presentation ? 1 : 0);
+    this.set1f('uSplit', screenFx.presentation ? 0 : screenFx.split);
+    this.set1f('uWarp', screenFx.presentation ? 0 : screenFx.warp);
     this.set1f('uPixel', cam?.zoom ?? 1);
     this.bindAndDraw(target);
   }
@@ -174,11 +183,19 @@ export function useScreenShader(cam: Phaser.Cameras.Scene2D.Camera): void {
  * An impact effect on the monitor: `split` pulls the colours apart, `warp` makes the rows wobble.
  * Starts at `px` and fades to nothing over `ms` on the scene's tweens (so slow motion slows it).
  */
-export function screenPulse(scene: Phaser.Scene, kind: 'split' | 'warp', px: number, ms: number): () => void {
-  scene.tweens.killTweensOf(screenFx);
+const activePulses = new Map<string, () => void>();
+
+export function screenPulse(
+  scene: Phaser.Scene,
+  kind: 'split' | 'warp' | 'flash' | 'mono',
+  px: number,
+  ms: number,
+): () => void {
+  activePulses.get(kind)?.();
   screenFx[kind] = px;
   const reset = () => {
     screenFx[kind] = 0;
+    activePulses.delete(kind);
     scene.events.off('shutdown', cancel);
   };
   const cancel = () => {
@@ -193,6 +210,7 @@ export function screenPulse(scene: Phaser.Scene, kind: 'split' | 'warp', px: num
     onStop: reset,
     onComplete: reset,
   });
+  activePulses.set(kind, cancel);
   scene.events.once('shutdown', cancel);
   return cancel;
 }

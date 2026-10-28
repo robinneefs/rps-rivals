@@ -15,7 +15,7 @@ Before the final release of the new game version, review and address every outst
 
 - Completed: online exit/disconnection flow and stale-connection detection implemented. On 2026-10-28 the user reported completing the recommended playtest and that everything seemed to work fine; individual scenarios/devices were not separately enumerated.
 - Completed: rematch-screen notification when the online opponent has pressed Rematch and is waiting for acceptance; included in the online-flow work preceding the user's playtest report.
-- [ ] When building the CRT experiment/control panel, add a separate effects panel with a selection of proposed intense, short-burst CRT effects for possible use in the game. Provide a preview of the main gameplay screen where each effect can be triggered and tested before choosing which to use. The specifically requested versus K.O.-style jolt is already implemented; this broader experiment remains open.
+- [x] CRT control panel, fine tuning and effects playground completed and accepted by the user on 28 October. Effects Studio provides real gameplay preview and individually triggerable short-burst CRT effects; accepted CRT defaults are saved in tuning.ts.
 - Implemented: approved fighting-game victory splash with all three existing large character portraits, Rematch/Main Menu, darker title shadow, blended portrait edge and prolonged entrance. Enabled for normal CPU/online match results; mirror headers identify the winning player.
 
 ## Marquee downscale trial

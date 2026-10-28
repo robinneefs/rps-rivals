@@ -219,9 +219,9 @@ export class LobbyScene extends Phaser.Scene {
     const cx = menuLayout.centerX;
     this.title('JOIN ROOM');
     new MenuText(this, cx, 65, 'ENTER THE CODE', menuColors.cyan);
-    const status = this.statusLines(132);
-    this.hint(['TYPE OR USE THE STICK']);
-    this.tapButton(173, 'BACK', () => this.toMode('menu'));
+    const status = this.statusLines(126);
+    new MenuText(this, cx, 216, 'TYPE OR USE THE STICK', menuColors.cyan);
+    this.tapButton(184, 'BACK', () => this.toMode('menu'));
 
     // four letter boxes; -1 = empty
     const slots: number[] = Array.from({ length: ROOM_CODE_LENGTH }, () => -1);
@@ -267,6 +267,8 @@ export class LobbyScene extends Phaser.Scene {
       status(['', '']);
     };
     const join = () => {
+      if (joining) return;
+      getContext(this).audio.play('menuSelect');
       const roomCode = code();
       if (!isRoomCode(roomCode)) return status(['FILL IN ALL', 'FOUR LETTERS'], palette.pink);
       joining = true;
@@ -286,6 +288,7 @@ export class LobbyScene extends Phaser.Scene {
       syncField();
       draw();
     };
+    this.tapButton(156, 'JOIN ROOM', join);
 
     // A see-through text field over the boxes: tapping them opens the phone's keyboard, and typing
     // goes through the keyboard's own layout. The boxes stay the visible part.
@@ -338,7 +341,6 @@ export class LobbyScene extends Phaser.Scene {
         setLetter(i);
         cursor = Math.min(ROOM_CODE_LENGTH - 1, cursor + 1);
       } else if (a.type === 'confirm' || a.type === 'pick') {
-        getContext(this).audio.play('menuSelect');
         join();
       } else if (a.type === 'back') {
         if (cur >= 0) slots[cursor] = -1;

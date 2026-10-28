@@ -3,7 +3,7 @@ import type { Fighters, Side } from '@rps/core';
 import { characterPresentation } from '../config/characters';
 import { cacheAlternatePortrait } from '../assets/alternatePortraits';
 import { tuning } from '../config/tuning';
-import { screenPulse } from '../fx/crt';
+import { playScreenEffect } from '../fx/screenEffects';
 import { menuColors as C, MenuText } from './MenuStyle';
 
 /** Runs on the persistent transition scene, covering selection and the prepared arena. */
@@ -134,7 +134,7 @@ export class VersusView {
         this.center.setVisible(true);
         if (!this.reduced) {
           impact();
-          this.clearCrt = screenPulse(scene, 'split', tuning.crt.koSplitPx, tuning.versus.crtJoltMs);
+          this.clearCrt = playScreenEffect(scene, 'heavyHit');
           this.burstSparks();
           const flash = scene.add.graphics().fillStyle(C.cream, 0.22).fillRect(0, 0, 192, 240);
           this.impactFlash = flash;

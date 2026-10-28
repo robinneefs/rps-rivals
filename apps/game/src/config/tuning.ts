@@ -165,21 +165,22 @@ export const tuning = {
   /**
    * CRT screen (Options > CRT SCREEN): glow is how much bright colours bleed, vignette darkens the
    * edges, cornerRadius rounds the corners (fraction of the screen), roll is the slow bright band.
-   * Native shader: alternating dark rows at scanlineAlpha and a subtle RGB phosphorMask.
-   * scanlineThickness is retained for the unused legacy device-resolution overlay.
+   * Display-resolution texture: scanlineAlpha darkens rows, scanlineThickness controls their
+   * duty cycle, and texturePitch sets spacing in display pixels, above the game pixel raster.
    */
   crt: {
-    glow: 1.15,
+    glow: 1.63,
     /** Midtone lift after the scanline/mask loss; keeps black/white endpoints intact. */
-    gamma: 0.85,
-    vignette: 0.4,
-    cornerRadius: 0.08,
-    roll: 0.095,
+    gamma: 1,
+    vignette: 0.61,
+    cornerRadius: 0.06,
+    roll: 0.15,
     /** Small one-native-pixel channel fringe, separate from the strong K.O. split. */
-    colorFringe: 0.12,
+    colorFringe: 0.14,
+    texturePitch: 4,
     scanlineThickness: 0.35,
-    scanlineAlpha: 0.12,
-    phosphorMask: 0.055,
+    scanlineAlpha: 0.2,
+    phosphorMask: 0,
     /** Impact effects (on even with the CRT look off): colour split on a K.O., row warp on big hits. */
     koSplitPx: 3,
     koSplitMs: 900,

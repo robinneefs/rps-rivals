@@ -12,6 +12,7 @@ import { browserStore, SettingsStore } from './platform/settings';
 import { BootScene } from './scenes/BootScene';
 import { CabinetShake } from './fx/cabinetShake';
 import { registerCrt, screenFx } from './fx/crt';
+import { mountCrtDisplay } from './fx/CrtDisplay';
 import { CabinetLights, setContext } from './scenes/context';
 import { FightScene } from './scenes/FightScene';
 import { SceneFlow } from './scenes/flow';
@@ -110,10 +111,11 @@ game.events.on(Phaser.Core.Events.STEP, (time: number) =>
   cabinetShake.tick(time, tuning.cabinet.shakeStepMs),
 );
 
-// CRT effects run inside the native framebuffer, never as a finer DOM overlay.
+// Present the native pixel framebuffer through a display-resolution CRT pass.
 game.events.once(Phaser.Core.Events.READY, () => {
   fitCanvas();
   registerCrt(game);
+  mountCrtDisplay(game, cabinet);
   const apply = (on: boolean) => {
     screenFx.crt = on;
   };
@@ -144,25 +146,27 @@ if (import.meta.env.DEV) {
   if (new URLSearchParams(location.search).has('menuReview')) {
     void import('./dev/menuReview').then(({ mountMenuReview }) => mountMenuReview(game, flow));
   }
-  void import('./dev/tuningPanel').then(({ mountTuningPanel }) => {
-    const pane = mountTuningPanel({
-      groups: [
-        { file: 'apps/game/src/config/tuning.ts', title: 'Feel (live)', tree: tuning, expanded: true },
-        {
-          file: 'packages/core/src/config.ts (defaultRules)',
-          title: 'Rules (next match)',
-          tree: defaultRules,
-        },
-        {
-          file: 'packages/core/src/config.ts (defaultTimings)',
-          title: 'Phase timings (next match)',
-          tree: defaultTimings,
-        },
-      ],
-      restartMatch: () => flow.toFight({ mode: 'cpu', cpu: 'random' }),
+  void import('./dev/effectsPanel').then(({ mountEffectsPanel }) => mountEffectsPanel(game, settings));
+  if (new URLSearchParams(location.search).has('legacyTuning'))
+    void import('./dev/tuningPanel').then(({ mountTuningPanel }) => {
+      const pane = mountTuningPanel({
+        groups: [
+          { file: 'apps/game/src/config/tuning.ts', title: 'Feel (live)', tree: tuning, expanded: true },
+          {
+            file: 'packages/core/src/config.ts (defaultRules)',
+            title: 'Rules (next match)',
+            tree: defaultRules,
+          },
+          {
+            file: 'packages/core/src/config.ts (defaultTimings)',
+            title: 'Phase timings (next match)',
+            tree: defaultTimings,
+          },
+        ],
+        restartMatch: () => flow.toFight({ mode: 'cpu', cpu: 'random' }),
+      });
+      if (new URLSearchParams(location.search).get('menuReview')) pane.hidden = true;
     });
-    if (new URLSearchParams(location.search).get('menuReview')) pane.hidden = true;
-  });
 }
 
 // A small read-only hook for the smoke tests: which screens are running, and the match phase.

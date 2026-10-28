@@ -1,5 +1,11 @@
 # RPS Rivals: Project Context
 
+## CRT completed and accepted (2026-10-28)
+
+- User confirmed the CRT control panel and CRT fine tuning are complete and requested pushing the changes. This supersedes earlier CRT next-chat/open-task notes.
+- Effects Studio provides CRT controls and presets, persisted tuning, and a real-game effects playground. The CRT pass runs at display resolution over the native pixel framebuffer; accepted defaults are saved in tuning.ts.
+- The remaining major revamp task is the gameplay visual makeover; see docs/design/release-checklist.md. No deployment or version bump requested.
+
 ## Final acceptance and wrap-up (2026-10-28)
 
 - User accepted the final Taiko combat-speck cleanup and ended this work. Alternate palettes/portraits and bird formation variations are complete and accepted. This supersedes older entries reopening alternate-colour quality. Release checklist and revamp follow-ups now reflect completion.

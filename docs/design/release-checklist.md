@@ -2,7 +2,7 @@
 
 Consolidated 28 October 2026 from PROJECT_CONTEXT.md, revamp-follow-ups.md, the overhaul checkpoint, visual-direction notes and current implementation. This is the current release agenda; older checkpoints remain historical. An unchecked decision must be settled explicitly before release, rather than silently dropped. Creating this checklist does not authorize deployment.
 
-Next-session priority (user, 28 October): set up the CRT shader control panel. Alternate combat palettes and generated portraits are installed and accepted after final Taiko speck cleanup. Harbor/rooftop bird formation variations are also accepted, with frequency unchanged. Gameplay makeover and remaining checklist decisions stay open.
+CRT control panel, effects playground and CRT fine tuning are complete and accepted by the user (28 October). Alternate combat palettes, generated portraits and bird formation variations are also accepted. Gameplay makeover and remaining checklist decisions stay open.
 
 ## 1. Gameplay visual makeover — main remaining work
 
@@ -24,10 +24,10 @@ These are design/review tasks, not approval of particular replacement artwork or
 
 - [x] Reuse the existing K.O. colour-split effect as a short versus-impact jolt, with cleanup and reduced-motion suppression. This specific requested effect is complete; the broader playground below remains open.
 
-- [ ] Review remaining filter performance and CRT-on brightness/readability. Recent mobile rendering fixes do not by themselves close the earlier brightness/tuning request.
-- [ ] Settle the proposed CRT/brightness control dials: development-only versus player-facing, useful controls and accepted defaults.
-- [ ] Build a separate effects panel beside a preview of real gameplay, with individually triggerable candidates for intense, short-burst CRT effects.
-- [ ] Let the user test and choose candidates before integrating them into match beats. Review reduced-motion behavior, readability and performance of any selected effects.
+- [x] CRT fine tuning complete and accepted by the user, closing the earlier brightness/readability and filter-tuning request.
+- [x] Development Effects Studio provides CRT controls, presets and persisted settings; accepted defaults are saved in tuning.ts.
+- [x] Separate effects playground provides real gameplay preview and individually triggerable short-burst CRT effects.
+- [x] User confirmed the CRT control panel and fine tuning are done. Any future integration of additional effects into redesigned combat beats belongs to the gameplay makeover.
 
 ## 3. Remaining visual and product decisions
 
