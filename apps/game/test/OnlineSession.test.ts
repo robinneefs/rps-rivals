@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { SessionEvents } from '../src/session/MatchSession';
 import { OnlineSession } from '../src/session/OnlineSession';
 import type { SocketHandlers } from '../src/session/socket';
+import { stageFor, STAGES } from '../src/config/stages';
 
 /** An OnlineSession on a fake socket: the test plays the room. */
 function setup() {
@@ -35,6 +36,24 @@ const state = (p1: number, p2: number, won = { p1: 0, p2: 0 }) => ({
 });
 
 describe('OnlineSession', () => {
+  it('keeps both players on the same rotating stage across repeated rematches', () => {
+    const a = setup(),
+      b = setup();
+    let previous = stageFor(a.session.stageSeed()).id;
+    const visited = new Set([previous]);
+    for (let i = 0; i < STAGES.length * 3; i++) {
+      a.room({ type: 'rematchAccepted' });
+      b.room({ type: 'rematchAccepted' });
+      const next = stageFor(a.session.stageSeed()).id;
+      expect(next).not.toBe(previous);
+      expect(next).toBe(stageFor(b.session.stageSeed()).id);
+      visited.add(next);
+      previous = next;
+    }
+    expect(visited.size).toBe(STAGES.length);
+    a.session.dispose();
+    b.session.dispose();
+  });
   it('connects to the room code and says hello when the socket opens', () => {
     const { sent, socket, handlers } = setup();
     expect(socket.url).toBe('wss://example.test/room/ABCD');

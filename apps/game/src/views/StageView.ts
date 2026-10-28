@@ -2,11 +2,14 @@ import type Phaser from 'phaser';
 import { MONITOR } from '../config/layout';
 import { stageCloudTexture, stageTexture, type StageDef } from '../config/stages';
 import { addStormStage } from './StormStageView';
+import { addHarborStage } from './HarborStageView';
+import { addDistantBirds } from './DistantBirds';
 
 /** Native-pixel layers: sky, drifting clouds, then the city/rail/floor that occludes them. */
 export function addStage(scene: Phaser.Scene, stage: StageDef, seed = 0): (() => void) | undefined {
   scene.data.set('stageId', stage.id);
   scene.data.set('stageEffects', null);
+  if (stage.harbor) return addHarborStage(scene);
   if (stage.storm) return addStormStage(scene, stage, seed);
   if (stage.sky !== undefined)
     scene.add.rectangle(0, 0, MONITOR.width, MONITOR.height, stage.sky).setOrigin(0);
@@ -40,5 +43,6 @@ export function addStage(scene: Phaser.Scene, stage: StageDef, seed = 0): (() =>
     });
     scene.events.once('shutdown', () => timer.remove());
   }
+  if (stage.id === 'rooftop') addDistantBirds(scene);
   scene.add.image(0, 0, stageTexture(stage.id)).setOrigin(0);
 }

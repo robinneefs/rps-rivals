@@ -8,6 +8,8 @@ To rebuild the stage theme: run `node tools/audio/make-menu-riff.mjs`, then `nod
 
 ## Sources and licences
 
+Sunset Harbor uses the approved **Golden Hour**, a144BPM stereo chiptune-funk loop (53.333seconds). Original master, listening preview, metrics and browser verification are in `art/audio/harbor-golden-hour-v1/`. Generate with `node tools/audio/make-harbor-theme.mjs`; install with `node tools/audio/install-harbor-theme.mjs` (ffmpeg on PATH or `RPS_FFMPEG`). Production `stage-golden-hour.ogg` and `.mp3` are selected via `music: 'harbor'`. Rooftop and Storm Field retain their existing themes. All sounds are original synthesis, no outside samples, under this repository's LICENSE.
+
 Storm Field now uses the approved **Under the Storm v2**, a148BPM C-minor chip-rock loop (about52seconds) with a distinct syncopated melody. Generate with `node tools/audio/make-storm-theme-v2.mjs`, then install with `node tools/audio/install-storm-theme.mjs` (ffmpeg or `RPS_FFMPEG`). Sources/master/preview/report: `art/audio/storm-theme-v2/`; production `stage-under-the-storm.ogg` and `.mp3`, selected by the stage's `music: 'storm'`. Same original synth/no external samples licence as existing tracks. Rooftop retains Ready to Rival. V1 exports remain backed up in `art/audio/storm-theme-v1/installed-backup/`. Browser verification passed both stage selections and stereo OGG/MP3 decoding.
 
 | What | Files | Source | Licence |

@@ -24,6 +24,11 @@ const memoryStore = (data: Record<string, string> = {}): KeyValueStore => ({
 
 describe('sound files', () => {
   it('loads a dedicated storm theme and retains the original rooftop theme', () => {
+    expect(stageFor(0, 'sunset-harbor').music).toBe('harbor');
+    expect(audioFiles().find((file) => file.key === 'music.harbor')?.urls).toEqual([
+      'assets/audio/music/stage-golden-hour.ogg',
+      'assets/audio/music/stage-golden-hour.mp3',
+    ]);
     expect(stageFor(0, 'storm-field').music).toBe('storm');
     expect(stageFor(0, 'rooftop').music ?? 'fight').toBe('fight');
     expect(audioFiles().find((file) => file.key === 'music.storm')?.urls).toEqual([

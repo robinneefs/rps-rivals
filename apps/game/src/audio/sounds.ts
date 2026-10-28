@@ -54,12 +54,13 @@ export const SFX_GAIN: Partial<Record<SfxKey, number>> = {
   loseJingle: 0.64,
 };
 
-export const MUSIC = ['menu', 'fight', 'storm'] as const;
+export const MUSIC = ['menu', 'fight', 'storm', 'harbor'] as const;
 export type MusicKey = (typeof MUSIC)[number];
 const MUSIC_FILES: Record<MusicKey, string> = {
   menu: 'menu-one-more-round',
   fight: 'stage-ready-to-rival',
   storm: 'stage-under-the-storm',
+  harbor: 'stage-golden-hour',
 };
 
 /** The hit sound for the move that landed. */

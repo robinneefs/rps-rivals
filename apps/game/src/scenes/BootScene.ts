@@ -9,6 +9,8 @@ import { registerPixelFont } from '../assets/pixelFont';
 import { palette } from '../config/palette';
 import {
   STAGES,
+  HARBOR_LAYERS,
+  harborTexture,
   stageCloudTexture,
   stageFieldTexture,
   stageForegroundTexture,
@@ -56,6 +58,14 @@ export class BootScene extends Phaser.Scene {
     this.load.image(HomeTex.arrow, `${home}arrow.png`);
     this.load.image('victory-title', `${home}victory-title.png`);
     for (const stage of STAGES) {
+      if (stage.harbor)
+        for (const layer of HARBOR_LAYERS)
+          this.load.image(harborTexture(layer), `${stage.harbor}${layer}.png`);
+      if (stage.harbor)
+        this.load.spritesheet('harbor-water-wave', `${stage.harbor}water-wave.png`, {
+          frameWidth: 192,
+          frameHeight: 240,
+        });
       if (stage.image) this.load.image(stageTexture(stage.id), stage.image);
       if (stage.clouds) this.load.image(stageCloudTexture(stage.id), stage.clouds.image);
       if (stage.storm) {

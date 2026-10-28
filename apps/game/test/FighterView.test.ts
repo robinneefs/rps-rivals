@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import type Phaser from 'phaser';
 import { FighterView } from '../src/views/FighterView';
 import { FIGHTER_GEOMETRY } from '../src/config/fighterGeometry';
+import { FIGHTER_FOOTPRINTS } from '../src/config/fighterFootprints';
 
 describe('approved fighter placement', () => {
   for (const texture of ['fighter-p1', 'fighter-p2', 'fighter-anchor'].flatMap((key) => [
@@ -32,16 +33,30 @@ describe('approved fighter placement', () => {
             return this;
           },
         };
+        const shadow = { x: 0, width: 0, height: 0, visible: true, color: -1, alpha: 0 };
         const scene = {
           add: {
-            rectangle: () => ({
+            ellipse: (_x: number, _y: number, _w: number, _h: number, color: number, alpha: number) => ({
+              setName() {
+                return this;
+              },
+              setVisible(visible: boolean) {
+                shadow.visible = visible;
+                return this;
+              },
               setOrigin() {
                 return this;
               },
-              setSize() {
+              setSize(width: number, height: number) {
+                Object.assign(shadow, { width, height, color, alpha });
                 return this;
               },
-              x: 0,
+              get x() {
+                return shadow.x;
+              },
+              set x(value: number) {
+                shadow.x = value;
+              },
             }),
             sprite: (x: number, y: number) => Object.assign(image, { x, y }),
           },
@@ -68,6 +83,16 @@ describe('approved fighter placement', () => {
             expect(image.originY).toBe(156);
             expect(image.flipX).toBe(side === 'p2');
             expect(Number.isInteger(image.x)).toBe(true);
+            expect(shadow.visible).toBe(pose !== 'ko');
+            expect(shadow.color).toBe(0);
+            expect(shadow.alpha).toBe(0.5);
+            const footprint = FIGHTER_FOOTPRINTS[texture.replace(/-alternate$/, '')]?.[pose];
+            if (pose === 'kick') expect(shadow.width).toBe(20);
+            else if (footprint) {
+              expect(shadow.width).toBe(footprint.width);
+              const center = footprint.left + footprint.width / 2 - geometry.originX;
+              expect(shadow.x).toBe(Math.round(image.x + center * (side === 'p1' ? 1 : -1)));
+            }
           }
       });
     }

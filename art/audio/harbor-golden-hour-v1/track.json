@@ -1,0 +1,22 @@
+{
+  "title": "Golden Hour",
+  "previewOnly": true,
+  "bpm": 144,
+  "bars": 32,
+  "key": "A minor / C major with seventh chords",
+  "sampleRate": 44100,
+  "channels": 2,
+  "durationSeconds": 53.333333333333336,
+  "peakDbFS": -1.1103466040620245,
+  "rmsDbFS": -15.78157823429706,
+  "seamSampleDelta": [5.605552360066213e-7, 0.0000013281405699672177],
+  "sections": [
+    "0:00 Main hook and groove",
+    "0:13 Replies and bell accents",
+    "0:27 Warm contrasting middle",
+    "0:40 Full hook reprise"
+  ],
+  "originalComposition": true,
+  "externalSamples": false,
+  "source": "tools/audio/make-harbor-theme.mjs"
+}

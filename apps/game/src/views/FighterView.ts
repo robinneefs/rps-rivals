@@ -5,11 +5,13 @@ import { tuning } from '../config/tuning';
 import { snap } from '../util/snap';
 import { FIGHTER_GEOMETRY } from '../config/fighterGeometry';
 import { MONITOR } from '../config/layout';
+import { FIGHTER_FOOTPRINTS } from '../config/fighterFootprints';
 
 /** One fighter on the stage. Dumb: it shows the pose it is told to, and breathes while idle. */
 export class FighterView {
   readonly sprite: Phaser.GameObjects.Sprite;
-  private readonly shadow: Phaser.GameObjects.Rectangle;
+  private readonly shadow: Phaser.GameObjects.Ellipse;
+  private readonly footprints: Record<string, { left: number; width: number }>;
   private idle = true;
   private breath = 0;
   private frame: FighterPose = 'idle0';
@@ -23,6 +25,7 @@ export class FighterView {
     floorY: number,
     texture: string = side === 'p1' ? Tex.fighterP1 : Tex.fighterP2,
   ) {
+    this.footprints = FIGHTER_FOOTPRINTS[texture.replace(/-alternate$/, '')] ?? {};
     this.geometry = FIGHTER_GEOMETRY[texture.replace(/-alternate$/, '')] ?? {
       originX: 64,
       originY: 124,
@@ -31,8 +34,9 @@ export class FighterView {
       bounds: {},
     };
     this.shadow = scene.add
-      .rectangle(homeX, floorY, this.geometry.shadowWidth, 4, 0x050014)
-      .setOrigin(0.5, 0.5);
+      .ellipse(homeX, floorY, this.geometry.shadowWidth, 8, 0x000000, 0.5)
+      .setOrigin(0.5, 0.5)
+      .setName(`shadow-${side}`);
     this.sprite = scene.add.sprite(homeX, floorY + 1, texture, 'idle0');
     this.sprite.setName(`fighter-${side}`);
     // Shared foot origin; right-facing source art is mirrored for p2 on the pixel grid.
@@ -97,8 +101,16 @@ export class FighterView {
   }
 
   private placeShadow(): void {
+    this.shadow.setVisible(this.frame !== 'ko');
+    const footprint = this.footprints[this.frame];
+    if (this.frame !== 'kick' && footprint) {
+      const center = footprint.left + footprint.width / 2 - this.geometry.originX;
+      this.shadow.x = snap(this.sprite.x + center * this.facing);
+      this.shadow.setSize(footprint.width, 8);
+      return;
+    }
     // The kick's planted foot sits behind the common pose anchor.
     this.shadow.x = this.sprite.x - (this.frame === 'kick' ? this.geometry.kickOffset * this.facing : 0);
-    this.shadow.setSize(this.frame === 'kick' ? 20 : this.geometry.shadowWidth, 4);
+    this.shadow.setSize(this.frame === 'kick' ? 20 : this.geometry.shadowWidth, 8);
   }
 }

@@ -4,6 +4,7 @@ import { FakeClock } from '../../../packages/core/test/fakeClock';
 import { RandomCpu } from '../src/session/cpu/RandomCpu';
 import { LocalSession } from '../src/session/LocalSession';
 import type { SessionEvents } from '../src/session/MatchSession';
+import { stageFor, STAGES } from '../src/config/stages';
 
 const timings: PhaseTimings = { roundIntroMs: 1000, pickMs: 5000, revealMs: 2000, roundOverMs: 3000 };
 
@@ -26,6 +27,17 @@ function setup(seed = 3) {
 }
 
 describe('LocalSession', () => {
+  it('cycles through every stage on rematch without consecutive repeats', () => {
+    const { session } = setup();
+    const stages = [stageFor(session.stageSeed()).id];
+    for (let i = 0; i < STAGES.length * 3; i++) {
+      session.requestRematch();
+      stages.push(stageFor(session.stageSeed()).id);
+      expect(stages.at(-1)).not.toBe(stages.at(-2));
+    }
+    expect(new Set(stages.slice(0, STAGES.length)).size).toBe(STAGES.length);
+    session.dispose();
+  });
   it('applies selected character damage to both the player and CPU', () => {
     const clock = new FakeClock();
     const session = new LocalSession(

@@ -1,6 +1,18 @@
 import type { PixelBuffer } from '../assets/placeholders/PixelBuffer';
 import type { MusicKey } from '../audio/sounds';
 
+export const HARBOR_LAYERS = [
+  'sky-gradient',
+  'distant-harbor',
+  'water-base',
+  'water-reflections',
+  'boat',
+  'pennant',
+  'rope-span',
+  'dock-foreground',
+] as const;
+export const harborTexture = (layer: (typeof HARBOR_LAYERS)[number]): string => `harbor-${layer}`;
+
 /** Stages authored at the native 192 x 240 resolution. */
 export interface StageDef {
   /** Short and unique; also used in the texture key and the ?stage= test link. */
@@ -16,6 +28,8 @@ export interface StageDef {
   clouds?: { image: string; y: number; height: number; stepMs: number; pauseMs?: number };
   /** Separate native grass sheets; effects never alter match state or combat randomness. */
   storm?: { clouds: string; field: string; foreground: string; frames: number; frameMs: number };
+  /** Directory of aligned 192 × 240 harbor layers. */
+  harbor?: string;
   /** Or a placeholder painted in code. */
   paint?: () => PixelBuffer;
 }
@@ -41,6 +55,13 @@ export const STAGES: readonly StageDef[] = [
       frames: 12,
       frameMs: 120,
     },
+  },
+  {
+    id: 'sunset-harbor',
+    name: 'Sunset Harbor',
+    music: 'harbor',
+    image: 'assets/stages/harbor/sky-gradient.png',
+    harbor: 'assets/stages/harbor/',
   },
 ];
 
