@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { Tex } from '../assets/keys';
 import { MONITOR } from '../config/layout';
-import { homeEntranceFrame, HOME_ENTRANCE } from '../config/homeEntrance';
+import { homeEntranceFrame, HOME_ENTRANCE } from '../config/logoEntrance';
 import { palette } from '../config/palette';
 import { tuning } from '../config/tuning';
 import { getContext } from './context';

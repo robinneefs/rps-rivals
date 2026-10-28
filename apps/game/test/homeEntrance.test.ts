@@ -1,28 +1,32 @@
 import { describe, expect, it } from 'vitest';
-import { HOME_ENTRANCE, homeEntranceFrame } from '../src/config/homeEntrance';
+import { homeEntranceFrame } from '../src/config/homeEntrance';
 
 describe('home entrance choreography', () => {
-  it('reveals pane, fighter, logo, then three labels in order', () => {
-    for (let i = 0; i < 6; i++) {
-      const at = HOME_ENTRANCE.delayMs + i * HOME_ENTRANCE.staggerMs;
-      expect(homeEntranceFrame(at, i).alpha).toBe(0);
-      expect(homeEntranceFrame(at + 50, i).alpha).toBeGreaterThan(0);
-      if (i < 5) expect(homeEntranceFrame(at + 50, i + 1).alpha).toBe(0);
-      expect(homeEntranceFrame(at + HOME_ENTRANCE.fallMs - 1, i).landed).toBe(false);
-      expect(homeEntranceFrame(at + HOME_ENTRANCE.fallMs, i).landed).toBe(true);
-    }
+  it('reveals the portrait before the title and menu', () => {
+    expect(homeEntranceFrame(200, 1).alpha).toBeGreaterThan(0);
+    expect(homeEntranceFrame(200, 2).alpha).toBe(0);
+    expect(homeEntranceFrame(400, 2).alpha).toBeGreaterThan(0);
+    expect(homeEntranceFrame(400, 3).alpha).toBe(0);
   });
-  it('drops, rebounds above its home position, and settles without fractional pixel positions', () => {
-    const start = HOME_ENTRANCE.delayMs;
-    expect(homeEntranceFrame(start, 0).offsetY).toBe(-10);
-    expect(homeEntranceFrame(start + 180, 0).offsetY).toBe(2);
-    expect(homeEntranceFrame(start + 260, 0).offsetY).toBe(-2);
-    expect(homeEntranceFrame(start + 360, 0)).toEqual({ alpha: 1, offsetY: 0, landed: true, complete: true });
-    for (let t = 0; t < 2000; t += 7) {
-      const state = homeEntranceFrame(t, 0);
-      expect(Number.isInteger(state.offsetY)).toBe(true);
-      expect(state.alpha).toBeGreaterThanOrEqual(0);
-      expect(state.alpha).toBeLessThanOrEqual(1);
+  it('keeps each plate and label together during the stagger', () => {
+    for (let row = 0; row < 3; row++) {
+      for (let t = 0; t < 1500; t += 17) {
+        expect(homeEntranceFrame(t, 3 + row)).toEqual(homeEntranceFrame(t, 6 + row));
+      }
+    }
+    expect(homeEntranceFrame(550, 3).alpha).toBeGreaterThan(0);
+    expect(homeEntranceFrame(550, 4).alpha).toBe(0);
+  });
+  it('settles every layer without overshoot or fractional pixel movement', () => {
+    for (let i = 0; i < 9; i++) {
+      let previous = 0;
+      for (let t = 0; t < 1600; t += 7) {
+        const state = homeEntranceFrame(t, i);
+        expect(state.alpha).toBeGreaterThanOrEqual(previous);
+        expect(Number.isInteger(state.offsetX) && Number.isInteger(state.offsetY)).toBe(true);
+        previous = state.alpha;
+      }
+      expect(homeEntranceFrame(1600, i)).toEqual({ alpha: 1, offsetX: 0, offsetY: 0, complete: true });
     }
   });
 });

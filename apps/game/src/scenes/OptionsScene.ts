@@ -10,7 +10,7 @@ import { useMonitorCamera } from './monitor';
 const VOLUME_KEY = { music: 'musicVolume', sfx: 'sfxVolume' } as const;
 
 /**
- * Options: the CRT look, vibration (phones only) and sound (on/off, music and effects volume).
+ * Options: display settings, haptics and sound (on/off, music and effects volume).
  * Changes apply at once.
  */
 export class OptionsScene extends Phaser.Scene {
@@ -24,8 +24,6 @@ export class OptionsScene extends Phaser.Scene {
     menuBackdrop(this);
     menuPanel(this, 47, 190);
     menuTitle(this, 'OPTIONS');
-    // VIBRATION only on phones
-    const listed = { vibration: haptics.supported };
 
     let leaving = false;
     const back = () => {
@@ -50,7 +48,7 @@ export class OptionsScene extends Phaser.Scene {
     };
     const menu = new OptionsMenuView(
       this,
-      optionsMenu(settings.value, listed, {
+      optionsMenu(settings.value, {
         toggleCrt,
         togglePixelPerfect,
         toggleVibration,

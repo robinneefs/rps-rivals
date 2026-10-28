@@ -2,6 +2,10 @@
 export {
   PLAYABLE_CHARACTERS,
   DEFAULT_FIGHTERS,
+  CHARACTER_DAMAGE,
+  CHARACTER_HEALTH,
+  characterStats,
+  rulesForFighters,
   isPlayableCharacter,
   initialCharacterSelection,
   type CharacterId,

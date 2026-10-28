@@ -4,7 +4,10 @@ import { FighterView } from '../src/views/FighterView';
 import { FIGHTER_GEOMETRY } from '../src/config/fighterGeometry';
 
 describe('approved fighter placement', () => {
-  for (const texture of ['fighter-p1', 'fighter-p2', 'fighter-anchor'])
+  for (const texture of ['fighter-p1', 'fighter-p2', 'fighter-anchor'].flatMap((key) => [
+    key,
+    `${key}-alternate`,
+  ]))
     for (const side of ['p1', 'p2'] as const) {
       it(`${texture} ${side}: every pose stays native-sized, floor-registered and inside the monitor`, () => {
         const image = {
@@ -52,7 +55,7 @@ describe('approved fighter placement', () => {
           220,
           texture,
         );
-        const geometry = FIGHTER_GEOMETRY[texture]!;
+        const geometry = FIGHTER_GEOMETRY[texture.replace(/-alternate$/, '')]!;
         for (const [pose, bounds] of Object.entries(geometry.bounds))
           for (const offset of [-20, 0, 12]) {
             fighter.pose(pose as Parameters<FighterView['pose']>[0]);

@@ -1,11 +1,13 @@
 import type Phaser from 'phaser';
 import type { SceneFlow } from '../scenes/flow';
 import { SceneKey } from '../scenes/keys';
+import { isPlayableCharacter } from '@rps/core';
 
 /** Local-only links for reviewing real menu scenes without finishing a match or connecting a rival. */
 export function mountMenuReview(game: Phaser.Game, flow: SceneFlow): void {
   const review = new URLSearchParams(location.search).get('menuReview');
-  if (!review || !['online', 'create', 'join', 'win', 'loss', 'characters'].includes(review)) return;
+  if (!review || !['online', 'create', 'join', 'win', 'loss', 'characters', 'victory'].includes(review))
+    return;
   let opened = false;
   const tick = () => {
     if (!game.scene.isActive(SceneKey.home)) return;
@@ -13,8 +15,19 @@ export function mountMenuReview(game: Phaser.Game, flow: SceneFlow): void {
     const home = game.scene.getScene(SceneKey.home);
     home.time.delayedCall(700, () => {
       if (review === 'characters') flow.toCharacterSelect({ mode: 'cpu', cpu: 'random' });
-      else if (review === 'win' || review === 'loss') {
-        flow.toFight({ mode: 'cpu', cpu: 'random' });
+      else if (review === 'win' || review === 'loss' || review === 'victory') {
+        const requested = new URLSearchParams(location.search).get('fighter');
+        const fighter = requested && isPlayableCharacter(requested) ? requested : 'riot';
+        const alternate =
+          review === 'victory' && new URLSearchParams(location.search).get('palette') === 'alternate';
+        const setup = {
+          mode: 'cpu',
+          cpu: 'random',
+          ...(review === 'victory'
+            ? { fighters: { p1: fighter, p2: alternate ? fighter : 'taiko' } as const }
+            : {}),
+        } as const;
+        flow.toFight(setup);
         const result = () => {
           if (!game.scene.isActive(SceneKey.fight) || opened) return;
           opened = true;
@@ -22,9 +35,9 @@ export function mountMenuReview(game: Phaser.Game, flow: SceneFlow): void {
           game.scene.getScene(SceneKey.fight).time.delayedCall(700, () => {
             const session = flow.activeSession;
             if (!session) return;
-            const winner = review === 'win' ? 'p1' : 'p2';
+            const winner = review === 'loss' || alternate ? 'p2' : 'p1';
             flow.toResult({
-              setup: { mode: 'cpu', cpu: 'random' },
+              setup,
               session,
               winner,
               state: {

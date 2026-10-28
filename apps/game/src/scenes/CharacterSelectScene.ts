@@ -1,4 +1,10 @@
-import { defaultRules, isPlayableCharacter, PLAYABLE_CHARACTERS, type CharacterSelection } from '@rps/core';
+import {
+  defaultRules,
+  characterStats,
+  isPlayableCharacter,
+  PLAYABLE_CHARACTERS,
+  type CharacterSelection,
+} from '@rps/core';
 import Phaser from 'phaser';
 import { CHARACTERS, characterPresentation } from '../config/characters';
 import { getContext } from './context';
@@ -7,7 +13,7 @@ import { SceneKey } from './keys';
 import { useMonitorCamera } from './monitor';
 import { menuBackdrop, menuPanel, menuTitle, MenuText, menuColors as C } from '../views/MenuStyle';
 
-/** Portrait lineup. Cosmetics only: displayed numbers come from the actual shared match rules. */
+/** Portrait lineup; displayed character values come from the actual shared match rules. */
 export class CharacterSelectScene extends Phaser.Scene {
   private selectionData!: CharacterSelectData;
   private selected = 0;
@@ -66,6 +72,7 @@ export class CharacterSelectScene extends Phaser.Scene {
   }
   get state() {
     const rules = this.selectionData.session?.rules ?? defaultRules;
+    const stats = characterStats(CHARACTERS[this.selected]!.id, rules);
     return {
       selected: CHARACTERS[this.selected]!.id,
       confirmed: this.confirmed,
@@ -74,10 +81,10 @@ export class CharacterSelectScene extends Phaser.Scene {
       available: isPlayableCharacter(CHARACTERS[this.selected]!.id),
       status: this.status,
       stats: {
-        rock: rules.damage.rock,
-        paper: rules.damage.paper,
-        scissors: rules.damage.scissors,
-        hp: rules.startHealth,
+        rock: stats.damage.rock,
+        paper: stats.damage.paper,
+        scissors: stats.damage.scissors,
+        hp: stats.hp,
       },
     };
   }
@@ -214,11 +221,12 @@ export class CharacterSelectScene extends Phaser.Scene {
           : '';
     new MenuText(this, 95, 160, status, this.ended ? C.pink : C.cyan);
     const rules = this.selectionData.session?.rules ?? defaultRules;
+    const damage = characterStats(current.id, rules).damage;
     const stats = [
-      ['ROCK', rules.damage.rock, C.pink],
-      ['PAPER', rules.damage.paper, C.gold],
-      ['SCISSORS', rules.damage.scissors, C.cyan],
-      ['HP', rules.startHealth, C.cream],
+      ['ROCK', damage.rock, C.pink],
+      ['PAPER', damage.paper, C.gold],
+      ['SCISSORS', damage.scissors, C.cyan],
+      ['HP', characterStats(current.id, rules).hp, C.cream],
     ] as const;
     stats.forEach(([label, value, color], i) => {
       const x = i % 2 ? 103 : 14,

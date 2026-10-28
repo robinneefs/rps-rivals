@@ -20,10 +20,9 @@ export const VIBRATION_HINT: [string, string] = ['THE PHONE BUZZES WITH', 'EVERY
 
 export type VolumeId = 'music' | 'sfx';
 
-/** VIBRATION is only listed on a device that can vibrate. */
+/** Haptics stays visible so the saved preference is available on every device. */
 export const optionsMenu = (
   settings: Settings,
-  show: { vibration: boolean },
   actions: {
     toggleCrt: () => void;
     togglePixelPerfect: () => void;
@@ -47,17 +46,13 @@ export const optionsMenu = (
     enabled: true,
     onSelect: actions.togglePixelPerfect,
   },
-  ...(show.vibration
-    ? [
-        {
-          id: 'vibration',
-          label: 'VIBRATION',
-          tag: onOffTag(settings.vibration),
-          enabled: true,
-          onSelect: actions.toggleVibration,
-        },
-      ]
-    : []),
+  {
+    id: 'vibration',
+    label: 'HAPTICS',
+    tag: onOffTag(settings.vibration),
+    enabled: true,
+    onSelect: actions.toggleVibration,
+  },
   {
     id: 'sound',
     label: 'SOUND',
@@ -74,7 +69,7 @@ export const optionsMenu = (
   },
   {
     id: 'sfx',
-    label: 'EFFECTS',
+    label: 'SFX',
     tag: volumeTag(settings.sfxVolume),
     enabled: true,
     onSelect: () => actions.stepVolume('sfx'),

@@ -78,7 +78,13 @@ try {
       await a.waitForTimeout(200);
     }
     await Promise.all([scene(a, 'Result'), scene(b, 'Result')]);
+    await a.locator('#game canvas').screenshot({ path: `${output}/online-result-host.png` });
+    await b.locator('#game canvas').screenshot({ path: `${output}/online-result-guest.png` });
     await a.keyboard.press('Enter');
+    await a.waitForTimeout(350);
+    if (!(await a.evaluate(() => window.__rps.scenes().includes('Result'))))
+      throw Error('Rematch started before the rival accepted');
+    await a.locator('#game canvas').screenshot({ path: `${output}/online-result-waiting.png` });
     await b.keyboard.press('Enter');
     await Promise.all([scene(a, 'Fight'), scene(b, 'Fight')]);
     for (const p of [a, b]) {

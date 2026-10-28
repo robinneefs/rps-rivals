@@ -11,14 +11,27 @@ export function addStage(scene: Phaser.Scene, stage: StageDef): void {
     const clouds = scene.add
       .tileSprite(0, layer.y, MONITOR.width, layer.height, stageCloudTexture(stage.id))
       .setOrigin(0);
-    const period = clouds.texture.getSourceImage().width;
+    // TileSprite.texture is its viewport-sized render canvas, not the source panorama.
+    const panorama = scene.textures.get(stageCloudTexture(stage.id));
+    const end = Math.max(0, panorama.getSourceImage().width - MONITOR.width);
     let offset = 0;
+    let direction = 1;
+    let pauseRemaining = 0;
     const timer = scene.time.addEvent({
       delay: layer.stepMs,
       loop: true,
       callback: () => {
-        offset = (offset + 1) % period;
+        if (end === 0) return;
+        if (pauseRemaining > 0) {
+          pauseRemaining -= layer.stepMs;
+          if (pauseRemaining > 0) return;
+        }
+        offset += direction;
         clouds.setTilePosition(offset, 0);
+        if (offset === end || offset === 0) {
+          direction *= -1;
+          pauseRemaining = layer.pauseMs ?? 600;
+        }
       },
     });
     scene.events.once('shutdown', () => timer.remove());

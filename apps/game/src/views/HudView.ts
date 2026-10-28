@@ -29,12 +29,13 @@ export class HudView {
   constructor(
     private readonly scene: Phaser.Scene,
     names: Record<Side, string>,
-    maxHealth: number,
+    maxHealth: number | Record<Side, number>,
     characters: Record<Side, string> = { p1: 'TAIKO', p2: 'RIOT' },
   ) {
+    const health = typeof maxHealth === 'number' ? { p1: maxHealth, p2: maxHealth } : maxHealth;
     this.bars = {
-      p1: { shown: maxHealth, trail: maxHealth, max: maxHealth },
-      p2: { shown: maxHealth, trail: maxHealth, max: maxHealth },
+      p1: { shown: health.p1, trail: health.p1, max: health.p1 },
+      p2: { shown: health.p2, trail: health.p2, max: health.p2 },
     };
     this.gfx = scene.add.graphics();
     const style = { outline: palette.ink, edgePx: 1 } as const;

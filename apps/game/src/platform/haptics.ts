@@ -43,7 +43,7 @@ export class Haptics {
     private readonly visible: () => boolean = () => typeof document === 'undefined' || !document.hidden,
   ) {}
 
-  /** True when this device can vibrate at all (Options shows the setting only then). */
+  /** True when this device exposes a vibration backend. */
   get supported(): boolean {
     return this.backend !== null;
   }

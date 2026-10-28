@@ -26,6 +26,30 @@ function setup(seed = 3) {
 }
 
 describe('LocalSession', () => {
+  it('applies selected character damage to both the player and CPU', () => {
+    const clock = new FakeClock();
+    const session = new LocalSession(
+      defaultRules,
+      timings,
+      clock,
+      seededRng(7),
+      {
+        onPickingStarted: (_context, submit) => submit('rock'),
+        cancel: () => {},
+      },
+      { p1: 'riot', p2: 'anchor' },
+    );
+    session.ready();
+    clock.advance(timings.roundIntroMs);
+    session.submitPick('paper');
+    clock.advance(timings.pickMs);
+    expect(session.snapshot().state.health).toEqual({ p1: 80, p2: 105 });
+    clock.advance(timings.revealMs);
+    session.submitPick('scissors');
+    clock.advance(timings.pickMs);
+    expect(session.snapshot().state.health).toEqual({ p1: 30, p2: 105 });
+    session.dispose();
+  });
   it('starts on ready() and reports the time left in the phase', () => {
     const { clock, session } = setup();
     expect(session.snapshot().phase).toBe('idle');

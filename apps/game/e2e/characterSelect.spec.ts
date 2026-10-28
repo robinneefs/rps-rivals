@@ -45,7 +45,7 @@ test('lineup browsing, playable Anchor, cancel-ready, Riot mirror fight and rema
   page.on('pageerror', (e) => errors.push(e.message));
   await boot(page, 0.5);
   expect((await state(page))?.selected).toBe('taiko');
-  expect((await state(page))?.stats).toEqual({ rock: 15, paper: 10, scissors: 20, hp: 50 });
+  expect((await state(page))?.stats).toEqual({ rock: 25, paper: 25, scissors: 25, hp: 100 });
   await page.locator('#game canvas').screenshot({ path: `${output}/taiko-browsing.png` });
   await page.keyboard.press('ArrowLeft');
   await advance(page, 50);
@@ -147,7 +147,7 @@ test('Anchor mirrors use her own combat atlas and retain identities through a CP
   expect(await state(page)).toMatchObject({
     selected: 'anchor',
     available: true,
-    stats: { rock: 15, paper: 10, scissors: 20, hp: 50 },
+    stats: { rock: 50, paper: 5, scissors: 5, hp: 120 },
   });
   await page.keyboard.press('Enter');
   await until(page, 'Fight');

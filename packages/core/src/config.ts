@@ -1,4 +1,5 @@
 import type { RulesConfig } from './rules/types';
+import { CHARACTER_DAMAGE, CHARACTER_HEALTH } from './characters';
 
 /**
  * Rules: changing these changes who wins. The server (step 5) uses the same values.
@@ -7,6 +8,8 @@ import type { RulesConfig } from './rules/types';
 export const defaultRules: RulesConfig = {
   beats: { rock: 'scissors', scissors: 'paper', paper: 'rock' },
   damage: { rock: 15, paper: 10, scissors: 20 },
+  characterDamage: CHARACTER_DAMAGE,
+  characterHealth: CHARACTER_HEALTH,
   startHealth: 50,
   roundsToWin: 2,
 };

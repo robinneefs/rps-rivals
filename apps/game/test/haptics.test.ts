@@ -25,6 +25,25 @@ function setup(opts: { on?: boolean; visible?: boolean } = {}) {
 }
 
 describe('vibration', () => {
+  it('applies the saved preference immediately to previews, shakes and K.O.s', () => {
+    const settings = new SettingsStore(null);
+    const { calls, backend } = recorder();
+    const haptics = new Haptics(backend, () => settings.value.vibration, tuning.haptics);
+    settings.set('vibration', false);
+    haptics.preview();
+    haptics.shake(4);
+    haptics.ko();
+    expect(calls).toHaveLength(0);
+    settings.set('vibration', true);
+    haptics.preview();
+    expect(calls).toHaveLength(1);
+    haptics.ko();
+    expect(calls).toHaveLength(2);
+    settings.set('vibration', false);
+    haptics.preview();
+    haptics.ko();
+    expect(calls).toHaveLength(2);
+  });
   it('buzzes longer and harder for a bigger shake, within the cap', () => {
     const { calls, haptics, advance } = setup();
     for (const px of [1, 2, 3, 4, 50]) {

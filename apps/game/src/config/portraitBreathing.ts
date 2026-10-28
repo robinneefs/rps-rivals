@@ -1,4 +1,4 @@
-/** Quiet torso-only motion: long relaxed exhale, no negative overshoot or whole-image bob. */
+/** Shared relaxed breath envelope; individual body regions follow with short delays. */
 export function portraitBreathAmount(elapsedMs: number): number {
   const t = ((elapsedMs % 3600) + 3600) % 3600;
   const ease = (v: number) => v * v * (3 - 2 * v);

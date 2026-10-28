@@ -1,10 +1,11 @@
-import { opponentOf, type Side } from '@rps/core';
+import { opponentOf, characterStats, type Side } from '@rps/core';
 import Phaser from 'phaser';
 import { STAGE } from '../config/layout';
 import { palette } from '../config/palette';
 import { stageFor } from '../config/stages';
 import { tuning } from '../config/tuning';
 import { characterPresentation } from '../config/characters';
+import { combatTexture } from '../assets/alternatePalettes';
 import { FightDirector } from '../fight/FightDirector';
 import { BannerView } from '../views/BannerView';
 import { ClashView } from '../views/ClashView';
@@ -42,27 +43,23 @@ export class FightScene extends Phaser.Scene {
     addStage(this, stage);
 
     const fighters = {
-      p1: new FighterView(
-        this,
-        'p1',
-        STAGE.fighterX.p1,
-        STAGE.floorY,
-        characterPresentation(session.fighters.p1).combat!,
-      ),
-      p2: new FighterView(
-        this,
-        'p2',
-        STAGE.fighterX.p2,
-        STAGE.floorY,
-        characterPresentation(session.fighters.p2).combat!,
-      ),
+      p1: new FighterView(this, 'p1', STAGE.fighterX.p1, STAGE.floorY, combatTexture(session.fighters, 'p1')),
+      p2: new FighterView(this, 'p2', STAGE.fighterX.p2, STAGE.floorY, combatTexture(session.fighters, 'p2')),
     };
     const names = labels(session);
     const tags = new TagView(this, names);
-    const hud = new HudView(this, hudNames(session, setup), session.rules.startHealth, {
-      p1: characterPresentation(session.fighters.p1).name,
-      p2: characterPresentation(session.fighters.p2).name,
-    });
+    const hud = new HudView(
+      this,
+      hudNames(session, setup),
+      {
+        p1: characterStats(session.fighters.p1, session.rules).hp,
+        p2: characterStats(session.fighters.p2, session.rules).hp,
+      },
+      {
+        p1: characterPresentation(session.fighters.p1).name,
+        p2: characterPresentation(session.fighters.p2).name,
+      },
+    );
     const clash = new ClashView(this, names, session.me);
     const banner = new BannerView(this, 90);
     /** Online, the rival left or the connection dropped: the match is over without a result. */

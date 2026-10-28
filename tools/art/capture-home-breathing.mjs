@@ -3,6 +3,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 const browser = await chromium.launch({ channel: 'chrome' });
 try {
   for (const [id, random] of [
+    ['riot', 0.02],
     ['taiko', 0.5],
     ['anchor', 0.99],
   ]) {

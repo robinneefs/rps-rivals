@@ -9,6 +9,7 @@ const results = [],
   errors = [];
 try {
   for (const [id, random] of [
+    ['riot', 0.02],
     ['taiko', 0.5],
     ['anchor', 0.99],
   ]) {
@@ -39,7 +40,10 @@ try {
     writeFileSync(`${folder}/${id}-inhale.png`, inhale);
     const a = await sharp(rest).ensureAlpha().raw().toBuffer(),
       b = await sharp(inhale).ensureAlpha().raw().toBuffer();
-    const source = `art/portraits/action-v1/native/${id}-rest.png`,
+    const source =
+        id === 'riot'
+          ? 'art/menus/action-v2/native/riot-rest.png'
+          : `art/portraits/action-v1/native/${id}-rest.png`,
       mask = await sharp(source).ensureAlpha().raw().toBuffer();
     const regions = {
       face: { x0: 109, x1: 166, y0: 70, y1: 107 },
@@ -61,9 +65,13 @@ try {
         }
       diff[name] = { changed: n, checked };
     }
-    for (const name of ['face', 'leftHand', 'rightHand', 'waist'])
+    for (const name of ['waist'])
       if (diff[name].changed) throw Error(`${id} ${name} shifted: ${JSON.stringify(diff)}`);
     if (diff.chest.changed < 5) throw Error(`${id} no visible chest motion: ${JSON.stringify(diff)}`);
+    if (diff.leftHand.changed < 5 || diff.face.changed < 5)
+      throw Error(`${id} missing coordinated body motion`);
+    if ((await page.evaluate(() => window.__rps.homePortrait().frame)) !== 'rest')
+      throw Error('Portrait changed source frame');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(100);
     if ((await page.evaluate(() => window.__rps.homePortrait().amount)) !== 0)

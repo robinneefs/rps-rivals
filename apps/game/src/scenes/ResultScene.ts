@@ -3,13 +3,13 @@ import { palette } from '../config/palette';
 import { tuning } from '../config/tuning';
 import { resultMenu } from '../menus/resultMenu';
 import { MenuView } from '../views/MenuView';
-import { menuBackdrop, menuPanel, menuTitle, MenuText, menuColors } from '../views/MenuStyle';
 import { getContext } from './context';
 import type { ResultData } from './flow';
 import { SceneKey } from './keys';
 import { useMonitorCamera } from './monitor';
+import { VictoryView } from '../views/VictoryView';
 
-/** Over the last fight frame: who won, the round score, and REMATCH / MAIN MENU. */
+/** Winner portrait splash with the existing local/online rematch and exit actions. */
 export class ResultScene extends Phaser.Scene {
   private result!: ResultData;
 
@@ -23,20 +23,18 @@ export class ResultScene extends Phaser.Scene {
 
   create(): void {
     const { flow, input, audio } = getContext(this);
-    const { session, setup, winner, state } = this.result;
+    const { session, setup, winner } = this.result;
     useMonitorCamera(this);
 
     const won = winner === session.me;
     audio.play(won ? 'winJingle' : 'loseJingle');
 
-    menuBackdrop(this);
-    menuPanel(this, 47, 180);
-    menuTitle(this, won ? 'YOU WIN!' : session.opponentName + ' WINS');
-    new MenuText(this, 95, 59, 'FINAL SCORE', menuColors.cyan);
-    new MenuText(this, 95, 80, state.roundsWon.p1 + ' - ' + state.roundsWon.p2, menuColors.gold);
-    new MenuText(this, 95, 99, 'ROUNDS');
+    // In a mirror, the portrait/name alone cannot identify which player won.
+    const mirror = session.fighters.p1 === session.fighters.p2;
+    const winnerLabel = mirror ? (won ? 'YOU WIN!' : `${session.opponentName} WINS`) : undefined;
+    const victory = new VictoryView(this, session.fighters[winner], winnerLabel, mirror && winner === 'p2');
     // Status remains visible while the online rematch handshake is pending.
-    const note = new MenuText(this, 95, 204, '', menuColors.cyan);
+    const note = victory.note;
 
     let leaving = false;
     let asked = false;
@@ -56,7 +54,7 @@ export class ResultScene extends Phaser.Scene {
           flow.toHome();
         },
       }),
-      129,
+      victory.menuY,
       input,
       audio,
     );

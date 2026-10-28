@@ -1,0 +1,12 @@
+{
+  "fonts": [
+    "bitmap",
+    "spleen",
+    "tamzen-bold",
+    "m6x11"
+  ],
+  "crt": true,
+  "pageErrors": [],
+  "optionsNavigation": true,
+  "note": "Comparison images are captured CRT-filtered game frames. Candidate font bitmaps themselves are native1x; bitmap reference is2x."
+}

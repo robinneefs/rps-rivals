@@ -24,7 +24,7 @@ export const MARQUEE = {
   width: 733,
   height: 161,
   bleed: 1,
-  src: 'assets/cabinet/marquee-v4.webp',
+  src: 'assets/cabinet/marquee-v4-1024.webp',
 } as const;
 
 /** Local artwork patch: a raised bottom bezel matching the top rail, including the fascia below. */

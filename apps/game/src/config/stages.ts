@@ -9,8 +9,8 @@ export interface StageDef {
   image?: string;
   /** Solid sky behind the transparent city layer. Keep the health-bar area clear for the HUD. */
   sky?: number;
-  /** Native-size, horizontally repeating cloud strip, always behind the city. */
-  clouds?: { image: string; y: number; height: number; stepMs: number };
+  /** Cloud panorama pans back and forth behind the city, resting briefly at each end. */
+  clouds?: { image: string; y: number; height: number; stepMs: number; pauseMs?: number };
   /** Or a placeholder painted in code. */
   paint?: () => PixelBuffer;
 }
@@ -21,7 +21,7 @@ export const STAGES: readonly StageDef[] = [
     name: 'City Rooftop',
     image: 'assets/stages/rooftop-v2-192.png',
     sky: 0x0066fe,
-    clouds: { image: 'assets/stages/rooftop-clouds-576.png', y: 52, height: 64, stepMs: 200 },
+    clouds: { image: 'assets/stages/rooftop-clouds-576.png', y: 52, height: 64, stepMs: 200, pauseMs: 600 },
   },
 ];
 

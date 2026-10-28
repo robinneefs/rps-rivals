@@ -76,7 +76,8 @@ export function audioFiles(): { key: string; urls: string[] }[] {
     files.push({
       key: musicFileKey(key),
       urls: ['ogg', 'mp3'].map(
-        (ext) => `assets/audio/music/${key === 'menu' ? 'menu-one-more-round' : key}.${ext}`,
+        (ext) =>
+          `assets/audio/music/${key === 'menu' ? 'menu-one-more-round' : 'stage-ready-to-rival'}.${ext}`,
       ),
     });
   return files;

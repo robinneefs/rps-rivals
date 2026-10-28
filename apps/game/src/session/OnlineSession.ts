@@ -1,5 +1,6 @@
 import {
   defaultRules,
+  characterStats,
   initialCharacterSelection,
   Emitter,
   PROTOCOL_VERSION,
@@ -106,7 +107,10 @@ export class OnlineSession implements MatchSession {
       phase: this.phase,
       state: this.state ?? {
         round: 1,
-        health: { p1: this.rules.startHealth, p2: this.rules.startHealth },
+        health: {
+          p1: characterStats(this.fighters.p1, this.rules).hp,
+          p2: characterStats(this.fighters.p2, this.rules).hp,
+        },
         roundsWon: { p1: 0, p2: 0 },
         winner: null,
       },

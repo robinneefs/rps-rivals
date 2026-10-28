@@ -3,11 +3,13 @@ import { HomeTex, type HomeLayout } from '../assets/homeArt';
 import type { SfxPlayer } from '../audio/sounds';
 import type { Action, InputRouter } from '../input/InputRouter';
 import type { MenuItem } from '../menus/MenuItem';
+import { menuColors } from './MenuStyle';
 
 /** The action menu's native label atlas, with the same inputs/SFX as the other menus. */
 export class HomeMenuView {
   private selected = 0;
   private readonly labels: Phaser.GameObjects.Image[] = [];
+  private readonly plates: Phaser.GameObjects.Image[] = [];
   private readonly arrow: Phaser.GameObjects.Image;
   private entranceReady = true;
 
@@ -20,17 +22,53 @@ export class HomeMenuView {
     texture: string = HomeTex.labels,
     private readonly skipEntrance: () => void = () => {},
   ) {
-    this.selected = Math.max(
-      0,
-      items.findIndex((item) => item.enabled),
-    );
+    const online = items.findIndex((item) => item.id === 'online' && item.enabled);
+    this.selected =
+      online >= 0
+        ? online
+        : Math.max(
+            0,
+            items.findIndex((item) => item.enabled),
+          );
+    for (const selected of [false, true]) {
+      const key = selected ? 'home-plate-selected' : 'home-plate-normal';
+      if (scene.textures.exists(key)) continue;
+      const g = scene.make.graphics({ x: 0, y: 0 });
+      const color = selected ? menuColors.gold : menuColors.edge;
+      g.fillStyle(color);
+      g.fillPoints(
+        [
+          { x: 13, y: 0 },
+          { x: 180, y: 0 },
+          { x: 166, y: 26 },
+          { x: 0, y: 26 },
+        ],
+        true,
+      );
+      g.fillStyle(selected ? 0x291b52 : menuColors.panel);
+      g.fillPoints(
+        [
+          { x: 14, y: 1 },
+          { x: 177, y: 1 },
+          { x: 165, y: 25 },
+          { x: 3, y: 25 },
+        ],
+        true,
+      );
+      g.fillStyle(color);
+      for (let n = 0; n < 4; n++) g.fillRect(180 - n * 3, 3 + n * 4, 9, 2);
+      // The glyphs occupy y+3..15: 26px plates give 7px padding on both sides.
+      g.generateTexture(key, 192, 28);
+      g.destroy();
+    }
     items.forEach((item, i) => {
-      const y = layout.menu.ys[i]!;
+      const y = this.rowY(i);
+      this.plates.push(scene.add.image(0, y - 4, 'home-plate-normal').setOrigin(0));
       const label = scene.add.image(layout.menu.x, y, texture, `${item.id}-normal`).setOrigin(0);
       if (!item.enabled) label.setTint(0x96767f).setAlpha(0.55);
       this.labels.push(label);
-      const top = i === 0 ? y - 5 : Math.floor((layout.menu.ys[i - 1]! + y) / 2) + 8;
-      const bottom = i === items.length - 1 ? 240 : Math.floor((y + layout.menu.ys[i + 1]!) / 2) + 8;
+      const top = i === 0 ? y - 5 : Math.floor((this.rowY(i - 1) + y) / 2) + 8;
+      const bottom = i === items.length - 1 ? 240 : Math.floor((y + this.rowY(i + 1)) / 2) + 8;
       const zone = scene.add
         .zone(0, top, 192, bottom - top)
         .setOrigin(0)
@@ -55,6 +93,10 @@ export class HomeMenuView {
     const off = input.on('action', this.onAction);
     scene.events.once('shutdown', off);
     this.draw();
+  }
+
+  private rowY(index: number): number {
+    return 160 + index * 28;
   }
 
   private onAction = (action: Action): void => {
@@ -83,6 +125,9 @@ export class HomeMenuView {
   }
 
   private draw(): void {
+    this.plates.forEach((plate, i) =>
+      plate.setTexture(i === this.selected ? 'home-plate-selected' : 'home-plate-normal'),
+    );
     this.items.forEach((item, i) =>
       this.labels[i]!.setFrame(`${item.id}-${i === this.selected ? 'selected' : 'normal'}`),
     );
@@ -90,11 +135,18 @@ export class HomeMenuView {
   }
 
   get entranceTargets(): { image: Phaser.GameObjects.Image; y: number; alpha: number }[] {
-    return this.labels.map((image, i) => ({
-      image,
-      y: this.layout.menu.ys[i]!,
-      alpha: this.items[i]!.enabled ? 1 : 0.55,
-    }));
+    return [
+      ...this.plates.map((image, i) => ({
+        image,
+        y: this.rowY(i) - 4,
+        alpha: this.items[i]!.enabled ? 1 : 0.55,
+      })),
+      ...this.labels.map((image, i) => ({
+        image,
+        y: this.rowY(i),
+        alpha: this.items[i]!.enabled ? 1 : 0.55,
+      })),
+    ];
   }
   setEntranceReady(ready: boolean): void {
     this.entranceReady = ready;

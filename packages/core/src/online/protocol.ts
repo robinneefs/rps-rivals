@@ -9,7 +9,7 @@ import { isPlayableCharacter, type PlayableCharacterId, type CharacterSelection 
  * WebSocket. Both sides import this file, so a renamed field is a type error on both ends.
  * Bump PROTOCOL_VERSION whenever a message changes shape: the room refuses clients on another one.
  */
-export const PROTOCOL_VERSION = 2;
+export const PROTOCOL_VERSION = 4;
 
 /**
  * Room codes: four consonants. No vowels, so a random code can't spell a word (rude or otherwise),

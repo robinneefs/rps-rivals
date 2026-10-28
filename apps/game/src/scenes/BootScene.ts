@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { audioFiles } from '../audio/sounds';
+import { generateAlternatePalettes } from '../assets/alternatePalettes';
 import { FONT_SIZES, Tex } from '../assets/keys';
 import { HOME_CHARACTERS, HOME_FONT_STUDY, HomeTex } from '../assets/homeArt';
 import { MENU_TYPOGRAPHY } from '../config/menuTypography';
@@ -47,6 +48,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image(HomeTex.logo, `${home}logo.png`);
     this.load.image(HomeTex.paint, `${home}paint-streak.png`);
     this.load.image(HomeTex.arrow, `${home}arrow.png`);
+    this.load.image('victory-title', `${home}victory-title.png`);
     for (const stage of STAGES) {
       if (stage.image) this.load.image(stageTexture(stage.id), stage.image);
       if (stage.clouds) this.load.image(stageCloudTexture(stage.id), stage.clouds.image);
@@ -58,6 +60,7 @@ export class BootScene extends Phaser.Scene {
   create(): void {
     for (const size of FONT_SIZES) registerPixelFont(this, size);
     generatePlaceholders(this);
+    generateAlternatePalettes(this);
     const art = new URLSearchParams(window.location.search).get('art');
     if (import.meta.env.DEV && (art === 'anchor-sheet' || art === 'riot-sheet' || art === 'taiko-sheet')) {
       void import('./AnchorSheetPreviewScene').then(({ AnchorSheetPreviewScene }) => {

@@ -23,7 +23,7 @@ export class FighterView {
     floorY: number,
     texture: string = side === 'p1' ? Tex.fighterP1 : Tex.fighterP2,
   ) {
-    this.geometry = FIGHTER_GEOMETRY[texture] ?? {
+    this.geometry = FIGHTER_GEOMETRY[texture.replace(/-alternate$/, '')] ?? {
       originX: 64,
       originY: 124,
       shadowWidth: 40,

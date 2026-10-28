@@ -1,0 +1,51 @@
+{
+  "canvas": [
+    192,
+    240
+  ],
+  "pageErrors": [],
+  "differences": [
+    {
+      "name": "taiko",
+      "frame": 1,
+      "changedPixels": 5798,
+      "partialAlpha": 0
+    },
+    {
+      "name": "taiko",
+      "frame": 2,
+      "changedPixels": 5694,
+      "partialAlpha": 0
+    },
+    {
+      "name": "taiko",
+      "frame": 3,
+      "changedPixels": 5800,
+      "partialAlpha": 0
+    },
+    {
+      "name": "anchor",
+      "frame": 1,
+      "changedPixels": 6716,
+      "partialAlpha": 0
+    },
+    {
+      "name": "anchor",
+      "frame": 2,
+      "changedPixels": 6730,
+      "partialAlpha": 0
+    },
+    {
+      "name": "anchor",
+      "frame": 3,
+      "changedPixels": 6601,
+      "partialAlpha": 0
+    },
+    {
+      "name": "riot",
+      "frame": 1,
+      "changedPixels": 3830,
+      "partialAlpha": 0
+    }
+  ]
+}

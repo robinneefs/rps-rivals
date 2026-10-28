@@ -1,0 +1,238 @@
+{
+  "canvas": [
+    192,
+    240
+  ],
+  "grid": {
+    "displaySize": [
+      576,
+      720
+    ],
+    "displayScale": 3,
+    "brokenCells": 0
+  },
+  "pageErrors": [],
+  "differences": [
+    {
+      "name": "background",
+      "frame": 1,
+      "changedPixels": 11372
+    },
+    {
+      "name": "background",
+      "frame": 2,
+      "changedPixels": 12236
+    },
+    {
+      "name": "background",
+      "frame": 3,
+      "changedPixels": 12264
+    }
+  ],
+  "assets": [
+    {
+      "name": "arrow.png",
+      "width": 9,
+      "height": 11,
+      "partialAlpha": 0
+    },
+    {
+      "name": "background-0.png",
+      "width": 192,
+      "height": 240,
+      "partialAlpha": 0
+    },
+    {
+      "name": "background-1.png",
+      "width": 192,
+      "height": 240,
+      "partialAlpha": 0
+    },
+    {
+      "name": "background-2.png",
+      "width": 192,
+      "height": 240,
+      "partialAlpha": 0
+    },
+    {
+      "name": "background-3.png",
+      "width": 192,
+      "height": 240,
+      "partialAlpha": 0
+    },
+    {
+      "name": "background-base.png",
+      "width": 192,
+      "height": 240,
+      "partialAlpha": 0
+    },
+    {
+      "name": "background-sheet.png",
+      "width": 768,
+      "height": 240,
+      "partialAlpha": 0
+    },
+    {
+      "name": "cpu-normal.png",
+      "width": 176,
+      "height": 20,
+      "partialAlpha": 0
+    },
+    {
+      "name": "cpu-selected.png",
+      "width": 176,
+      "height": 20,
+      "partialAlpha": 0
+    },
+    {
+      "name": "labels-14.png",
+      "width": 176,
+      "height": 120,
+      "partialAlpha": 0
+    },
+    {
+      "name": "labels-16.png",
+      "width": 176,
+      "height": 120,
+      "partialAlpha": 0
+    },
+    {
+      "name": "labels-18.png",
+      "width": 176,
+      "height": 120,
+      "partialAlpha": 0
+    },
+    {
+      "name": "labels-20.png",
+      "width": 176,
+      "height": 120,
+      "partialAlpha": 0
+    },
+    {
+      "name": "labels-bitmap.png",
+      "width": 176,
+      "height": 120,
+      "partialAlpha": 0
+    },
+    {
+      "name": "labels.png",
+      "width": 176,
+      "height": 120,
+      "partialAlpha": 0
+    },
+    {
+      "name": "logo-filtered.png",
+      "width": 128,
+      "height": 64,
+      "partialAlpha": 0
+    },
+    {
+      "name": "logo-nearest.png",
+      "width": 128,
+      "height": 64,
+      "partialAlpha": 0
+    },
+    {
+      "name": "logo-soft.png",
+      "width": 128,
+      "height": 64,
+      "partialAlpha": 0
+    },
+    {
+      "name": "logo.png",
+      "width": 128,
+      "height": 64,
+      "partialAlpha": 0
+    },
+    {
+      "name": "online-normal.png",
+      "width": 176,
+      "height": 20,
+      "partialAlpha": 0
+    },
+    {
+      "name": "online-selected.png",
+      "width": 176,
+      "height": 20,
+      "partialAlpha": 0
+    },
+    {
+      "name": "options-normal.png",
+      "width": 176,
+      "height": 20,
+      "partialAlpha": 0
+    },
+    {
+      "name": "options-selected.png",
+      "width": 176,
+      "height": 20,
+      "partialAlpha": 0
+    },
+    {
+      "name": "paint-streak.png",
+      "width": 192,
+      "height": 100,
+      "partialAlpha": 0
+    },
+    {
+      "name": "riot-exhale.png",
+      "width": 192,
+      "height": 240,
+      "partialAlpha": 0
+    },
+    {
+      "name": "riot-inhale.png",
+      "width": 192,
+      "height": 240,
+      "partialAlpha": 0
+    },
+    {
+      "name": "riot-rest.png",
+      "width": 192,
+      "height": 240,
+      "partialAlpha": 0
+    },
+    {
+      "name": "riot-sheet.png",
+      "width": 576,
+      "height": 240,
+      "partialAlpha": 0
+    },
+    {
+      "name": "riot.png",
+      "width": 192,
+      "height": 240,
+      "partialAlpha": 0
+    },
+    {
+      "name": "speed-0.png",
+      "width": 192,
+      "height": 240,
+      "partialAlpha": 0
+    },
+    {
+      "name": "speed-1.png",
+      "width": 192,
+      "height": 240,
+      "partialAlpha": 0
+    },
+    {
+      "name": "speed-2.png",
+      "width": 192,
+      "height": 240,
+      "partialAlpha": 0
+    },
+    {
+      "name": "speed-3.png",
+      "width": 192,
+      "height": 240,
+      "partialAlpha": 0
+    },
+    {
+      "name": "speed-lines.png",
+      "width": 192,
+      "height": 240,
+      "partialAlpha": 0
+    }
+  ]
+}

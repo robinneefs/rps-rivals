@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { defaultRules, seededRng, PROTOCOL_VERSION, type ServerMessage } from '@rps/core';
+import {
+  defaultRules,
+  defaultTimings,
+  characterStats,
+  seededRng,
+  PROTOCOL_VERSION,
+  type ServerMessage,
+} from '@rps/core';
 import { FakeClock } from '../../../packages/core/test/fakeClock';
 import { MatchRoom, type Connection } from '../src/MatchRoom';
 import { OnlineSession } from '../../game/src/session/OnlineSession';
@@ -51,6 +58,38 @@ function network() {
 }
 
 describe('character selection over the match protocol', () => {
+  it('uses the advertised selected character damage for both clients and retains it on rematch', () => {
+    const { a, b, clock } = network();
+    a.session.selectCharacter('riot', true);
+    b.session.selectCharacter('anchor', true);
+    expect(characterStats('riot', b.session.rules).damage.paper).toBe(15);
+    expect(characterStats('anchor', a.session.rules).damage.rock).toBe(50);
+    a.session.ready();
+    b.session.ready();
+    const exchange = (p1: 'paper' | 'scissors', p2: 'rock') => {
+      clock.advance(defaultTimings.roundIntroMs);
+      a.session.submitPick(p1);
+      b.session.submitPick(p2);
+      clock.advance(defaultTimings.pickMs);
+    };
+    exchange('paper', 'rock');
+    expect(a.session.snapshot().state.health).toEqual({ p1: 80, p2: 105 });
+    expect(b.session.snapshot().state).toEqual(a.session.snapshot().state);
+    clock.advance(defaultTimings.revealMs);
+    a.session.submitPick('scissors');
+    b.session.submitPick('rock');
+    clock.advance(defaultTimings.pickMs);
+    expect(a.session.snapshot().state.health).toEqual({ p1: 30, p2: 105 });
+    for (let i = 0; i < 2000 && a.session.snapshot().phase !== 'matchOver'; i++) clock.advance(1000);
+    expect(a.session.snapshot().phase).toBe('matchOver');
+    a.session.requestRematch();
+    b.session.requestRematch();
+    a.session.ready();
+    b.session.ready();
+    exchange('paper', 'rock');
+    expect(a.session.snapshot().state.health).toEqual({ p1: 80, p2: 105 });
+    expect(b.session.snapshot().state).toEqual(a.session.snapshot().state);
+  });
   it('never starts from ready alone; confirmations synchronize identities, including mirrors', () => {
     const { a, b } = network();
     a.session.ready();
@@ -66,7 +105,7 @@ describe('character selection over the match protocol', () => {
     b.session.ready();
     expect(a.session.snapshot().phase).toBe('roundIntro');
     expect(a.session.rules).toEqual(defaultRules);
-    expect(a.session.snapshot().state.health).toEqual({ p1: 50, p2: 50 });
+    expect(a.session.snapshot().state.health).toEqual({ p1: 80, p2: 80 });
   });
   it('allows changing/unconfirming while waiting, but locks both identities at mutual confirmation', () => {
     const { a, b } = network();

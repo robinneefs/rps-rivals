@@ -99,12 +99,11 @@ const memoryStore = (
 };
 
 describe('SettingsStore', () => {
-  it('places Pixel Perfect directly below CRT on both desktop and phone', () => {
+  it('keeps Haptics directly below Pixel Perfect, whether enabled or disabled', () => {
     const noop = () => {};
     for (const vibration of [false, true]) {
       const items = optionsMenu(
-        new SettingsStore(null).value,
-        { vibration },
+        { ...new SettingsStore(null).value, vibration },
         {
           toggleCrt: noop,
           togglePixelPerfect: noop,
@@ -114,7 +113,8 @@ describe('SettingsStore', () => {
           back: noop,
         },
       );
-      expect(items.slice(0, 2).map((item) => item.id)).toEqual(['crt', 'pixelPerfect']);
+      expect(items.slice(0, 3).map((item) => item.id)).toEqual(['crt', 'pixelPerfect', 'vibration']);
+      expect(items[2]).toMatchObject({ label: 'HAPTICS', tag: vibration ? 'ON' : 'OFF', enabled: true });
     }
   });
   it('defaults to the CRT screen on', () => {

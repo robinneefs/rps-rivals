@@ -1,5 +1,34 @@
 # RPS Rivals: Project Context
 
+## Final release requirement (2026-10-28)
+
+- User requires all previously noted outstanding work to be reviewed and addressed before the final release of the new game version. Audit this context, `docs/design/revamp-follow-ups.md`, and the other project planning notes; consolidate a release checklist and resolve every outstanding item before release. Bring any undecided items to the user rather than silently leaving them deferred.
+
+## Deferred CRT effects and online rematch notification (2026-10-28)
+
+- Notes only: when building the CRT experiment/control panel, include a separate effects panel with a range of proposed intense, short-burst CRT effects, triggerable on a preview of the main gameplay screen so the user can test candidates for use in the game.
+- During the already-planned online exit/disconnection-flow rethink, add a notification on the rematch screen when the online opponent has pressed Rematch and is waiting for the player to accept. Tracked together in `docs/design/revamp-follow-ups.md`; implementation remains deferred.
+
+## User-specified character roles and HP (2026-10-28)
+
+- Supersedes the earlier equal-HP rotating damage pass. Exact user values (HP/ROCK/PAPER/SCISSORS): Taiko100/25/25/25; Riot80/15/15/35; Anchor120/50/5/5. Taiko all-rounder, Riot fragile scissors specialist, Anchor rock tank. Shared phase/animation timings unchanged; no actual speed mechanic requested/added.
+- Authoritative characterHealth plus match-bound healthBySide now complement characterDamage/damageBySide. Initial health, each new round, rematches, online pre-phase snapshots, selection and per-side HUD maximums use actual character health. Protocol4 carries the new health rules; future client/server rollout must match. No package version bump or deployment.
+-128 unit tests passed, including individual HP resets and CPU/server damage/rematches; all-workspace typecheck/full lint/build and3 Chrome selection/phone/full-match-rematch checks passed. Running5184 selection captures/state verified all exact values in `art/menus/character-values-v2/`. Alternate palette work remains deferred/discussion only.
+
+## Distinct character damage implemented (2026-10-28)
+
+- User requested unique character values, followed by discussion of one alternate palette each. First tuning pass installed ROCK/PAPER/SCISSORS: Taiko15/10/20, Riot10/20/15, Anchor20/15/10; all HP50. Equal damage sums/health are a starting point, not a playtested balance claim.
+- Shared `CHARACTER_DAMAGE`, `characterStats`, `rulesForFighters` in core; RulesConfig carries authoritative characterDamage and match-bound damageBySide. CPU/server bind selected identities; pure exchange uses winning side's move damage. Selection reads the same authoritative roster values. Rematches retain profiles. Protocol3 prevents old shared-stat clients joining new rooms; package versions unchanged. Future client/server rollout must match; no deployment performed here.
+-127 unit tests/17files passed, including all character/side/move combinations, CPU damage, real client-session/server damage and rematch. All-workspace typecheck/full lint/build and3 Chrome selection/phone/full-match-rematch checks passed. New core coverage `packages/core/test/characters.test.ts`; Anchor selection expected values updated.
+- Alternate palettes remain discussion only; no artwork changes in this pass.
+
+## Victory splash integrated (2026-10-28)
+
+- Approved concept A now supplies normal CPU/online results for Riot, Taiko and Anchor. Existing portrait atlases/shared menu palette/font/controls; native brush headline with deep-plum shadow, slanted pixel-textured torso blend and1.1s entrance (reduced motion respected). Mirror header identifies YOU/opponent.
+- Existing Rematch/Main Menu and online status/session behavior retained. Dev review http://127.0.0.1:5184/?menuReview=victory accepts optional `&fighter=taiko` / `&fighter=anchor`. Art/source/captures/notes: `art/menus/victory-v1/`; presentation `views/VictoryView.ts`; title preparation `tools/art/prepare-victory-title.mjs`.
+- Build, all-workspace typecheck, focused lint,120 unit tests and2 full CPU match/rematch checks passed. Real local Worker/two browsers completed Riot mirror match, both results, waiting and accepted rematch plus existing disconnect checks. Online evidence in `art/menus/victory-v1/online/`. Local Worker8787 started for verification. This victory task did not push/deploy/bump versions.
+- Still review online-match exit UX before finishing revamp (`docs/design/revamp-follow-ups.md`). User deferred further marquee work.
+
 ## Wrap-up checkpoint and push requested (2026-10-28)
 
 - User approved Pixel Perfect, requested it directly below CRT SCREEN, and authorized a push. Options order now CRT SCREEN / PIXEL PERFECT / optional VIBRATION / SOUND / MUSIC / EFFECTS / BACK. All native layout and behavior retained; unit order assertion covers desktop and phone. Updated production capture/touch/grid scripts for the new row positions.
@@ -648,3 +677,9 @@ Architecture rules:
 - 2026-10-24: The user named the new fighters: **TAIKO** (the man, P1, ex-Brawler numbers) and **RIOT** (the woman, ex-Martial artist numbers). Bruiser and Skater are still working titles. First combat-screen mock-up reviewed: layout good (HUD top, open sky for the verdict, feet at about y 300, PICK YOUR MOVE with damage numbers below); pixel sizes mixed across parts and fighters too tall (about 128 game px), so it is a layout reference only; fighters stay about 105 px; rock and paper icons to be redrawn (they read as meat and cheese).
 - 2026-10-24: Second combat-screen mock-up is the layout reference: `docs/mockups/v2/7-combat-pick.webp` (TAIKO vs RIOT, fighters about 100 game px tall, one pixel grid across nearly everything, move icons as white hand signs on pink / yellow / cyan coins with the damage under each).
 - 2026-10-25: New marquee art (ChatGPT, Taiko, Anchor and Riot with the flame title, `art/source/marquee.webp`). The marquee box was shorter than the body's empty panel, so the body's own yellow stripe showed under the art; it is now the measured window, 101, 43, 739 x 180 cabinet units (1478 x 360 file px, 4.1 : 1). Marquee art must be generated at that shape or it gets cropped. A CSS shadow layer over it (seam, top-bezel shadow, edge shading, vignette; strengths in `tuning.marquee`) makes it sit in the cabinet. The PixelLab branch was merged into main with it as v2.2.0.
+
+## Menu polish and cloud scrolling checkpoint (2026-10-28)
+- All three main-menu portraits now breathe from their rest image with torso/head/hand follow-through. Riot no longer cycles generated breathing frames. Reduced motion holds the still pose.
+- Main menu uses angled plates, comfortable equal text padding, shared purple/lavender/gold panel colors, unchanged text hover colors, and defaults to Online when enabled. Victory-style portrait/title/paired-row fades replace the bouncy entrance; studio logo retains its prior animation.
+- Fixed rooftop cloud panning to measure the original source panorama rather than TileSprite's viewport-sized internal texture. Slow 1px/200ms back-and-forth movement pauses at both ends; regression covers the distinction.
+- User requested pushing all outstanding project changes, including earlier gameplay/palette/victory/audio work and review artwork. Private .claude/.codex settings and .tmp scratch files remain local. No deployment requested.

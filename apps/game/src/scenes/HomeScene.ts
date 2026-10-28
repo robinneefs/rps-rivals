@@ -21,7 +21,6 @@ export class HomeScene extends Phaser.Scene {
   private title!: Phaser.GameObjects.Image;
   private entranceTargets: { image: Phaser.GameObjects.Image; y: number; alpha: number }[] = [];
   private entranceFinished = false;
-  private readonly landed = new Set<number>();
   private steadyPortrait = false;
   private portraitMotion: ReturnType<typeof addPortraitBreathing> = null;
   private portraitId = 'riot';
@@ -45,18 +44,61 @@ export class HomeScene extends Phaser.Scene {
     this.elapsed = 0;
     this.logoHoverStart = null;
     this.entranceFinished = false;
-    this.landed.clear();
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     this.background = this.add.image(0, 0, HomeTex.background, 'speed0').setOrigin(0);
     const { character, logo, paint } = this.layout;
     const selected = HOME_CHARACTERS[Math.floor(Math.random() * HOME_CHARACTERS.length)]!;
     this.portraitId = selected.id;
     this.character = this.add.image(character.x, character.y, selected.texture, 'rest').setOrigin(0);
-    this.steadyPortrait = selected.id !== 'riot';
-    this.portraitMotion =
-      selected.id === 'riot' ? null : addPortraitBreathing(this, this.character, selected.id);
+    this.steadyPortrait = true;
+    this.portraitMotion = addPortraitBreathing(this, this.character, selected.id);
     const title = (this.title = this.add.image(logo.x, logo.y, HomeTex.logo).setOrigin(0));
-    const panel = this.add.image(paint.x, paint.y, HomeTex.paint).setOrigin(0);
+    if (!this.textures.exists('home-angled-backdrop')) {
+      const g = this.make.graphics({ x: 0, y: 0 });
+      g.fillStyle(0x291b52);
+      g.fillPoints(
+        [
+          { x: 0, y: 7 },
+          { x: 224, y: 30 },
+          { x: 224, y: 120 },
+          { x: 0, y: 120 },
+        ],
+        true,
+      );
+      g.fillStyle(0xe95079);
+      g.fillPoints(
+        [
+          { x: 0, y: 3 },
+          { x: 224, y: 26 },
+          { x: 224, y: 30 },
+          { x: 0, y: 9 },
+        ],
+        true,
+      );
+      for (let i = 0; i < 5; i++) {
+        const y = 42 + i * 15;
+        g.fillPoints(
+          [
+            { x: 0, y },
+            { x: 28, y: y - 7 },
+            { x: 17, y: y - 1 },
+            { x: 0, y: y + 4 },
+          ],
+          true,
+        );
+        g.fillPoints(
+          [
+            { x: 224, y: y + 7 },
+            { x: 198, y: y + 15 },
+            { x: 212, y: y + 7 },
+          ],
+          true,
+        );
+      }
+      g.generateTexture('home-angled-backdrop', 224, 120);
+      g.destroy();
+    }
+    const panel = this.add.image(paint.x, paint.y, 'home-angled-backdrop').setOrigin(0);
     this.menu = new HomeMenuView(
       this,
       homeMenu(flow),
@@ -96,26 +138,15 @@ export class HomeScene extends Phaser.Scene {
     }
     const bg = this.layout.background;
     this.background.setFrame(`speed${bg.frames[Math.floor(this.elapsed / bg.frameMs) % bg.frames.length]}`);
-    if (this.steadyPortrait) {
-      this.character.setFrame('rest');
-      this.portraitMotion?.update(this.elapsed, false);
-      return;
-    }
-    const loop = this.layout.characterLoop;
-    let left = this.elapsed % loop.durations.reduce((a, b) => a + b, 0);
-    for (let i = 0; i < loop.frames.length; i++) {
-      if (left < loop.durations[i]!) {
-        this.character.setFrame(['rest', 'inhale', 'exhale'][loop.frames[i]!]!);
-        break;
-      }
-      left -= loop.durations[i]!;
-    }
+    this.character.setFrame('rest');
+    this.portraitMotion?.update(this.elapsed, false);
   }
 
   private finishEntrance(): void {
     if (this.entranceFinished) return;
     this.entranceFinished = true;
     this.entranceTargets.forEach(({ image, y, alpha }) => image.setY(y).setAlpha(alpha));
+    this.character.setX(this.layout.character.x);
     this.menu.setEntranceReady(true);
     this.menu.syncEntranceCursor();
     this.logoHoverStart ??= this.elapsed;
@@ -127,16 +158,9 @@ export class HomeScene extends Phaser.Scene {
     this.entranceTargets.forEach(({ image, y, alpha }, i) => {
       const state = homeEntranceFrame(this.elapsed, i);
       image.setY(y + state.offsetY).setAlpha(alpha * state.alpha);
+      if (i === 1) image.setX(this.layout.character.x + state.offsetX);
       if (!state.complete) finished = false;
       if (i === 2 && state.complete) this.logoHoverStart ??= this.elapsed;
-      if (state.landed && !this.landed.has(i)) {
-        this.landed.add(i);
-        if (!document.hidden && !this.reducedMotion.matches) {
-          const { audio, haptics } = getContext(this);
-          audio.play('menuMove', { volume: 0.18, detune: -180 + i * 70 });
-          haptics.shake(1);
-        }
-      }
     });
     this.menu.syncEntranceCursor();
     if (finished) this.finishEntrance();

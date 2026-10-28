@@ -9,6 +9,12 @@ export interface RulesConfig {
   beats: Record<Move, Move>;
   /** Damage dealt to the loser when this move wins the exchange. */
   damage: Record<Move, number>;
+  /** Authoritative roster values, sent with online room rules before selection. */
+  characterDamage?: Record<CharacterId, Record<Move, number>>;
+  characterHealth?: Record<CharacterId, number>;
+  healthBySide?: Record<Side, number>;
+  /** Damage bound to the selected identities when a match starts. */
+  damageBySide?: Record<Side, Record<Move, number>>;
   startHealth: number;
   /** Rounds needed to win the match (2 = best of three). */
   roundsToWin: number;
@@ -33,3 +39,4 @@ export type RuleEvent =
   | { type: 'ko'; side: Side }
   | { type: 'roundWon'; side: Side; round: number; roundsWon: number }
   | { type: 'matchWon'; side: Side };
+import type { CharacterId } from '../characters';

@@ -1,5 +1,6 @@
 import {
   defaultRules,
+  rulesForFighters,
   initialCharacterSelection,
   defaultTimings,
   opponentOf,
@@ -169,7 +170,12 @@ export class MatchRoom {
   }
 
   private createReferee(): Referee {
-    const referee = new Referee(this.rules, this.timings, this.clock, this.rng);
+    const referee = new Referee(
+      rulesForFighters(this.rules, this.selection.fighters),
+      this.timings,
+      this.clock,
+      this.rng,
+    );
     referee.on('phase', (e) =>
       this.broadcast({
         type: 'phase',

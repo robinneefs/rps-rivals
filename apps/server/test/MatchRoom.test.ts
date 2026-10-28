@@ -1,4 +1,4 @@
-import { defaultRules, defaultTimings, PROTOCOL_VERSION, seededRng, type ServerMessage } from '@rps/core';
+import { defaultTimings, PROTOCOL_VERSION, seededRng, type ServerMessage } from '@rps/core';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { FakeClock } from '../../../packages/core/test/fakeClock';
 import { CloseCode, defaultRoomTimeouts, MatchRoom, type Connection } from '../src/MatchRoom';
@@ -99,8 +99,7 @@ describe('MatchRoom', () => {
     send(room, b, { type: 'ready' });
     const [phase] = a.of('phase');
     expect(phase).toMatchObject({ phase: 'roundIntro', msLeft: defaultTimings.roundIntroMs, round: 1 });
-    const full = defaultRules.startHealth;
-    expect(phase?.state.health).toEqual({ p1: full, p2: full });
+    expect(phase?.state.health).toEqual({ p1: 100, p2: 80 });
     expect(b.of('phase')).toEqual(a.of('phase'));
   });
 
@@ -116,7 +115,7 @@ describe('MatchRoom', () => {
     clock.advance(defaultTimings.pickMs);
     const [reveal] = b.of('reveal');
     expect(reveal?.picks).toEqual({ p1: 'scissors', p2: 'paper' });
-    expect(reveal?.outcome).toMatchObject({ kind: 'win', winner: 'p1', damage: 20 });
+    expect(reveal?.outcome).toMatchObject({ kind: 'win', winner: 'p1', damage: 25 });
     expect(reveal?.autoPicked).toEqual({ p1: false, p2: false });
   });
 
