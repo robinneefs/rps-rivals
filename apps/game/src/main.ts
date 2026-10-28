@@ -144,8 +144,8 @@ if (import.meta.env.DEV) {
   if (new URLSearchParams(location.search).has('menuReview')) {
     void import('./dev/menuReview').then(({ mountMenuReview }) => mountMenuReview(game, flow));
   }
-  void import('./dev/tuningPanel').then(({ mountTuningPanel }) =>
-    mountTuningPanel({
+  void import('./dev/tuningPanel').then(({ mountTuningPanel }) => {
+    const pane = mountTuningPanel({
       groups: [
         { file: 'apps/game/src/config/tuning.ts', title: 'Feel (live)', tree: tuning, expanded: true },
         {
@@ -160,8 +160,9 @@ if (import.meta.env.DEV) {
         },
       ],
       restartMatch: () => flow.toFight({ mode: 'cpu', cpu: 'random' }),
-    }),
-  );
+    });
+    if (new URLSearchParams(location.search).get('menuReview') === 'stage') pane.hidden = true;
+  });
 }
 
 // A small read-only hook for the smoke tests: which screens are running, and the match phase.
@@ -190,5 +191,14 @@ if (import.meta.env.DEV) {
           .children.list.filter((object) => object.name === 'fighter-p1' || object.name === 'fighter-p2')
           .map((object) => (object as Phaser.GameObjects.Sprite).texture.key)
       : [],
+  stage: () => {
+    if (!game.scene.isActive(SceneKey.fight)) return null;
+    const scene = game.scene.getScene(SceneKey.fight);
+    return {
+      id: scene.data.get('stageId'),
+      effects: scene.data.get('stageEffects'),
+      layers: scene.children.list.map((object) => object.name).filter(Boolean),
+    };
+  },
   version: VERSION,
 };

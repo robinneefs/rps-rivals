@@ -51,11 +51,11 @@
   "baseWidth": 245,
   "baseBottom": 430,
   "pivot": [
-    288.0120627261761,
+    280.0,
     339.00663449939685
   ],
   "sharedBaseHash": "8deab8f5a06e416c6965025a445ad6221c64d480264b12b412ee2cf5deaa3ef2",
-  "fixedBasePixelsCompared": 27722,
+  "fixedBasePixelsCompared": 27696,
   "basePixelDifferences": [
     0,
     0,
@@ -78,7 +78,7 @@
       "direction": "ul",
       "tiltDegrees": 12,
       "ballCenter": [
-        260.9611616965796,
+        252.9490989704035,
         183.74489527580297
       ],
       "ballDiameter": 128,
@@ -93,7 +93,7 @@
       "direction": "u",
       "tiltDegrees": 12,
       "ballCenter": [
-        288.0120627261761,
+        280.0,
         177.58222773132383
       ],
       "ballDiameter": 128,
@@ -108,7 +108,7 @@
       "direction": "ur",
       "tiltDegrees": 12,
       "ballCenter": [
-        315.0629637557726,
+        307.0509010295965,
         183.74489527580297
       ],
       "ballDiameter": 128,
@@ -123,7 +123,7 @@
       "direction": "l",
       "tiltDegrees": 12,
       "ballCenter": [
-        249.7563116157084,
+        241.7442488895323,
         198.62289084208106
       ],
       "ballDiameter": 128,
@@ -138,7 +138,7 @@
       "direction": "c",
       "tiltDegrees": 0,
       "ballCenter": [
-        288.0120627261761,
+        280.0,
         195.48663449939684
       ],
       "ballDiameter": 128,
@@ -153,7 +153,7 @@
       "direction": "r",
       "tiltDegrees": 12,
       "ballCenter": [
-        326.2678138366438,
+        318.2557511104677,
         198.62289084208106
       ],
       "ballDiameter": 128,
@@ -168,7 +168,7 @@
       "direction": "dl",
       "tiltDegrees": 12,
       "ballCenter": [
-        260.9611616965796,
+        252.9490989704035,
         213.50088640835915
       ],
       "ballDiameter": 128,
@@ -183,7 +183,7 @@
       "direction": "d",
       "tiltDegrees": 12,
       "ballCenter": [
-        288.0120627261761,
+        280.0,
         219.6635539528383
       ],
       "ballDiameter": 128,
@@ -198,7 +198,7 @@
       "direction": "dr",
       "tiltDegrees": 12,
       "ballCenter": [
-        315.0629637557726,
+        307.0509010295965,
         213.50088640835915
       ],
       "ballDiameter": 128,

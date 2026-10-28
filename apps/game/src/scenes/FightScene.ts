@@ -40,12 +40,15 @@ export class FightScene extends Phaser.Scene {
     useMonitorCamera(this);
     // ?stage=<id> in the address forces a stage, for trying one out
     const stage = stageFor(session.stageSeed(), new URLSearchParams(window.location.search).get('stage'));
-    addStage(this, stage);
+    audio.playMusic(stage.music ?? 'fight');
+    const addForeground = addStage(this, stage, session.stageSeed());
 
     const fighters = {
       p1: new FighterView(this, 'p1', STAGE.fighterX.p1, STAGE.floorY, combatTexture(session.fighters, 'p1')),
       p2: new FighterView(this, 'p2', STAGE.fighterX.p2, STAGE.floorY, combatTexture(session.fighters, 'p2')),
     };
+    // Grass/rain overlap the fighters, while tags, move effects and HUD remain above them.
+    addForeground?.();
     const names = labels(session);
     const tags = new TagView(this, names);
     const hud = new HudView(

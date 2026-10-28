@@ -54,8 +54,13 @@ export const SFX_GAIN: Partial<Record<SfxKey, number>> = {
   loseJingle: 0.64,
 };
 
-export const MUSIC = ['menu', 'fight'] as const;
+export const MUSIC = ['menu', 'fight', 'storm'] as const;
 export type MusicKey = (typeof MUSIC)[number];
+const MUSIC_FILES: Record<MusicKey, string> = {
+  menu: 'menu-one-more-round',
+  fight: 'stage-ready-to-rival',
+  storm: 'stage-under-the-storm',
+};
 
 /** The hit sound for the move that landed. */
 export const HIT_SFX: Record<Move, SfxKey> = { rock: 'hitRock', paper: 'hitPaper', scissors: 'hitScissors' };
@@ -75,10 +80,7 @@ export function audioFiles(): { key: string; urls: string[] }[] {
   for (const key of MUSIC)
     files.push({
       key: musicFileKey(key),
-      urls: ['ogg', 'mp3'].map(
-        (ext) =>
-          `assets/audio/music/${key === 'menu' ? 'menu-one-more-round' : 'stage-ready-to-rival'}.${ext}`,
-      ),
+      urls: ['ogg', 'mp3'].map((ext) => `assets/audio/music/${MUSIC_FILES[key]}.${ext}`),
     });
   return files;
 }

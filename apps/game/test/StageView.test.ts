@@ -19,6 +19,7 @@ describe('stage panorama', () => {
       },
     };
     const scene = {
+      data: { set: vi.fn() },
       textures: { get: () => ({ getSourceImage: () => ({ width: MONITOR.width + 4 }) }) },
       add: { tileSprite: () => clouds, image: () => ({ setOrigin() {} }) },
       time: {

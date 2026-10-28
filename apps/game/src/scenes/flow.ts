@@ -16,7 +16,7 @@ const SCENE_MUSIC: Record<string, MusicKey | null> = {
   [SceneKey.characterSelect]: 'menu',
   [SceneKey.howTo]: 'menu',
   [SceneKey.lobby]: 'menu',
-  [SceneKey.fight]: 'fight',
+  // FightScene selects the theme from its actual seeded/overridden stage.
 };
 
 /** How long the result jingle plays before the menu music comes back. */

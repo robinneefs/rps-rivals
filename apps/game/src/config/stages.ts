@@ -1,16 +1,21 @@
 import type { PixelBuffer } from '../assets/placeholders/PixelBuffer';
+import type { MusicKey } from '../audio/sounds';
 
-/** The single temporary rooftop stage, authored at the native 192 x 240 resolution. */
+/** Stages authored at the native 192 x 240 resolution. */
 export interface StageDef {
   /** Short and unique; also used in the texture key and the ?stage= test link. */
   id: string;
   name: string;
+  /** Stage-specific soundtrack; stages without one retain the original fight theme. */
+  music?: MusicKey;
   /** The picture, loaded at boot. The fighters stand at STAGE.floorY. */
   image?: string;
   /** Solid sky behind the transparent city layer. Keep the health-bar area clear for the HUD. */
   sky?: number;
   /** Cloud panorama pans back and forth behind the city, resting briefly at each end. */
   clouds?: { image: string; y: number; height: number; stepMs: number; pauseMs?: number };
+  /** Separate native grass sheets; effects never alter match state or combat randomness. */
+  storm?: { clouds: string; field: string; foreground: string; frames: number; frameMs: number };
   /** Or a placeholder painted in code. */
   paint?: () => PixelBuffer;
 }
@@ -23,10 +28,26 @@ export const STAGES: readonly StageDef[] = [
     sky: 0x0066fe,
     clouds: { image: 'assets/stages/rooftop-clouds-576.png', y: 52, height: 64, stepMs: 200, pauseMs: 600 },
   },
+  {
+    id: 'storm-field',
+    name: 'Storm Field',
+    music: 'storm',
+    image: 'assets/stages/storm-field-192.png',
+    sky: 0x020925,
+    storm: {
+      clouds: 'assets/stages/storm-clouds.png',
+      field: 'assets/stages/storm-field.png',
+      foreground: 'assets/stages/storm-foreground.png',
+      frames: 12,
+      frameMs: 120,
+    },
+  },
 ];
 
 export const stageTexture = (id: string): string => `stage-${id}`;
 export const stageCloudTexture = (id: string): string => `stage-${id}-clouds`;
+export const stageFieldTexture = (id: string): string => `stage-${id}-field`;
+export const stageForegroundTexture = (id: string): string => `stage-${id}-foreground`;
 
 /**
  * The stage for a match. `seed` comes from the session (both online players get the same one);

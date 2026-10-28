@@ -7,7 +7,13 @@ import { MENU_TYPOGRAPHY } from '../config/menuTypography';
 import { generatePlaceholders } from '../assets/placeholders';
 import { registerPixelFont } from '../assets/pixelFont';
 import { palette } from '../config/palette';
-import { STAGES, stageCloudTexture, stageTexture } from '../config/stages';
+import {
+  STAGES,
+  stageCloudTexture,
+  stageFieldTexture,
+  stageForegroundTexture,
+  stageTexture,
+} from '../config/stages';
 import { getContext } from './context';
 import { SceneKey } from './keys';
 
@@ -52,6 +58,17 @@ export class BootScene extends Phaser.Scene {
     for (const stage of STAGES) {
       if (stage.image) this.load.image(stageTexture(stage.id), stage.image);
       if (stage.clouds) this.load.image(stageCloudTexture(stage.id), stage.clouds.image);
+      if (stage.storm) {
+        this.load.image(stageCloudTexture(stage.id), stage.storm.clouds);
+        this.load.spritesheet(stageFieldTexture(stage.id), stage.storm.field, {
+          frameWidth: 192,
+          frameHeight: 240,
+        });
+        this.load.spritesheet(stageForegroundTexture(stage.id), stage.storm.foreground, {
+          frameWidth: 192,
+          frameHeight: 32,
+        });
+      }
     }
     // sound effects and music (made by tools/audio/make-audio.mjs)
     for (const { key, urls } of audioFiles()) this.load.audio(key, urls);

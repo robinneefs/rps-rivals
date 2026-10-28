@@ -49,7 +49,9 @@ def prepare():
     socket = ((arr[:, :, :3].max(axis=2) < 14) & (arr[:, :, 3] > 220)
               & (xx > base.width * .40) & (xx < base.width * .63)
               & (yy > base.height * .30) & (yy < base.height * .55))
-    pivot_x = base_x + float(xx[socket].mean())
+    # Socket shading is asymmetric; its dark-pixel centroid biases the shaft right.
+    # Align every pose to the physical mounting plate center instead.
+    pivot_x = float(center_x)
     pivot_y = base_y + float(yy[socket].mean())
     base_canvas = Image.new('RGBA', (size, size))
     base_canvas.alpha_composite(base, (base_x, base_y))

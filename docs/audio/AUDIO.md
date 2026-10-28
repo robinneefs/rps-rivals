@@ -8,6 +8,8 @@ To rebuild the stage theme: run `node tools/audio/make-menu-riff.mjs`, then `nod
 
 ## Sources and licences
 
+Storm Field now uses the approved **Under the Storm v2**, a148BPM C-minor chip-rock loop (about52seconds) with a distinct syncopated melody. Generate with `node tools/audio/make-storm-theme-v2.mjs`, then install with `node tools/audio/install-storm-theme.mjs` (ffmpeg or `RPS_FFMPEG`). Sources/master/preview/report: `art/audio/storm-theme-v2/`; production `stage-under-the-storm.ogg` and `.mp3`, selected by the stage's `music: 'storm'`. Same original synth/no external samples licence as existing tracks. Rooftop retains Ready to Rival. V1 exports remain backed up in `art/audio/storm-theme-v1/installed-backup/`. Browser verification passed both stage selections and stereo OGG/MP3 decoding.
+
 | What | Files | Source | Licence |
 | --- | --- | --- | --- |
 | All sound effects | `apps/game/public/assets/audio/sfx/*.wav` | Made by `tools/audio/make-audio.mjs` (original) | This repository's licence (`LICENSE`) |

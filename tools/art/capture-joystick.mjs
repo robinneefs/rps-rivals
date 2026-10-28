@@ -12,7 +12,7 @@ try {
     const page = await browser.newPage({ viewport, reducedMotion: 'reduce' });
     const errors = [];
     page.on('pageerror', (e) => errors.push(e.message));
-    await page.goto('http://127.0.0.1:5181/?review=joystick-v2');
+    await page.goto(`${process.env.RPS_PREVIEW_URL || 'http://127.0.0.1:5181'}/?review=joystick-v2`);
     await page.waitForFunction(() => window.__rps?.scenes().includes('Home'));
     await page.waitForTimeout(400);
     const frames = page.locator('[data-joystick-frame]');

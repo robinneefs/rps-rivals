@@ -42,6 +42,19 @@ describe('stages', () => {
     expect(stageFor(5, STAGES[0]!.id).id).toBe(STAGES[0]!.id);
     expect(stageFor(0, 'nope').id).toBe(STAGES[0]!.id);
   });
+
+  it('storm sheets contain complete native frames and a separate ankle-height foreground', () => {
+    const storm = STAGES.find((s) => s.id === 'storm-field')!.storm!;
+    for (const [file, width, height] of [
+      [storm.clouds, 384, 160],
+      [storm.field, MONITOR.width * storm.frames, MONITOR.height],
+      [storm.foreground, MONITOR.width * storm.frames, 32],
+    ] as const) {
+      const png = readFileSync(resolve(__dirname, '../public', file));
+      expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([width, height]);
+    }
+    expect(stageFor(0, 'storm-field').id).toBe('storm-field');
+  });
 });
 
 function pngChunks(png: Buffer): Map<string, Buffer> {

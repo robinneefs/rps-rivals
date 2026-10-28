@@ -1,9 +1,13 @@
 import type Phaser from 'phaser';
 import { MONITOR } from '../config/layout';
 import { stageCloudTexture, stageTexture, type StageDef } from '../config/stages';
+import { addStormStage } from './StormStageView';
 
 /** Native-pixel layers: sky, drifting clouds, then the city/rail/floor that occludes them. */
-export function addStage(scene: Phaser.Scene, stage: StageDef): void {
+export function addStage(scene: Phaser.Scene, stage: StageDef, seed = 0): (() => void) | undefined {
+  scene.data.set('stageId', stage.id);
+  scene.data.set('stageEffects', null);
+  if (stage.storm) return addStormStage(scene, stage, seed);
   if (stage.sky !== undefined)
     scene.add.rectangle(0, 0, MONITOR.width, MONITOR.height, stage.sky).setOrigin(0);
   if (stage.clouds) {

@@ -1,5 +1,40 @@
 # RPS Rivals: Project Context
 
+## Handoff: Storm Field checkpoint (2026-10-28)
+
+- User approved the animated Storm Field stage, inverted cloud v2 artwork, centered very slow limited cloud drift, denser grass covering feet, and more frequent lightning. Approved music v2 Under the Storm is installed for this stage. Joystick centering is fixed across all9poses.
+- User confirmed cursor flicker occurs only in Codex preview; normal browser is fine. Treat as a preview-browser issue, with no game cursor change needed.
+- Five stages total remain the target: rooftop and Storm Field are done; brainstorm the remaining three with the user next. Existing release follow-ups remain in `docs/design/revamp-follow-ups.md`; do not silently clear them. Version remains2.2.0; this checkpoint is a GitHub push to `codex/edits`, not a deployment.
+- Final all-workspace typecheck/lint,162unit tests and game build passed (bundle-size advisory). Earlier real browser checks verified the stage match/rematch, weather/layering/reduced-motion, audio selection/decoding and joystick desktop/phone directions. Private agent settings and temporary files remain local.
+
+## Cursor flicker investigation (2026-10-28)
+
+- User reports native pointer flickering over all clickable areas in the Codex in-app browser. Actual Chrome movement tests over all3cabinet buttons, joystick and Home menu returned stable expected cursor values across130samples. Artwork is noninteractive (`pointer-events:none`), cabinet hit zones remain fixed. In-app DOM styles are also correct. User subsequently confirmed normal browser behavior is fine: issue is specific to Codex preview. No game cursor workaround needed. Check/report: `tools/art/check-cursor.mjs`, `art/cursor-review/checks.json`.
+
+## Joystick centering adjustment (2026-10-28)
+
+- User noticed neutral joystick biased right in its mounting plate. Corrected native component exporter to anchor the shaft/ball at plate center x280 instead of asymmetric dark-socket pixel centroid. All9poses rebuilt around this shared pivot; plate art/position and controls unchanged. Previous exports retained in `art/cabinet/joystick-v2/before-centering/`. Export audit confirms fixed base pixels identical across poses and equal physical tilt.
+
+## Storm music: approved v2 installed (2026-10-28)
+
+- UPDATE: user loved v2 and approved installing it. Installed v2 Cminor148BPM master in Storm Field (OGG/MP3), retained v1 exports in `art/audio/storm-theme-v1/installed-backup/`, and updated installer to v2. Browser checks passed storm/rooftop track selection and both stereo decoders with zero errors;7audio tests passed. V2 is now approved/installed, superseding the pending-approval notes below.
+
+- User requested a moody yet energetic storm track in the established composition style. Initial Under the Storm v1 (148BPM,Eminor,52s) was composed and wired to Storm Field via `stage.music='storm'`; rooftop retains `fight`. OGG/MP3 masters/source retained in `art/audio/storm-theme-v1/` and music public assets. All-workspace typecheck/lint,162tests and build passed.
+- User liked the vibe but said the melody resembles other tracks, then explicitly instructed: **let them hear it before putting it in the game**. V2 is PREVIEW ONLY; do not install without approval. `art/audio/storm-theme-v2/under-the-storm-preview.mp3` has a new Cminor progression, syncopated/repeated-note melody and changed guitar rhythm, retaining148BPM/moody chip-rock palette. Master/seam checks and composer lint passed. Composer `tools/audio/make-storm-theme-v2.mjs`. V2 did not change production audio; approval pending.
+
+## Animated Storm Field stage (2026-10-28)
+
+- Cloud-motion follow-up: start centered at panorama offset96; drift smoothly between48 and144 (halfway from center to either edge), initially moving the visible art right. Eight-minute sine cycle, two minutes center-to-turn, integer pixels, independent paused motion clock for reduced-motion users. Three focused stage tests including the full cycle, game typecheck/lint and refreshed in-game captures passed.
+
+- User then requested upside-down cloud art: cloud TileSprite now uses `setFlipY(true)`, placing the heavy banks at the top. Source remains intact; stage tests/typecheck and refreshed in-game normal/lightning/phone captures passed.
+
+- Follow-up: user requested more frequent lightning and better pixel-art clouds. Installed cloud v2 with larger defined blue-violet cloud banks and a 16-color native export; original source/export retained in `generated-clouds.png`/`clouds-v1-backup/`. First strike now2.4–3.6s and subsequent intervals4.5–8s (was8–16s). Timing-bound/lifecycle/reduced-motion tests, game typecheck/lint and build passed; clean in-game captures refreshed. Foreground grass/combat unchanged.
+
+- User approved storm-field concepts inspired by a classic fighting-game grass/storm stage and authorized implementation. Five stages total planned: existing rooftop, Storm Field, three further ideas undecided/deferred. Explicit art direction: grass must cover the fighters' feet more than in the mockup.
+- Storm Field is installed in STAGES as the second seeded match stage. Actual character atlases/HUD/combat remain intact. Separate cloud panorama, 12-frame native field/foreground grass, sparse rain and irregular branching lightning. Dense foreground grass is above fighters at y208, covering feet/lower ankles. One scene timer, separate cosmetic RNG, shutdown cleanup and live reduced-motion support. No new audio, balance, release version, deployment or push.
+- Source/concepts/export notes and actual runtime captures: `art/stages/storm-field-v1/`. Reproducible art exporter `tools/art/prepare-storm-field.mjs`; browser check `tools/art/check-storm-stage.mjs`. Dev playable review http://127.0.0.1:5185/?menuReview=stage&stage=storm-field ; existing `?stage=rooftop`/`?stage=storm-field` override works for normal matches.
+- All-workspace typecheck/lint and 160 tests passed; production build passed with a chunk-size advisory. Browser checks passed actual CPU match/rematch, effect reset, lightning/cloud movement, foreground order, reduced motion and rooftop regression, with no page or asset errors (`art/stages/storm-field-v1/review/checks.json`). Final clean desktop/phone/native captures refreshed and grass advancement verified. Dev stage review hides tuning controls initially; backquote still toggles them.
+
 ## Final release requirement (2026-10-28)
 
 - User requires all previously noted outstanding work to be reviewed and addressed before the final release of the new game version. Audit this context, `docs/design/revamp-follow-ups.md`, and the other project planning notes; consolidate a release checklist and resolve every outstanding item before release. Bring any undecided items to the user rather than silently leaving them deferred.

@@ -1,0 +1,27 @@
+{
+  "errors": [],
+  "results": [
+    {
+      "stage": "storm-field",
+      "music": "storm"
+    },
+    {
+      "decoded": [
+        {
+          "ext": "ogg",
+          "duration": 51.891875,
+          "channels": 2
+        },
+        {
+          "ext": "mp3",
+          "duration": 51.891875,
+          "channels": 2
+        }
+      ]
+    },
+    {
+      "stage": "rooftop",
+      "music": "fight"
+    }
+  ]
+}
