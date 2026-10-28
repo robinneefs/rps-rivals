@@ -1,4 +1,5 @@
 import type { Move } from '@rps/core';
+import { MONITOR } from '../config/layout';
 
 /**
  * Where everything sits on the v2.0 cabinet, in cabinet units: pixels of the original cabinet
@@ -9,6 +10,12 @@ export const BODY = { width: 941, height: 2372, src: 'assets/cabinet/body.webp' 
 
 /** The opening the monitor canvas fills (4:5, the game's 192 x 240). */
 export const SCREEN = { x: 162, y: 322, width: 616, height: 767 } as const;
+/** Exact 4:5 rectangle inside the approved artwork opening. */
+export const PIXEL_SCREEN = {
+  width: (SCREEN.height * MONITOR.width) / MONITOR.height,
+  height: SCREEN.height,
+};
+export const PIXEL_SCREEN_INSET = (SCREEN.width - PIXEL_SCREEN.width) / 2;
 
 export const MARQUEE = {
   // Fill through to the inner uprights and the top/bottom rails; center stays at x470.5.
@@ -86,13 +93,27 @@ export interface CabinetFit {
  * essential part fills the width on an upright phone or the height on a desktop, centred; nothing
  * of it is ever cut off.
  */
-export function fitCabinet(area: { x: number; y: number; width: number; height: number }): CabinetFit {
-  const scale = Math.min(area.width / ESSENTIAL.width, area.height / ESSENTIAL.height);
-  return {
+export function fitCabinet(
+  area: { x: number; y: number; width: number; height: number },
+  pixelPerfect = false,
+  dpr = 1,
+): CabinetFit {
+  const fill = Math.min(area.width / ESSENTIAL.width, area.height / ESSENTIAL.height);
+  const deviceRatio = Number.isFinite(dpr) && dpr > 0 ? dpr : 1;
+  const multiple = Math.max(1, Math.floor((fill * PIXEL_SCREEN.width * deviceRatio) / MONITOR.width + 1e-9));
+  const scale = pixelPerfect ? (multiple * MONITOR.width) / (PIXEL_SCREEN.width * deviceRatio) : fill;
+  const fit = {
     scale,
     left: area.x + (area.width - ESSENTIAL.width * scale) / 2 - ESSENTIAL.x * scale,
     top: area.y + (area.height - ESSENTIAL.height * scale) / 2 - ESSENTIAL.y * scale,
   };
+  if (pixelPerfect) {
+    const screenX = (SCREEN.x + PIXEL_SCREEN_INSET) * scale;
+    const screenY = SCREEN.y * scale;
+    fit.left = Math.round((fit.left + screenX) * deviceRatio) / deviceRatio - screenX;
+    fit.top = Math.round((fit.top + screenY) * deviceRatio) / deviceRatio - screenY;
+  }
+  return fit;
 }
 
 /**

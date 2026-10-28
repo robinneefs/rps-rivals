@@ -4,188 +4,188 @@
       "frame": {
         "x": 0,
         "y": 0,
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       },
       "sourceSize": {
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       }
     },
     "idle1": {
       "frame": {
-        "x": 128,
+        "x": 160,
         "y": 0,
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       },
       "sourceSize": {
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       }
     },
     "rock": {
       "frame": {
-        "x": 256,
+        "x": 320,
         "y": 0,
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       },
       "sourceSize": {
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       }
     },
     "paper": {
       "frame": {
         "x": 0,
-        "y": 128,
-        "w": 128,
-        "h": 128
+        "y": 160,
+        "w": 160,
+        "h": 160
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       },
       "sourceSize": {
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       }
     },
     "scissors": {
       "frame": {
-        "x": 128,
-        "y": 128,
-        "w": 128,
-        "h": 128
+        "x": 160,
+        "y": 160,
+        "w": 160,
+        "h": 160
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       },
       "sourceSize": {
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       }
     },
     "hurt": {
       "frame": {
-        "x": 256,
-        "y": 128,
-        "w": 128,
-        "h": 128
+        "x": 320,
+        "y": 160,
+        "w": 160,
+        "h": 160
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       },
       "sourceSize": {
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       }
     },
     "ko": {
       "frame": {
         "x": 0,
-        "y": 256,
-        "w": 128,
-        "h": 128
+        "y": 320,
+        "w": 160,
+        "h": 160
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       },
       "sourceSize": {
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       }
     },
     "win": {
       "frame": {
-        "x": 128,
-        "y": 256,
-        "w": 128,
-        "h": 128
+        "x": 160,
+        "y": 320,
+        "w": 160,
+        "h": 160
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       },
       "sourceSize": {
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       }
     },
     "kick": {
       "frame": {
-        "x": 256,
-        "y": 256,
-        "w": 128,
-        "h": 128
+        "x": 320,
+        "y": 320,
+        "w": 160,
+        "h": 160
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       },
       "sourceSize": {
-        "w": 128,
-        "h": 128
+        "w": 160,
+        "h": 160
       }
     }
   },
   "meta": {
     "image": "riot.png",
     "size": {
-      "w": 384,
-      "h": 384
+      "w": 480,
+      "h": 480
     },
     "scale": "1"
   }

@@ -1,0 +1,40 @@
+{
+  "results": [
+    {
+      "width": 600,
+      "height": 1000,
+      "dpr": 1,
+      "multiple": 2,
+      "brokenBlocks": 0
+    },
+    {
+      "width": 600,
+      "height": 1000,
+      "dpr": 1.25,
+      "multiple": 2,
+      "brokenBlocks": 0
+    },
+    {
+      "width": 390,
+      "height": 664,
+      "dpr": 2,
+      "multiple": 2,
+      "brokenBlocks": 0
+    },
+    {
+      "width": 390,
+      "height": 664,
+      "dpr": 3,
+      "multiple": 4,
+      "brokenBlocks": 0
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "dpr": 1.5,
+      "multiple": 2,
+      "brokenBlocks": 0
+    }
+  ],
+  "errors": []
+}

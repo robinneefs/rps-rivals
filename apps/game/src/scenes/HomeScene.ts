@@ -6,6 +6,8 @@ import { HomeMenuView } from '../views/HomeMenuView';
 import { getContext } from './context';
 import { SceneKey } from './keys';
 import { useMonitorCamera } from './monitor';
+import { addPortraitBreathing } from '../fx/portraitBreathing';
+import { portraitBreathAmount } from '../config/portraitBreathing';
 
 /** Layered action menu on the same native pixel grid as the fight. */
 export class HomeScene extends Phaser.Scene {
@@ -20,6 +22,17 @@ export class HomeScene extends Phaser.Scene {
   private entranceTargets: { image: Phaser.GameObjects.Image; y: number; alpha: number }[] = [];
   private entranceFinished = false;
   private readonly landed = new Set<number>();
+  private steadyPortrait = false;
+  private portraitMotion: ReturnType<typeof addPortraitBreathing> = null;
+  private portraitId = 'riot';
+  get portraitState() {
+    return {
+      id: this.portraitId,
+      steady: this.steadyPortrait,
+      amount: this.reducedMotion.matches ? 0 : portraitBreathAmount(this.elapsed),
+      frame: this.character.frame.name,
+    };
+  }
   constructor() {
     super(SceneKey.home);
   }
@@ -37,7 +50,11 @@ export class HomeScene extends Phaser.Scene {
     this.background = this.add.image(0, 0, HomeTex.background, 'speed0').setOrigin(0);
     const { character, logo, paint } = this.layout;
     const selected = HOME_CHARACTERS[Math.floor(Math.random() * HOME_CHARACTERS.length)]!;
+    this.portraitId = selected.id;
     this.character = this.add.image(character.x, character.y, selected.texture, 'rest').setOrigin(0);
+    this.steadyPortrait = selected.id !== 'riot';
+    this.portraitMotion =
+      selected.id === 'riot' ? null : addPortraitBreathing(this, this.character, selected.id);
     const title = (this.title = this.add.image(logo.x, logo.y, HomeTex.logo).setOrigin(0));
     const panel = this.add.image(paint.x, paint.y, HomeTex.paint).setOrigin(0);
     this.menu = new HomeMenuView(
@@ -66,6 +83,7 @@ export class HomeScene extends Phaser.Scene {
       this.finishEntrance();
       this.background.setFrame('speed0');
       this.character.setFrame('rest');
+      this.portraitMotion?.update(0, true);
       this.title.setY(this.layout.logo.y);
       return;
     }
@@ -78,6 +96,11 @@ export class HomeScene extends Phaser.Scene {
     }
     const bg = this.layout.background;
     this.background.setFrame(`speed${bg.frames[Math.floor(this.elapsed / bg.frameMs) % bg.frames.length]}`);
+    if (this.steadyPortrait) {
+      this.character.setFrame('rest');
+      this.portraitMotion?.update(this.elapsed, false);
+      return;
+    }
     const loop = this.layout.characterLoop;
     let left = this.elapsed % loop.durations.reduce((a, b) => a + b, 0);
     for (let i = 0; i < loop.frames.length; i++) {

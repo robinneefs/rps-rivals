@@ -1,0 +1,41 @@
+{
+  "errors": [],
+  "checks": [
+    {
+      "id": "taiko",
+      "source": "taiko-v2",
+      "textures": ["fighter-p1", "fighter-p1"],
+      "available": true,
+      "stats": {
+        "rock": 15,
+        "paper": 10,
+        "scissors": 20,
+        "hp": 50
+      }
+    },
+    {
+      "id": "riot",
+      "source": "riot-v2-first",
+      "textures": ["fighter-p2", "fighter-p1"],
+      "available": true,
+      "stats": {
+        "rock": 15,
+        "paper": 10,
+        "scissors": 20,
+        "hp": 50
+      }
+    },
+    {
+      "id": "anchor",
+      "source": "anchor-v3",
+      "textures": ["fighter-anchor", "fighter-p1"],
+      "available": true,
+      "stats": {
+        "rock": 15,
+        "paper": 10,
+        "scissors": 20,
+        "hp": 50
+      }
+    }
+  ]
+}

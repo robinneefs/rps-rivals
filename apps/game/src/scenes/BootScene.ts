@@ -34,6 +34,7 @@ export class BootScene extends Phaser.Scene {
     this.load.atlas(Tex.logoSheen, 'assets/logo-sheen.png', 'assets/logo-sheen.json');
     this.load.atlas(Tex.fighterP1, 'assets/taiko.png', 'assets/taiko.json');
     this.load.atlas(Tex.fighterP2, 'assets/riot.png', 'assets/riot.json');
+    this.load.atlas(Tex.fighterAnchor, 'assets/anchor.png', 'assets/anchor.json');
     const home = 'assets/menus/action/';
     this.load.json(HomeTex.layout, `${home}manifest.json`);
     this.load.bitmapFont(MENU_TYPOGRAPHY.fontKey, `${home}menu-font.png`, `${home}menu-font.fnt`);
@@ -58,7 +59,14 @@ export class BootScene extends Phaser.Scene {
     for (const size of FONT_SIZES) registerPixelFont(this, size);
     generatePlaceholders(this);
     const art = new URLSearchParams(window.location.search).get('art');
-    if (import.meta.env.DEV && art === 'taiko-sheet') {
+    if (import.meta.env.DEV && (art === 'anchor-sheet' || art === 'riot-sheet' || art === 'taiko-sheet')) {
+      void import('./AnchorSheetPreviewScene').then(({ AnchorSheetPreviewScene }) => {
+        this.scene.add(SceneKey.sheetPreview, AnchorSheetPreviewScene, true);
+        this.scene.stop();
+      });
+      return;
+    }
+    if (import.meta.env.DEV && art === 'taiko-legacy-sheet') {
       void import('./TaikoSheetPreviewScene').then(({ TaikoSheetPreviewScene }) => {
         this.scene.add(SceneKey.sheetPreview, TaikoSheetPreviewScene, true);
         this.scene.stop();

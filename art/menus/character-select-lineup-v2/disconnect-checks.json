@@ -1,0 +1,9 @@
+{
+  "realLocalWorker": true,
+  "mockedSockets": false,
+  "errors": [],
+  "checks": [
+    "Opponent leaving during confirmation shows RIVAL LEFT and permits return Home.",
+    "Disconnect during the selection-to-fight transition recovers Home without a stuck match."
+  ]
+}

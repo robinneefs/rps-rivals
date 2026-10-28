@@ -78,7 +78,7 @@ export class OptionsMenuView {
   }
 
   private rowY(i: number): number {
-    return this.items[i]?.id === 'back' ? 181 : 57 + i * 24;
+    return this.items[i]?.id === 'back' ? 201 : 57 + i * 24;
   }
 
   get selectedId(): string | undefined {

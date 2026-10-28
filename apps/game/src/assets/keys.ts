@@ -9,6 +9,7 @@ export const Tex = {
   menuStripes: 'menu-stripes',
   fighterP1: 'fighter-p1',
   fighterP2: 'fighter-p2',
+  fighterAnchor: 'fighter-anchor',
   badges: 'move-badges',
   /** Small move symbols over the fighters' heads while picking (your pick, the rival's "?"). */
   pickChips: 'pick-chips',
@@ -17,7 +18,7 @@ export const Tex = {
   koLetters: 'ko-letters',
 } as const;
 
-/** Frames every fighter sheet provides (Taiko in 128 x 128 cells, facing right). */
+/** Frames every fighter sheet provides (160 x 160 cells, facing right). */
 export const FighterFrames = ['idle0', 'idle1', 'rock', 'paper', 'scissors', 'hurt', 'ko', 'win'] as const;
 export type FighterFrame = (typeof FighterFrames)[number];
 /** The real Taiko atlas also contains a kick; legacy placeholder sheets keep their original frames. */

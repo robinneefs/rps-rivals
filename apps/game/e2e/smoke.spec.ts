@@ -9,6 +9,16 @@ declare global {
       phase: () => string | null;
       renderScale: () => number;
       music: () => string | null;
+      fighters: () => Record<'p1' | 'p2', string> | null;
+      combatTextures: () => string[];
+      characterSelection: () => {
+        selected: string;
+        confirmed: boolean;
+        starting: boolean;
+        available: boolean;
+        status: string;
+        stats: { rock: number; paper: number; scissors: number; hp: number };
+      } | null;
       version: string;
     };
   }
@@ -56,6 +66,19 @@ async function untilScene(page: Page, key: string, maxMs = 5000): Promise<void> 
   await run(page, 300);
 }
 
+/** Follow the new cosmetic selection step, without skipping it in the game. */
+async function untilFight(page: Page): Promise<void> {
+  for (let t = 0; t < 5000 && !(await scenes(page)).includes('Fight'); t += 50) {
+    if ((await scenes(page)).includes('CharacterSelect')) {
+      await untilScene(page, 'CharacterSelect');
+      await page.keyboard.press('Enter');
+      break;
+    }
+    await run(page, 50);
+  }
+  await untilScene(page, 'Fight');
+}
+
 test('boots to the logo, the home menu, and plays an exchange against the CPU', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -68,7 +91,7 @@ test('boots to the logo, the home menu, and plays an exchange against the CPU', 
   await untilScene(page, 'Home'); // the logo leaves on its own (about 2.7s)
 
   await page.keyboard.press('Enter'); // START GAME (VS CPU)
-  await run(page, 600);
+  await untilFight(page);
   expect(await scenes(page)).toContain('Fight');
   expect(await phase(page)).toBe('roundIntro');
 
@@ -102,14 +125,14 @@ test('native Taiko and Riot assets load and a complete CPU match can be replayed
   expect(assets.has('/assets/stages/rooftop-v2-192.png')).toBe(true);
   expect(assets.has('/assets/stages/rooftop-clouds-576.png')).toBe(true);
   await page.keyboard.press('Enter');
-  await untilScene(page, 'Fight');
+  await untilFight(page);
   await run(page, 1800);
   await page.keyboard.press('Backquote'); // hide the development tuning panel for the art capture
   await page.screenshot({ path: testInfo.outputPath('riot-in-game.png') });
   // Auto-picks exercise ties, hits, round transitions and the KO animation without changing rules.
   await untilScene(page, 'Result', 180_000);
   await page.keyboard.press('Enter');
-  await untilScene(page, 'Fight');
+  await untilFight(page);
   expect(await phase(page)).toBe('roundIntro');
   expect(errors).toEqual([]);
 });
@@ -151,7 +174,7 @@ test('layered home art loads, options wrap correctly, and returning home restore
     expect(await scenes(page)).toContain('Home');
   }
   await page.keyboard.press('Enter');
-  await untilScene(page, 'Fight');
+  await untilFight(page);
   expect(errors).toEqual([]);
 });
 
@@ -196,7 +219,7 @@ test('home entrance gives six light phone ticks, and skip/reduced-motion/vibrati
     await untilScene(page, 'Home');
     if (mode === 'skip') {
       await page.keyboard.press('Enter');
-      await untilScene(page, 'Fight');
+      await untilFight(page);
     }
     await run(page, 1800);
     const buzzes = await page.evaluate(() => window.__homeBuzzes);
@@ -272,7 +295,7 @@ test('the cabinet fits an upright phone and its buttons work by touch', async ({
   await page.keyboard.press('Escape');
   await untilScene(page, 'Home');
   await page.touchscreen.tap(rock!.x + rock!.width / 2, rock!.y + rock!.height / 2);
-  await untilScene(page, 'Fight');
+  await untilFight(page);
   await ctx.close();
 });
 
@@ -288,7 +311,7 @@ test('music: the menu loop on home and the fight loop in a match', async ({ page
   expect(await page.evaluate(() => window.__rps.music())).toBe('menu');
 
   await page.keyboard.press('Enter'); // START GAME
-  await untilScene(page, 'Fight');
+  await untilFight(page);
   await run(page, 300);
   expect(await page.evaluate(() => window.__rps.music())).toBe('fight');
   expect(errors).toEqual([]);

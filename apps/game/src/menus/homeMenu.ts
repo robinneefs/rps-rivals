@@ -8,7 +8,7 @@ export const homeMenu = (flow: SceneFlow): MenuItem[] => [
     id: 'cpu',
     label: 'PLAY VERSUS CPU',
     enabled: true,
-    onSelect: () => flow.toFight({ mode: 'cpu', cpu: 'random' }),
+    onSelect: () => flow.toCharacterSelect({ mode: 'cpu', cpu: 'random' }),
   },
   // greyed out in a build that has no match server address
   SERVER_URL

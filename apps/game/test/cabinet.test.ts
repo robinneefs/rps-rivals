@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { ESSENTIAL, fitCabinet, SCREEN, stickDirection } from '../src/cabinet/geometry';
+import {
+  ESSENTIAL,
+  fitCabinet,
+  SCREEN,
+  PIXEL_SCREEN,
+  PIXEL_SCREEN_INSET,
+  stickDirection,
+} from '../src/cabinet/geometry';
 import { MONITOR } from '../src/config/layout';
 import { SettingsStore, type KeyValueStore } from '../src/platform/settings';
+import { optionsMenu } from '../src/menus/optionsMenu';
 
 describe('fitCabinet', () => {
   const area = (width: number, height: number) => ({ x: 0, y: 0, width, height });
@@ -38,6 +46,28 @@ describe('fitCabinet', () => {
   it('keeps the screen opening at the monitor shape', () => {
     expect(SCREEN.width / SCREEN.height).toBeCloseTo(MONITOR.width / MONITOR.height, 2);
   });
+  it('sizes the cabinet around integer device-pixel monitor blocks, including fractional DPR', () => {
+    for (const dpr of [1, 1.25, 1.5, 2, 3])
+      for (const [width, height] of [
+        [390, 664],
+        [600, 1000],
+        [1280, 720],
+        [320, 568],
+      ]) {
+        const fit = fitCabinet({ x: 0, y: 0, width: width!, height: height! }, true, dpr);
+        const pixels = (PIXEL_SCREEN.width * fit.scale * dpr) / 192;
+        expect(pixels).toBeCloseTo(Math.round(pixels), 10);
+        expect(Math.round(pixels)).toBeGreaterThanOrEqual(1);
+        expect((PIXEL_SCREEN.height * fit.scale * dpr) / 240).toBeCloseTo(pixels, 10);
+        for (const edge of [
+          fit.left + (SCREEN.x + PIXEL_SCREEN_INSET) * fit.scale,
+          fit.top + SCREEN.y * fit.scale,
+        ])
+          expect(edge * dpr).toBeCloseTo(Math.round(edge * dpr), 10);
+        expect(ESSENTIAL.width * fit.scale).toBeLessThanOrEqual(width! + 1 / dpr);
+        expect(ESSENTIAL.height * fit.scale).toBeLessThanOrEqual(height! + 1 / dpr);
+      }
+  });
 });
 
 describe('stickDirection', () => {
@@ -69,6 +99,24 @@ const memoryStore = (
 };
 
 describe('SettingsStore', () => {
+  it('places Pixel Perfect directly below CRT on both desktop and phone', () => {
+    const noop = () => {};
+    for (const vibration of [false, true]) {
+      const items = optionsMenu(
+        new SettingsStore(null).value,
+        { vibration },
+        {
+          toggleCrt: noop,
+          togglePixelPerfect: noop,
+          toggleVibration: noop,
+          toggleSound: noop,
+          stepVolume: noop,
+          back: noop,
+        },
+      );
+      expect(items.slice(0, 2).map((item) => item.id)).toEqual(['crt', 'pixelPerfect']);
+    }
+  });
   it('defaults to the CRT screen on', () => {
     expect(new SettingsStore(memoryStore()).value.crt).toBe(true);
     expect(new SettingsStore(null).value.crt).toBe(true);
@@ -84,7 +132,7 @@ describe('SettingsStore', () => {
     expect(new SettingsStore(store).value.crt).toBe(false);
   });
 
-  it('ignores broken or unknown saved values, and the old scaling setting', () => {
+  it('ignores broken or unknown saved values, and accepts the restored pixel-perfect preference', () => {
     expect(new SettingsStore(memoryStore({ 'rps-fighter.settings': '{nope' })).value.crt).toBe(true);
     const old = new SettingsStore(
       memoryStore({ 'rps-fighter.settings': '{"scaling":"pixelPerfect","crt":"maybe","muted":true}' }),
@@ -92,6 +140,13 @@ describe('SettingsStore', () => {
     expect(old.crt).toBe(true);
     expect(old.muted).toBe(true);
     expect('scaling' in old).toBe(false);
+    const store = memoryStore();
+    const current = new SettingsStore(store);
+    current.set('pixelPerfect', true);
+    expect(new SettingsStore(store).value.pixelPerfect).toBe(true);
+    expect(
+      new SettingsStore(memoryStore({ 'rps-fighter.settings': '{"pixelPerfect":"yes"}' })).value.pixelPerfect,
+    ).toBe(false);
   });
 
   it('still applies a setting when storage refuses to save', () => {

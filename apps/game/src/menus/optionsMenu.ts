@@ -26,6 +26,7 @@ export const optionsMenu = (
   show: { vibration: boolean },
   actions: {
     toggleCrt: () => void;
+    togglePixelPerfect: () => void;
     toggleVibration: () => void;
     toggleSound: () => void;
     stepVolume: (id: VolumeId) => void;
@@ -38,6 +39,13 @@ export const optionsMenu = (
     tag: onOffTag(settings.crt),
     enabled: true,
     onSelect: actions.toggleCrt,
+  },
+  {
+    id: 'pixelPerfect',
+    label: 'PIXEL PERFECT',
+    tag: onOffTag(settings.pixelPerfect),
+    enabled: true,
+    onSelect: actions.togglePixelPerfect,
   },
   ...(show.vibration
     ? [

@@ -2,13 +2,14 @@ import type { PhaseTimings } from '../config';
 import type { Phase, RefereeEvents } from '../referee/referee';
 import type { MatchState, Move, RulesConfig, Side } from '../rules/types';
 import { MOVES } from '../rules/types';
+import { isPlayableCharacter, type PlayableCharacterId, type CharacterSelection } from '../characters';
 
 /**
  * The messages between the game and an online match room (apps/server), as plain JSON over a
  * WebSocket. Both sides import this file, so a renamed field is a type error on both ends.
  * Bump PROTOCOL_VERSION whenever a message changes shape: the room refuses clients on another one.
  */
-export const PROTOCOL_VERSION = 1;
+export const PROTOCOL_VERSION = 2;
 
 /**
  * Room codes: four consonants. No vowels, so a random code can't spell a word (rude or otherwise),
@@ -34,6 +35,7 @@ export type ClientMessage =
   | { type: 'hello'; protocol: number; version: string; intent: 'create' | 'join' }
   /** The fight screen is listening; the match starts when both players are ready. */
   | { type: 'ready' }
+  | { type: 'character'; character: PlayableCharacterId; confirmed: boolean }
   | { type: 'pick'; move: Move }
   /** Play again; the room answers `rematchAccepted` once both players asked. */
   | { type: 'rematch' };
@@ -54,6 +56,7 @@ export type JoinError =
 
 /** Room → game. Sides are the room's real sides: the host is p1 (left), the guest p2 (right), on both screens. */
 export type ServerMessage =
+  | ({ type: 'selection' } & CharacterSelection)
   | { type: 'welcome'; side: Side; rules: RulesConfig; timings: PhaseTimings }
   | { type: 'error'; error: JoinError }
   /** The opponent is in the room (sent to both when the second player joins). */
@@ -103,6 +106,10 @@ export function parseClientMessage(raw: unknown): ClientMessage | null {
         : null;
     case 'ready':
       return { type: 'ready' };
+    case 'character':
+      return isPlayableCharacter(m.character) && typeof m.confirmed === 'boolean'
+        ? { type: 'character', character: m.character, confirmed: m.confirmed }
+        : null;
     case 'rematch':
       return { type: 'rematch' };
     case 'pick':

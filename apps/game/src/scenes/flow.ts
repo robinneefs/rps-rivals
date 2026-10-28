@@ -1,9 +1,10 @@
-import type { MatchState, Side } from '@rps/core';
+import type { MatchState, Side, PlayableCharacterId } from '@rps/core';
 import type Phaser from 'phaser';
 import type { AudioService } from '../audio/AudioService';
 import type { MusicKey } from '../audio/sounds';
 import { createSession } from '../session/createSession';
 import type { MatchSession, MatchSetup } from '../session/MatchSession';
+import type { OnlineSession } from '../session/OnlineSession';
 import { MONITOR_SCENES, SceneKey } from './keys';
 import type { TransitionScene } from './TransitionScene';
 
@@ -12,6 +13,7 @@ const SCENE_MUSIC: Record<string, MusicKey | null> = {
   [SceneKey.logo]: null,
   [SceneKey.home]: 'menu',
   [SceneKey.options]: 'menu',
+  [SceneKey.characterSelect]: 'menu',
   [SceneKey.howTo]: 'menu',
   [SceneKey.lobby]: 'menu',
   [SceneKey.fight]: 'fight',
@@ -23,6 +25,10 @@ const RESULT_MUSIC_DELAY_MS = 2200;
 export interface FightData {
   setup: MatchSetup;
   session: MatchSession;
+}
+export interface CharacterSelectData {
+  setup: MatchSetup;
+  session?: OnlineSession;
 }
 
 export interface ResultData extends FightData {
@@ -38,6 +44,10 @@ export interface ResultData extends FightData {
 export class SceneFlow {
   private session: MatchSession | null = null;
   private busy = false;
+  selectedCharacter: PlayableCharacterId = 'taiko';
+  get transitioning(): boolean {
+    return this.busy;
+  }
 
   constructor(
     private readonly game: Phaser.Game,
@@ -71,6 +81,14 @@ export class SceneFlow {
   /** Online: create or join a room. The lobby hands its connected session to toFight. */
   toLobby(): void {
     this.wipe(() => this.show(SceneKey.lobby));
+  }
+
+  toCharacterSelect(setup: MatchSetup, session?: OnlineSession): void {
+    this.wipe(() => {
+      if (session !== this.session) this.endSession();
+      this.session = session ?? null;
+      this.show(SceneKey.characterSelect, { setup, session } satisfies CharacterSelectData);
+    });
   }
 
   /** Starts a match; pass the existing session for a rematch (Retry). */

@@ -1,4 +1,14 @@
 // The public API of @rps/core. Nothing else is imported from outside the package.
+export {
+  PLAYABLE_CHARACTERS,
+  DEFAULT_FIGHTERS,
+  isPlayableCharacter,
+  initialCharacterSelection,
+  type CharacterId,
+  type PlayableCharacterId,
+  type Fighters,
+  type CharacterSelection,
+} from './characters';
 export type { ExchangeOutcome, MatchState, Move, Picks, RuleEvent, RulesConfig, Side } from './rules/types';
 export { MOVES, SIDES } from './rules/types';
 export { opponentOf } from './rules/sides';

@@ -136,7 +136,7 @@ export class LobbyScene extends Phaser.Scene {
 
   private toFight(session: OnlineSession): void {
     this.handedOff = true;
-    getContext(this).flow.toFight({ mode: 'online', roomCode: session.roomCode }, session);
+    getContext(this).flow.toCharacterSelect({ mode: 'online', roomCode: session.roomCode }, session);
   }
 
   private showMenu(): void {

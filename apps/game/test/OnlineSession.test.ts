@@ -1,4 +1,4 @@
-import { defaultRules, defaultTimings, type ServerMessage } from '@rps/core';
+import { defaultRules, defaultTimings, PROTOCOL_VERSION, type ServerMessage } from '@rps/core';
 import { describe, expect, it } from 'vitest';
 import type { SessionEvents } from '../src/session/MatchSession';
 import { OnlineSession } from '../src/session/OnlineSession';
@@ -39,7 +39,7 @@ describe('OnlineSession', () => {
     const { sent, socket, handlers } = setup();
     expect(socket.url).toBe('wss://example.test/room/ABCD');
     handlers().open();
-    expect(sent).toEqual([{ type: 'hello', protocol: 1, version: '0.6.0', intent: 'join' }]);
+    expect(sent).toEqual([{ type: 'hello', protocol: PROTOCOL_VERSION, version: '0.6.0', intent: 'join' }]);
   });
 
   it("as the guest, plays p2 on the right: sides, health and picks are the room's own", () => {

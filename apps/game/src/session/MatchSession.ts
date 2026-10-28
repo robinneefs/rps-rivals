@@ -7,6 +7,8 @@ import type {
   RulesConfig,
   Side,
   Unsubscribe,
+  Fighters,
+  CharacterSelection,
 } from '@rps/core';
 
 /** What a match looks like right now, from one player's seat. */
@@ -19,6 +21,7 @@ export interface MatchView {
 }
 
 export interface SessionEvents extends Record<string, unknown> {
+  selection: CharacterSelection;
   phase: RefereeEvents['phase'];
   locked: RefereeEvents['locked'];
   reveal: RefereeEvents['reveal'];
@@ -43,6 +46,8 @@ export interface SessionEvents extends Record<string, unknown> {
  * so the fight screen doesn't care whether the opponent is a CPU here or a person online.
  */
 export interface MatchSession {
+  readonly endedReason?: 'refused' | 'opponentLeft' | 'disconnected' | null;
+  readonly fighters: Fighters;
   readonly me: Side;
   /** Shown on the HUD and the result screen ("CPU" in a CPU match, "RIVAL" online). */
   readonly opponentName: string;
@@ -65,6 +70,7 @@ export interface MatchSession {
 }
 
 /** Describes a match, so Retry can replay the same kind of match. */
-export type MatchSetup = { mode: 'cpu'; cpu: CpuKind } | { mode: 'online'; roomCode: string };
+export type MatchSetup =
+  { mode: 'cpu'; cpu: CpuKind; fighters?: Fighters } | { mode: 'online'; roomCode: string };
 
 export type CpuKind = 'random';

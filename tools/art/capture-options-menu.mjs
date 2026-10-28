@@ -30,8 +30,8 @@ try {
     const musicLevelNow = () =>
       page.evaluate(() => JSON.parse(localStorage.getItem('rps-fighter.settings') ?? '{}').musicVolume);
     if (!phone) {
-      const start = point(109, 116),
-        end = point(167, 116);
+      const start = point(109, 140),
+        end = point(167, 140);
       await page.mouse.move(start.x, start.y);
       await page.mouse.down();
       if ((await musicLevelNow()) !== 0) throw Error('Mouse slider minimum failed');
@@ -43,11 +43,12 @@ try {
       await page.mouse.up();
       await page.keyboard.press('ArrowUp');
       await page.keyboard.press('ArrowUp');
+      await page.keyboard.press('ArrowUp');
     } else {
       const cdp = await page.context().newCDPSession(page);
-      const start = point(101, 139),
-        end = point(176, 139),
-        middle = point(144, 139);
+      const start = point(101, 163),
+        end = point(176, 163),
+        middle = point(144, 163);
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ ...start, id: 1 }] });
       if ((await musicLevelNow()) !== 0) throw Error('Touch slider padded target failed');
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ ...end, id: 1 }] });
@@ -56,6 +57,7 @@ try {
       if ((await musicLevelNow()) !== 6) throw Error('Touch slider middle failed');
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
       await cdp.detach();
+      await page.keyboard.press('ArrowUp');
       await page.keyboard.press('ArrowUp');
       await page.keyboard.press('ArrowUp');
       await page.keyboard.press('ArrowUp');
@@ -70,6 +72,7 @@ try {
       await page.keyboard.press('Enter');
       if ((await saved()).crt !== false) throw Error('CRT toggle failed');
       await page.keyboard.press('Enter');
+      await page.keyboard.press('ArrowDown');
       await page.keyboard.press('ArrowDown');
       await page.keyboard.press('Enter');
       if ((await saved()).muted !== true) throw Error('Sound toggle failed');
@@ -87,18 +90,20 @@ try {
       await page.keyboard.press('Enter');
       await scene(page, 'Home');
       await page.keyboard.press('Enter');
+      await scene(page, 'CharacterSelect');
+      await page.keyboard.press('Enter');
       await scene(page, 'Fight');
     } else {
       const box = await page.locator('#game canvas').boundingBox();
       const tapRow = (y) => page.touchscreen.tap(box.x + box.width / 2, box.y + (box.height * y) / 240);
-      await tapRow(91);
+      await tapRow(115);
       const vibration = await page.evaluate(
         () => JSON.parse(localStorage.getItem('rps-fighter.settings') ?? '{}').vibration,
       );
       if (vibration !== false) throw Error('Phone vibration tap failed');
-      await tapRow(91);
+      await tapRow(115);
       // A zero meter, a full meter, confirm wrapping, and directional clamping.
-      await tapRow(139);
+      await tapRow(163);
       for (let n = 0; n < 12; n++) await page.keyboard.press('ArrowLeft');
       const musicLevel = () =>
         page.evaluate(() => JSON.parse(localStorage.getItem('rps-fighter.settings') ?? '{}').musicVolume);

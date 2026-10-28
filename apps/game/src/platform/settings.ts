@@ -4,6 +4,7 @@ import { Emitter } from '@rps/core';
 export const VOLUME_MAX = 10;
 
 export interface Settings {
+  pixelPerfect: boolean;
   /** Sound off altogether (music and effects); the volumes are kept for when it's back on. */
   muted: boolean;
   musicVolume: number;
@@ -15,6 +16,7 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
+  pixelPerfect: false,
   muted: false,
   musicVolume: 6,
   sfxVolume: 8,
@@ -62,6 +64,8 @@ function load(store: KeyValueStore | null): Settings {
     if (!raw) return DEFAULT_SETTINGS;
     const saved = JSON.parse(raw) as Partial<Settings>;
     return {
+      pixelPerfect:
+        typeof saved.pixelPerfect === 'boolean' ? saved.pixelPerfect : DEFAULT_SETTINGS.pixelPerfect,
       muted: typeof saved.muted === 'boolean' ? saved.muted : DEFAULT_SETTINGS.muted,
       musicVolume: volume(saved.musicVolume, DEFAULT_SETTINGS.musicVolume),
       sfxVolume: volume(saved.sfxVolume, DEFAULT_SETTINGS.sfxVolume),

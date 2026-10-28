@@ -1,5 +1,6 @@
 import {
   defaultRules,
+  initialCharacterSelection,
   Emitter,
   PROTOCOL_VERSION,
   type ClientMessage,
@@ -11,6 +12,7 @@ import {
   type ServerMessage,
   type Side,
   type Unsubscribe,
+  type PlayableCharacterId,
 } from '@rps/core';
 import type { MatchSession, MatchView, SessionEvents } from './MatchSession';
 import type { OpenSocket, Socket } from './socket';
@@ -34,6 +36,14 @@ export interface OnlineOptions {
  * the left, the guest is p2 on the right. Also reports the lobby steps: joined, refused, left.
  */
 export class OnlineSession implements MatchSession {
+  selection = initialCharacterSelection();
+  get fighters() {
+    return this.selection.fighters;
+  }
+
+  selectCharacter(character: PlayableCharacterId, confirmed: boolean): void {
+    this.send({ type: 'character', character, confirmed });
+  }
   readonly opponentName = 'RIVAL';
   rules: RulesConfig = structuredClone(defaultRules);
   private readonly events = new Emitter<SessionEvents>();
@@ -45,6 +55,7 @@ export class OnlineSession implements MatchSession {
   private state: MatchState | null = null;
   private myPick: Move | null = null;
   private ended = false;
+  endedReason: 'refused' | 'opponentLeft' | 'disconnected' | null = null;
   /** Matches started in this room before the current one (rematches both players count alike). */
   private rematches = 0;
 
@@ -127,6 +138,10 @@ export class OnlineSession implements MatchSession {
     }
     const seated = this.side !== null;
     switch (msg.type) {
+      case 'selection':
+        this.selection = { fighters: { ...msg.fighters }, confirmed: { ...msg.confirmed } };
+        this.events.emit('selection', this.selection);
+        break;
       case 'welcome':
         this.side = msg.side;
         this.rules = msg.rules;
@@ -186,6 +201,7 @@ export class OnlineSession implements MatchSession {
   ): void {
     if (this.ended) return;
     this.ended = true;
+    this.endedReason = event;
     this.events.emit(event, payload);
     this.socket.close();
   }

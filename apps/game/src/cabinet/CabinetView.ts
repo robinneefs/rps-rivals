@@ -13,6 +13,8 @@ import {
   MARQUEE_RAIL,
   PANEL,
   SCREEN,
+  PIXEL_SCREEN,
+  PIXEL_SCREEN_INSET,
   stickDirection,
   type CabinetFit,
 } from './geometry';
@@ -76,6 +78,7 @@ export class CabinetView {
   private readonly probe: HTMLDivElement;
   private readonly events = new Emitter<{ resize: ScreenSize }>();
   private fit: CabinetFit = { scale: 1, left: 0, top: 0 };
+  private pixelPerfect = false;
   private readonly buttons: Record<
     Move,
     { el: HTMLDivElement; up: HTMLImageElement; down: HTMLImageElement }
@@ -226,6 +229,18 @@ export class CabinetView {
     window.addEventListener('orientationchange', refit);
     window.visualViewport?.addEventListener('resize', refit);
     window.visualViewport?.addEventListener('scroll', refit);
+    // Moving between displays or changing browser zoom can change DPR without changing CSS size.
+    const watchDensity = () => {
+      window.matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`).addEventListener(
+        'change',
+        () => {
+          this.layout();
+          watchDensity();
+        },
+        { once: true },
+      );
+    };
+    watchDensity();
     shake.onMove(() => this.place());
     this.layout();
   }
@@ -233,9 +248,20 @@ export class CabinetView {
   /** The monitor's size now (the game canvas follows it). */
   get screenSize(): ScreenSize {
     const dpr = window.devicePixelRatio || 1;
-    const cssWidth = SCREEN.width * this.fit.scale;
+    const cssWidth = (this.pixelPerfect ? PIXEL_SCREEN.width : SCREEN.width) * this.fit.scale;
     const cssHeight = SCREEN.height * this.fit.scale;
     return { cssWidth, cssHeight, deviceWidth: cssWidth * dpr, deviceHeight: cssHeight * dpr };
+  }
+  get canvasZoom(): number {
+    return (this.pixelPerfect ? PIXEL_SCREEN.width : SCREEN.width) / MONITOR.width;
+  }
+  get monitorInsetX(): number {
+    return this.pixelPerfect ? PIXEL_SCREEN_INSET : 0;
+  }
+  setPixelPerfect(on: boolean): void {
+    if (this.pixelPerfect === on) return;
+    this.pixelPerfect = on;
+    this.layout();
   }
 
   /**
@@ -248,14 +274,14 @@ export class CabinetView {
 
   /** CSS pixels per monitor pixel. */
   get monitorScale(): number {
-    return (SCREEN.width * this.fit.scale) / MONITOR.width;
+    return this.canvasZoom * this.fit.scale;
   }
 
   /** A point on the monitor (monitor pixels) in page coordinates, e.g. for a text field over it. */
   monitorToPage(x: number, y: number): { x: number; y: number } {
     const r = this.screen.getBoundingClientRect();
     return {
-      x: r.left + window.scrollX + x * this.monitorScale,
+      x: r.left + this.monitorInsetX * this.fit.scale + window.scrollX + x * this.monitorScale,
       y: r.top + window.scrollY + y * this.monitorScale,
     };
   }
@@ -380,17 +406,19 @@ export class CabinetView {
     const inset = (side: string) => parseFloat(p.getPropertyValue(`padding-${side}`)) || 0;
     const width = vv?.width ?? window.innerWidth;
     const height = vv?.height ?? window.innerHeight;
-    const prev = this.screenSize;
-    this.fit = fitCabinet({
-      x: (vv?.offsetLeft ?? 0) + inset('left'),
-      y: (vv?.offsetTop ?? 0) + inset('top'),
-      width: width - inset('left') - inset('right'),
-      height: height - inset('top') - inset('bottom'),
-    });
+    this.fit = fitCabinet(
+      {
+        x: (vv?.offsetLeft ?? 0) + inset('left'),
+        y: (vv?.offsetTop ?? 0) + inset('top'),
+        width: width - inset('left') - inset('right'),
+        height: height - inset('top') - inset('bottom'),
+      },
+      this.pixelPerfect,
+      window.devicePixelRatio || 1,
+    );
     this.place();
     const next = this.screenSize;
-    if (next.deviceWidth !== prev.deviceWidth || next.deviceHeight !== prev.deviceHeight)
-      this.events.emit('resize', next);
+    this.events.emit('resize', next);
   }
 
   private place(): void {

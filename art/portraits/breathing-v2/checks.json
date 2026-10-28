@@ -1,0 +1,57 @@
+{
+  "errors": [],
+  "results": [
+    {
+      "id": "taiko",
+      "diff": {
+        "face": {
+          "changed": 0,
+          "checked": 1954
+        },
+        "leftHand": {
+          "changed": 0,
+          "checked": 6015
+        },
+        "rightHand": {
+          "changed": 0,
+          "checked": 809
+        },
+        "waist": {
+          "changed": 0,
+          "checked": 866
+        },
+        "chest": {
+          "changed": 710,
+          "checked": 779
+        }
+      },
+      "reducedMotion": true
+    },
+    {
+      "id": "anchor",
+      "diff": {
+        "face": {
+          "changed": 0,
+          "checked": 1889
+        },
+        "leftHand": {
+          "changed": 0,
+          "checked": 5899
+        },
+        "rightHand": {
+          "changed": 0,
+          "checked": 896
+        },
+        "waist": {
+          "changed": 0,
+          "checked": 1998
+        },
+        "chest": {
+          "changed": 710,
+          "checked": 779
+        }
+      },
+      "reducedMotion": true
+    }
+  ]
+}

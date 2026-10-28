@@ -1,0 +1,177 @@
+{
+  "scale": 0.24509803921568626,
+  "anchor": [80, 156],
+  "audit": [
+    {
+      "name": "idle0",
+      "source": {
+        "id": 1,
+        "count": 61741,
+        "left": 60,
+        "top": 37,
+        "right": 394,
+        "bottom": 444
+      },
+      "placed": {
+        "left": 39,
+        "top": 56,
+        "width": 82,
+        "height": 100
+      },
+      "anchor": [80, 156],
+      "poseScale": 0.24509803921568626
+    },
+    {
+      "name": "idle1",
+      "source": {
+        "id": 2,
+        "count": 60338,
+        "left": 473,
+        "top": 39,
+        "right": 803,
+        "bottom": 444
+      },
+      "placed": {
+        "left": 40,
+        "top": 56,
+        "width": 81,
+        "height": 100
+      },
+      "anchor": [80, 156],
+      "poseScale": 0.24509803921568626
+    },
+    {
+      "name": "rock",
+      "source": {
+        "id": 3,
+        "count": 61959,
+        "left": 857,
+        "top": 39,
+        "right": 1240,
+        "bottom": 444
+      },
+      "placed": {
+        "left": 35,
+        "top": 56,
+        "width": 94,
+        "height": 100
+      },
+      "anchor": [80, 156],
+      "poseScale": 0.24509803921568626
+    },
+    {
+      "name": "paper",
+      "source": {
+        "id": 5,
+        "count": 53591,
+        "left": 61,
+        "top": 478,
+        "right": 392,
+        "bottom": 861
+      },
+      "placed": {
+        "left": 39,
+        "top": 62,
+        "width": 81,
+        "height": 94
+      },
+      "anchor": [80, 156],
+      "poseScale": 0.24509803921568626
+    },
+    {
+      "name": "scissors",
+      "source": {
+        "id": 4,
+        "count": 60512,
+        "left": 453,
+        "top": 476,
+        "right": 840,
+        "bottom": 861
+      },
+      "placed": {
+        "left": 37,
+        "top": 61,
+        "width": 95,
+        "height": 95
+      },
+      "anchor": [80, 156],
+      "poseScale": 0.24509803921568626
+    },
+    {
+      "name": "hurt",
+      "source": {
+        "id": 6,
+        "count": 59416,
+        "left": 894,
+        "top": 488,
+        "right": 1251,
+        "bottom": 860
+      },
+      "placed": {
+        "left": 33,
+        "top": 65,
+        "width": 88,
+        "height": 91
+      },
+      "anchor": [80, 156],
+      "poseScale": 0.24509803921568626
+    },
+    {
+      "name": "ko",
+      "source": {
+        "id": 9,
+        "count": 33800,
+        "left": 39,
+        "top": 1137,
+        "right": 503,
+        "bottom": 1237
+      },
+      "placed": {
+        "left": 23,
+        "top": 131,
+        "width": 114,
+        "height": 25
+      },
+      "anchor": [80, 156],
+      "poseScale": 0.24509803921568626
+    },
+    {
+      "name": "win",
+      "source": {
+        "id": 7,
+        "count": 48357,
+        "left": 525,
+        "top": 839,
+        "right": 807,
+        "bottom": 1242
+      },
+      "placed": {
+        "left": 43,
+        "top": 49,
+        "width": 75,
+        "height": 107
+      },
+      "anchor": [80, 156],
+      "poseScale": 0.2647058823529412
+    },
+    {
+      "name": "kick",
+      "source": {
+        "id": 8,
+        "count": 45780,
+        "left": 872,
+        "top": 897,
+        "right": 1239,
+        "bottom": 1242
+      },
+      "placed": {
+        "left": 20,
+        "top": 69,
+        "width": 92,
+        "height": 87
+      },
+      "anchor": [80, 156],
+      "poseScale": 0.25
+    }
+  ]
+}

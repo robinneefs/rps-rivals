@@ -30,6 +30,7 @@ export class HudView {
     private readonly scene: Phaser.Scene,
     names: Record<Side, string>,
     maxHealth: number,
+    characters: Record<Side, string> = { p1: 'TAIKO', p2: 'RIOT' },
   ) {
     this.bars = {
       p1: { shown: maxHealth, trail: maxHealth, max: maxHealth },
@@ -41,7 +42,7 @@ export class HudView {
     for (const side of SIDES) {
       const x = side === 'p1' ? 6 : 186;
       const align = side === 'p1' ? 'left' : 'right';
-      new PixelText(scene, x, 5, side === 'p1' ? 'TAIKO' : 'RIOT', {
+      new PixelText(scene, x, 5, characters[side], {
         ...style,
         align,
         color: palette.text,

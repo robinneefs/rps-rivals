@@ -4,6 +4,7 @@ import { STAGE } from '../config/layout';
 import { palette } from '../config/palette';
 import { stageFor } from '../config/stages';
 import { tuning } from '../config/tuning';
+import { characterPresentation } from '../config/characters';
 import { FightDirector } from '../fight/FightDirector';
 import { BannerView } from '../views/BannerView';
 import { ClashView } from '../views/ClashView';
@@ -41,12 +42,27 @@ export class FightScene extends Phaser.Scene {
     addStage(this, stage);
 
     const fighters = {
-      p1: new FighterView(this, 'p1', STAGE.fighterX.p1, STAGE.floorY),
-      p2: new FighterView(this, 'p2', STAGE.fighterX.p2, STAGE.floorY),
+      p1: new FighterView(
+        this,
+        'p1',
+        STAGE.fighterX.p1,
+        STAGE.floorY,
+        characterPresentation(session.fighters.p1).combat!,
+      ),
+      p2: new FighterView(
+        this,
+        'p2',
+        STAGE.fighterX.p2,
+        STAGE.floorY,
+        characterPresentation(session.fighters.p2).combat!,
+      ),
     };
     const names = labels(session);
     const tags = new TagView(this, names);
-    const hud = new HudView(this, hudNames(session, setup), session.rules.startHealth);
+    const hud = new HudView(this, hudNames(session, setup), session.rules.startHealth, {
+      p1: characterPresentation(session.fighters.p1).name,
+      p2: characterPresentation(session.fighters.p2).name,
+    });
     const clash = new ClashView(this, names, session.me);
     const banner = new BannerView(this, 90);
     /** Online, the rival left or the connection dropped: the match is over without a result. */
@@ -106,7 +122,12 @@ export class FightScene extends Phaser.Scene {
       lights.select(null);
     });
     this.hud = hud;
-    session.ready();
+    if (session.endedReason)
+      // create() runs before the scene becomes active; report after its first update.
+      this.time.delayedCall(0, () =>
+        endEarly(session.endedReason === 'opponentLeft' ? 'RIVAL LEFT' : 'OFFLINE'),
+      );
+    else session.ready();
   }
 
   override update(): void {

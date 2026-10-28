@@ -4,7 +4,10 @@ import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 const browser = await chromium.launch({ channel: 'chrome' });
 const motion = process.argv.includes('--motion');
-const page = await browser.newPage({ viewport: { width: 600, height: 1000 }, reducedMotion: motion ? 'no-preference' : 'reduce' });
+const page = await browser.newPage({
+  viewport: { width: 600, height: 1000 },
+  reducedMotion: motion ? 'no-preference' : 'reduce',
+});
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
 const scene = async (name) => {
@@ -16,7 +19,9 @@ try {
   await scene('Home');
   if (motion) await page.waitForTimeout(2400);
   await page.screenshot({
-    path: fileURLToPath(new URL(`../../art/menus/action-v2/production-home${motion ? '-motion' : ''}.png`, import.meta.url)),
+    path: fileURLToPath(
+      new URL(`../../art/menus/action-v2/production-home${motion ? '-motion' : ''}.png`, import.meta.url),
+    ),
   });
   if (process.argv.includes('--font-study')) {
     const raw = await browser.newPage({ viewport: { width: 600, height: 1000 }, reducedMotion: 'reduce' });
@@ -42,6 +47,8 @@ try {
   await scene('Options');
   await page.keyboard.press('Escape');
   await scene('Home');
+  await page.keyboard.press('Enter');
+  await scene('CharacterSelect');
   await page.keyboard.press('Enter');
   await scene('Fight');
   if (errors.length) throw new Error(errors.join('\n'));

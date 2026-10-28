@@ -1,5 +1,7 @@
 import {
   Emitter,
+  DEFAULT_FIGHTERS,
+  type Fighters,
   opponentOf,
   Referee,
   type Clock,
@@ -34,6 +36,7 @@ export class LocalSession implements MatchSession {
     baseClock: Clock,
     private readonly rng: Rng,
     private readonly opponent: MoveSource,
+    readonly fighters: Fighters = { ...DEFAULT_FIGHTERS },
   ) {
     this.clock = new PausableClock(baseClock);
     const clock = this.clock;

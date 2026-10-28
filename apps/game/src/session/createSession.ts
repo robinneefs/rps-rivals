@@ -22,6 +22,7 @@ export function createSession(setup: MatchSetup): MatchSession {
         browserClock,
         mathRandomRng,
         new RandomCpu(),
+        setup.fighters ? { ...setup.fighters } : undefined,
       );
     case 'online':
       return connectOnline(setup.roomCode, 'join');

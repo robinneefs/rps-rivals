@@ -1,0 +1,241 @@
+{
+  "provisional": true,
+  "errors": [],
+  "failedAssets": [],
+  "checks": [
+    {
+      "layout": "lineup",
+      "fighter": "taiko",
+      "touch": false,
+      "stats": {
+        "rock": 15,
+        "paper": 10,
+        "scissors": 20,
+        "hp": 50
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "lineup",
+      "fighter": "riot",
+      "touch": false,
+      "stats": {
+        "rock": 10,
+        "paper": 20,
+        "scissors": 15,
+        "hp": 50
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "lineup",
+      "fighter": "anchor",
+      "touch": false,
+      "stats": {
+        "rock": 20,
+        "paper": 15,
+        "scissors": 10,
+        "hp": 55
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "hero",
+      "fighter": "taiko",
+      "touch": false,
+      "stats": {
+        "rock": 15,
+        "paper": 10,
+        "scissors": 20,
+        "hp": 50
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "hero",
+      "fighter": "riot",
+      "touch": false,
+      "stats": {
+        "rock": 10,
+        "paper": 20,
+        "scissors": 15,
+        "hp": 50
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "hero",
+      "fighter": "anchor",
+      "touch": false,
+      "stats": {
+        "rock": 20,
+        "paper": 15,
+        "scissors": 10,
+        "hp": 55
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "versus",
+      "fighter": "taiko",
+      "touch": false,
+      "stats": {
+        "rock": 15,
+        "paper": 10,
+        "scissors": 20,
+        "hp": 50
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "versus",
+      "fighter": "riot",
+      "touch": false,
+      "stats": {
+        "rock": 10,
+        "paper": 20,
+        "scissors": 15,
+        "hp": 50
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "versus",
+      "fighter": "anchor",
+      "touch": false,
+      "stats": {
+        "rock": 20,
+        "paper": 15,
+        "scissors": 10,
+        "hp": 55
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "lineup",
+      "fighter": "taiko",
+      "touch": true,
+      "stats": {
+        "rock": 15,
+        "paper": 10,
+        "scissors": 20,
+        "hp": 50
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "lineup",
+      "fighter": "riot",
+      "touch": true,
+      "stats": {
+        "rock": 10,
+        "paper": 20,
+        "scissors": 15,
+        "hp": 50
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "lineup",
+      "fighter": "anchor",
+      "touch": true,
+      "stats": {
+        "rock": 20,
+        "paper": 15,
+        "scissors": 10,
+        "hp": 55
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "hero",
+      "fighter": "taiko",
+      "touch": true,
+      "stats": {
+        "rock": 15,
+        "paper": 10,
+        "scissors": 20,
+        "hp": 50
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "hero",
+      "fighter": "riot",
+      "touch": true,
+      "stats": {
+        "rock": 10,
+        "paper": 20,
+        "scissors": 15,
+        "hp": 50
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "hero",
+      "fighter": "anchor",
+      "touch": true,
+      "stats": {
+        "rock": 20,
+        "paper": 15,
+        "scissors": 10,
+        "hp": 55
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "versus",
+      "fighter": "taiko",
+      "touch": true,
+      "stats": {
+        "rock": 15,
+        "paper": 10,
+        "scissors": 20,
+        "hp": 50
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "versus",
+      "fighter": "riot",
+      "touch": true,
+      "stats": {
+        "rock": 10,
+        "paper": 20,
+        "scissors": 15,
+        "hp": 50
+      },
+      "crt": true,
+      "shader": true
+    },
+    {
+      "layout": "versus",
+      "fighter": "anchor",
+      "touch": true,
+      "stats": {
+        "rock": 20,
+        "paper": 15,
+        "scissors": 10,
+        "hp": 55
+      },
+      "crt": true,
+      "shader": true
+    }
+  ]
+}

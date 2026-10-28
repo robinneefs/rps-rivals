@@ -1,5 +1,6 @@
 import {
   defaultRules,
+  initialCharacterSelection,
   defaultTimings,
   opponentOf,
   parseClientMessage,
@@ -14,6 +15,7 @@ import {
   type RulesConfig,
   type ServerMessage,
   type Side,
+  type PlayableCharacterId,
 } from '@rps/core';
 
 /** One player's connection, whatever carries it (a WebSocket in the Durable Object, a fake in tests). */
@@ -50,6 +52,8 @@ export class MatchRoom {
   private readonly seats: Record<Side, Seat | null> = { p1: null, p2: null };
   private referee: Referee | null = null;
   private idle: Cancel | null = null;
+  private selection = initialCharacterSelection();
+  private selectionLocked = false;
 
   constructor(
     private readonly clock: Clock,
@@ -78,6 +82,9 @@ export class MatchRoom {
       case 'ready':
         seat.ready = true;
         this.startIfReady();
+        break;
+      case 'character':
+        this.chooseCharacter(side, msg.character, msg.confirmed);
         break;
       case 'pick':
         this.referee?.submitPick(side, msg.move);
@@ -117,6 +124,8 @@ export class MatchRoom {
     this.seats.p2 = { conn, version, ready: false, rematch: false };
     this.clearIdle();
     this.welcome('p2');
+    this.setIdle(this.timeouts.lobbyMs);
+    this.broadcast({ type: 'selection', ...this.selection });
     this.broadcast({ type: 'opponentJoined' });
   }
 
@@ -126,11 +135,27 @@ export class MatchRoom {
 
   private startIfReady(): void {
     if (!SIDES.every((s) => this.seats[s]?.ready)) return;
+    if (!SIDES.every((s) => this.selection.confirmed[s])) return;
     const phase = this.referee?.currentPhase ?? 'idle';
     if (phase !== 'idle' && phase !== 'matchOver') return;
     this.clearIdle();
     this.referee ??= this.createReferee();
     this.referee.start();
+  }
+
+  private chooseCharacter(side: Side, character: PlayableCharacterId, confirmed: boolean): void {
+    // Identities cannot change during a match or its rematch handshake.
+    if (this.referee || this.selectionLocked) return;
+    this.selection.fighters[side] = character;
+    this.selection.confirmed[side] = confirmed;
+    this.selectionLocked = SIDES.every((s) => this.selection.confirmed[s]);
+    // A readiness message sent before lock-in cannot bypass selection.
+    for (const s of SIDES) if (this.seats[s]) this.seats[s]!.ready = false;
+    this.broadcast({
+      type: 'selection',
+      fighters: { ...this.selection.fighters },
+      confirmed: { ...this.selection.confirmed },
+    });
   }
 
   private requestRematch(side: Side): void {
@@ -197,6 +222,8 @@ export class MatchRoom {
     this.clearIdle();
     this.referee?.dispose();
     this.referee = null;
+    this.selection = initialCharacterSelection();
+    this.selectionLocked = false;
     for (const s of SIDES) this.seats[s] = null;
   }
 }

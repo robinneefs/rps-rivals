@@ -22,7 +22,7 @@ export class OptionsScene extends Phaser.Scene {
     const { flow, input, settings, audio, haptics } = getContext(this);
     useMonitorCamera(this);
     menuBackdrop(this);
-    menuPanel(this);
+    menuPanel(this, 47, 190);
     menuTitle(this, 'OPTIONS');
     // VIBRATION only on phones
     const listed = { vibration: haptics.supported };
@@ -36,6 +36,7 @@ export class OptionsScene extends Phaser.Scene {
     };
     const toggleSound = () => settings.set('muted', !settings.value.muted);
     const toggleCrt = () => settings.set('crt', !settings.value.crt);
+    const togglePixelPerfect = () => settings.set('pixelPerfect', !settings.value.pixelPerfect);
     const toggleVibration = () => {
       settings.set('vibration', !settings.value.vibration);
       haptics.preview();
@@ -51,6 +52,7 @@ export class OptionsScene extends Phaser.Scene {
       this,
       optionsMenu(settings.value, listed, {
         toggleCrt,
+        togglePixelPerfect,
         toggleVibration,
         toggleSound,
         stepVolume: (id) => changeVolume(id, 1, true),
@@ -69,6 +71,7 @@ export class OptionsScene extends Phaser.Scene {
     const show = () => {
       const s = settings.value;
       menu.setTag('crt', onOffTag(s.crt));
+      menu.setTag('pixelPerfect', onOffTag(s.pixelPerfect));
       menu.setTag('vibration', onOffTag(s.vibration));
       menu.setTag('sound', soundTag(s.muted));
       menu.setTag('music', volumeTag(s.musicVolume));
@@ -88,6 +91,7 @@ export class OptionsScene extends Phaser.Scene {
           const dir = a.dir === 'right' ? 1 : -1;
           const id = menu.selectedId;
           if (id === 'crt') toggleCrt();
+          else if (id === 'pixelPerfect') togglePixelPerfect();
           else if (id === 'vibration') toggleVibration();
           else if (id === 'sound') toggleSound();
           else if (id === 'music' || id === 'sfx') changeVolume(id, dir, false);

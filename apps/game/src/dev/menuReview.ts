@@ -5,14 +5,15 @@ import { SceneKey } from '../scenes/keys';
 /** Local-only links for reviewing real menu scenes without finishing a match or connecting a rival. */
 export function mountMenuReview(game: Phaser.Game, flow: SceneFlow): void {
   const review = new URLSearchParams(location.search).get('menuReview');
-  if (!review || !['online', 'create', 'join', 'win', 'loss'].includes(review)) return;
+  if (!review || !['online', 'create', 'join', 'win', 'loss', 'characters'].includes(review)) return;
   let opened = false;
   const tick = () => {
     if (!game.scene.isActive(SceneKey.home)) return;
     game.events.off('step', tick);
     const home = game.scene.getScene(SceneKey.home);
     home.time.delayedCall(700, () => {
-      if (review === 'win' || review === 'loss') {
+      if (review === 'characters') flow.toCharacterSelect({ mode: 'cpu', cpu: 'random' });
+      else if (review === 'win' || review === 'loss') {
         flow.toFight({ mode: 'cpu', cpu: 'random' });
         const result = () => {
           if (!game.scene.isActive(SceneKey.fight) || opened) return;

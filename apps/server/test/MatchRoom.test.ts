@@ -44,6 +44,8 @@ describe('MatchRoom', () => {
   };
   const startMatch = () => {
     seatBoth();
+    send(room, a, { type: 'character', character: 'taiko', confirmed: true });
+    send(room, b, { type: 'character', character: 'riot', confirmed: true });
     send(room, a, { type: 'ready' });
     send(room, b, { type: 'ready' });
   };
@@ -90,6 +92,8 @@ describe('MatchRoom', () => {
 
   it('starts only when both players are ready, and sends time left instead of clock times', () => {
     seatBoth();
+    send(room, a, { type: 'character', character: 'taiko', confirmed: true });
+    send(room, b, { type: 'character', character: 'riot', confirmed: true });
     send(room, a, { type: 'ready' });
     expect(a.of('phase')).toHaveLength(0);
     send(room, b, { type: 'ready' });

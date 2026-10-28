@@ -2,7 +2,6 @@ import { defaultRules, defaultTimings } from '@rps/core';
 import Phaser from 'phaser';
 import { AudioService } from './audio/AudioService';
 import { CabinetView } from './cabinet/CabinetView';
-import { SCREEN } from './cabinet/geometry';
 import { MONITOR } from './config/layout';
 import { palette } from './config/palette';
 import { tuning } from './config/tuning';
@@ -21,6 +20,7 @@ import { LobbyScene } from './scenes/LobbyScene';
 import { LogoScene } from './scenes/LogoScene';
 import { HowToScene } from './scenes/HowToScene';
 import { OptionsScene } from './scenes/OptionsScene';
+import { CharacterSelectScene } from './scenes/CharacterSelectScene';
 import { ResultScene } from './scenes/ResultScene';
 import { SceneKey } from './scenes/keys';
 import { TransitionScene } from './scenes/TransitionScene';
@@ -41,6 +41,8 @@ const cabinet = new CabinetView(
   },
   cabinetShake,
 );
+cabinet.setPixelPerfect(settings.value.pixelPerfect);
+settings.onChange((s) => cabinet.setPixelPerfect(s.pixelPerfect));
 input.on('button', (e) => cabinet.setDown(e.move, e.down));
 input.on('stick', (t) => cabinet.setTilt(t));
 lights.onChange((m) => cabinet.setSelected(m));
@@ -49,7 +51,7 @@ lights.onChange((m) => cabinet.setSelected(m));
 const canvasSize = () => ({
   width: MONITOR.width,
   height: MONITOR.height,
-  zoom: SCREEN.width / MONITOR.width,
+  zoom: cabinet.canvasZoom,
 });
 const size = canvasSize();
 
@@ -67,6 +69,7 @@ const game = new Phaser.Game({
     LogoScene,
     HomeScene,
     OptionsScene,
+    CharacterSelectScene,
     HowToScene,
     LobbyScene,
     FightScene,
@@ -76,7 +79,12 @@ const game = new Phaser.Game({
 });
 // Preserve the native pixel grid when fitting the cabinet opening.
 const fitCanvas = () => {
-  Object.assign(game.canvas.style, { imageRendering: 'pixelated', display: 'block' });
+  Object.assign(game.canvas.style, {
+    imageRendering: 'pixelated',
+    display: 'block',
+    marginLeft: `${cabinet.monitorInsetX}px`,
+  });
+  game.scale.updateBounds();
 };
 audio = new AudioService(game, settings);
 const flow = new SceneFlow(game, audio);
@@ -128,6 +136,11 @@ onAppActive((active) => {
 
 // Dev tuning panel (npm run dev only; never in a release build). Toggle with the ` key.
 if (import.meta.env.DEV) {
+  if (new URLSearchParams(location.search).has('characterReview')) {
+    void import('./dev/characterSelectReview').then(({ mountCharacterSelectReview }) =>
+      mountCharacterSelectReview(game),
+    );
+  }
   if (new URLSearchParams(location.search).has('menuReview')) {
     void import('./dev/menuReview').then(({ mountMenuReview }) => mountMenuReview(game, flow));
   }
@@ -157,5 +170,25 @@ if (import.meta.env.DEV) {
   phase: () => flow.activeSession?.snapshot().phase ?? null,
   renderScale: () => cabinet.renderScale,
   music: () => audio.music,
+  fighters: () => flow.activeSession?.fighters ?? null,
+  snapshot: () =>
+    new Promise<string>((resolve) =>
+      game.renderer.snapshot((image) => resolve((image as HTMLImageElement).src)),
+    ),
+  homePortrait: () =>
+    game.scene.isActive(SceneKey.home)
+      ? (game.scene.getScene(SceneKey.home) as HomeScene).portraitState
+      : null,
+  characterSelection: () =>
+    game.scene.isActive(SceneKey.characterSelect)
+      ? (game.scene.getScene(SceneKey.characterSelect) as CharacterSelectScene).state
+      : null,
+  combatTextures: () =>
+    game.scene.isActive(SceneKey.fight)
+      ? game.scene
+          .getScene(SceneKey.fight)
+          .children.list.filter((object) => object.name === 'fighter-p1' || object.name === 'fighter-p2')
+          .map((object) => (object as Phaser.GameObjects.Sprite).texture.key)
+      : [],
   version: VERSION,
 };
