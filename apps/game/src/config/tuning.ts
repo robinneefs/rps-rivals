@@ -202,5 +202,5 @@ export const tuning = {
   },
   result: { delayAfterMatchMs: 400 },
   /** Online: how long "RIVAL LEFT" and other ending messages stay up before going home; lobby text blink. */
-  online: { endedHoldMs: 2500, waitBlinkMs: 500 },
+  online: { endedHoldMs: 3500, waitBlinkMs: 500 },
 } as const;

@@ -46,6 +46,7 @@ export interface SessionEvents extends Record<string, unknown> {
  * so the fight screen doesn't care whether the opponent is a CPU here or a person online.
  */
 export interface MatchSession {
+  readonly rivalRequestedRematch?: boolean;
   readonly endedReason?: 'refused' | 'opponentLeft' | 'disconnected' | null;
   readonly fighters: Fighters;
   readonly me: Side;

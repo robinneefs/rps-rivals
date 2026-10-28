@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
-import { palette } from '../config/palette';
-import { tuning } from '../config/tuning';
+import { rematchNotice, showDisconnect } from '../views/OnlineNotice';
 import { resultMenu } from '../menus/resultMenu';
 import { MenuView } from '../views/MenuView';
 import { getContext } from './context';
@@ -34,7 +33,7 @@ export class ResultScene extends Phaser.Scene {
     const winnerLabel = mirror ? (won ? 'YOU WIN!' : `${session.opponentName} WINS`) : undefined;
     const victory = new VictoryView(this, session.fighters[winner], winnerLabel, mirror && winner === 'p2');
     // Status remains visible while the online rematch handshake is pending.
-    const note = victory.note;
+    const notice = rematchNotice(this);
 
     let leaving = false;
     let asked = false;
@@ -44,7 +43,7 @@ export class ResultScene extends Phaser.Scene {
         retry: () => {
           if (leaving || asked) return;
           asked = true;
-          note.setText('WAITING FOR RIVAL');
+          if (setup.mode === 'online') notice(true);
           session.requestRematch(); // online: waits for the opponent; locally accepted at once
         },
         mainMenu: () => {
@@ -58,24 +57,24 @@ export class ResultScene extends Phaser.Scene {
       input,
       audio,
     );
-    const ended = (text: string) => {
+    const ended = (rivalLeft: boolean) => {
       if (leaving) return;
       leaving = true;
       menu.lock();
-      note.setText(text).setColor(palette.pink);
-      this.time.delayedCall(tuning.online.endedHoldMs, () => flow.toHome());
+      showDisconnect(this, rivalLeft, () => flow.toHome());
     };
     const offs = [
       session.on('rematchAccepted', () => {
+        if (leaving) return;
         leaving = true;
         menu.lock();
         flow.toFight(setup, session);
       }),
       session.on('rematchRequested', ({ side }) => {
-        if (side !== session.me) note.setText('RIVAL WANTS A REMATCH').setColor(palette.gold);
+        if (!leaving && !asked && side !== session.me) notice(false);
       }),
-      session.on('opponentLeft', () => ended('RIVAL LEFT')),
-      session.on('disconnected', () => ended('CONNECTION LOST')),
+      session.on('opponentLeft', () => ended(true)),
+      session.on('disconnected', () => ended(false)),
       input.on('action', (a) => {
         if (a.type === 'back' && this.scene.isActive() && !leaving) {
           audio.play('menuBack');
@@ -85,6 +84,8 @@ export class ResultScene extends Phaser.Scene {
         }
       }),
     ];
+    if (session.endedReason) ended(session.endedReason === 'opponentLeft');
+    else if (session.rivalRequestedRematch) notice(false);
     this.events.once('shutdown', () => offs.forEach((off) => off()));
   }
 }

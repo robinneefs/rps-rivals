@@ -59,6 +59,7 @@ export class OnlineSession implements MatchSession {
   endedReason: 'refused' | 'opponentLeft' | 'disconnected' | null = null;
   /** Matches started in this room before the current one (rematches both players count alike). */
   private rematches = 0;
+  rivalRequestedRematch = false;
 
   constructor(private readonly opts: OnlineOptions) {
     this.socket = opts.openSocket(`${opts.serverUrl}/room/${opts.roomCode}`, {
@@ -189,9 +190,13 @@ export class OnlineSession implements MatchSession {
         this.events.emit('matchOver', { winner: msg.winner, state: this.state });
         break;
       case 'rematchRequested':
-        if (seated) this.events.emit('rematchRequested', { side: msg.side });
+        if (seated) {
+          if (msg.side !== this.me) this.rivalRequestedRematch = true;
+          this.events.emit('rematchRequested', { side: msg.side });
+        }
         break;
       case 'rematchAccepted':
+        this.rivalRequestedRematch = false;
         this.rematches++;
         this.events.emit('rematchAccepted', {});
         break;

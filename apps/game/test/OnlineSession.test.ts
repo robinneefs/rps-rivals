@@ -36,6 +36,16 @@ const state = (p1: number, p2: number, won = { p1: 0, p2: 0 }) => ({
 });
 
 describe('OnlineSession', () => {
+  it('remembers a rival rematch request until the next match starts', () => {
+    const { session, room } = setup();
+    room({ type: 'welcome', side: 'p2', rules: defaultRules, timings: defaultTimings });
+    room({ type: 'rematchRequested', side: 'p2' });
+    expect(session.rivalRequestedRematch).toBe(false);
+    room({ type: 'rematchRequested', side: 'p1' });
+    expect(session.rivalRequestedRematch).toBe(true);
+    room({ type: 'rematchAccepted' });
+    expect(session.rivalRequestedRematch).toBe(false);
+  });
   it('keeps both players on the same rotating stage across repeated rematches', () => {
     const a = setup(),
       b = setup();

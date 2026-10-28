@@ -1,8 +1,8 @@
 import { opponentOf, characterStats, type Side } from '@rps/core';
 import Phaser from 'phaser';
 import { STAGE } from '../config/layout';
-import { palette } from '../config/palette';
 import { stageFor } from '../config/stages';
+import { showDisconnect } from '../views/OnlineNotice';
 import { tuning } from '../config/tuning';
 import { characterPresentation } from '../config/characters';
 import { combatTexture } from '../assets/alternatePalettes';
@@ -91,12 +91,12 @@ export class FightScene extends Phaser.Scene {
     const endEarly = (text: string) => {
       if (endedEarly || !this.scene.isActive()) return;
       endedEarly = true;
-      banner.show(text, { color: palette.pink, holdMs: Infinity });
-      this.time.delayedCall(tuning.online.endedHoldMs, () => flow.toHome());
+      lights.select(null);
+      showDisconnect(this, text === 'RIVAL LEFT', () => flow.toHome());
     };
     const offs = [
       input.on('action', (a) => {
-        if (!this.scene.isActive() || a.type !== 'pick') return;
+        if (endedEarly || !this.scene.isActive() || a.type !== 'pick') return;
         const before = session.snapshot().myPick;
         session.submitPick(a.move);
         const picked = session.snapshot().myPick;
