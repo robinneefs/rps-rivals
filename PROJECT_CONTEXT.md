@@ -1,5 +1,13 @@
 # RPS Rivals: Project Context
 
+## Handoff: five-stage lineup complete (2026-10-28)
+
+- All five stages are playable and rotate on CPU/online rematches: City Rooftop, Storm Field, Sunset Harbor, Lantern Courtyard and Foundry Floor. Each has its own installed track: Ready to Rival, Under the Storm, Golden Hour, Lantern Rush and Pressure Point. Foundry is fully registered, not a static preview.
+- Courtyard has fixed-pivot whole-lantern native pendulum frames, stronger localized glow and more frequent drifting petals. Foundry has continuous dark overhead architecture instead of a cutoff, a slow native-frame gear, animated furnace/glow, toned-down sparks and rounded curling smoke. Motion honors reduced motion, resets on scene entry and cleans up scene timers/listeners. Approved sources, exact prompts, export tools, tracks and browser checks are retained under art/ and tools/.
+- Removed the detached yellow fragment beneath the VICTORY title's C/T; extraction script reproduces the fix. Earlier Taiko alternate-palette cleanup, audio-focus backlog fix and victory-title bob were already pushed in38f6f8a.
+- Latest validation:171unit tests, full lint, all-workspace typecheck and production build passed. Browser checks cover all five stages, effects/reduced motion, scene resets, and dedicated stereo OGG/MP3 selection/decoding. Existing bundle-size advisory remains. Version stays2.2.0; this is a push to codex/edits, not deployment.
+- Next recommended work: online leave/disconnect/rematch experience, followed by a consolidated release checklist/device playtest. Preserve all outstanding items in docs/design/revamp-follow-ups.md, including CRT-effect experiments and marquee review; do not silently clear them. The five-stage target is complete, superseding the older Storm Field checkpoint below.
+
 ## Handoff: Storm Field checkpoint (2026-10-28)
 
 - User approved the animated Storm Field stage, inverted cloud v2 artwork, centered very slow limited cloud drift, denser grass covering feet, and more frequent lightning. Approved music v2 Under the Storm is installed for this stage. Joystick centering is fixed across all9poses.

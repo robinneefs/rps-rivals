@@ -3,14 +3,25 @@ import { chromium } from '@playwright/test';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 const harborV3 = process.argv.includes('--harbor-v3');
+const foundryV2 = process.argv.includes('--foundry-v2');
+const courtyardV2 = process.argv.includes('--courtyard-v2');
 const harborV2 = process.argv.includes('--harbor-v2');
-const out = harborV3
-  ? 'art/stages/sunset-harbor-v3'
-  : harborV2
-    ? 'art/stages/sunset-harbor-v2'
-    : 'art/stages/three-stage-concepts-v1';
-const ids =
-  harborV3 || harborV2 ? ['sunset-harbor'] : ['sunset-harbor', 'lantern-courtyard', 'foundry-floor'];
+const out = foundryV2
+  ? 'art/stages/foundry-floor-v2'
+  : courtyardV2
+    ? 'art/stages/lantern-courtyard-v2'
+    : harborV3
+      ? 'art/stages/sunset-harbor-v3'
+      : harborV2
+        ? 'art/stages/sunset-harbor-v2'
+        : 'art/stages/three-stage-concepts-v1';
+const ids = foundryV2
+  ? ['foundry-floor']
+  : courtyardV2
+    ? ['lantern-courtyard']
+    : harborV3 || harborV2
+      ? ['sunset-harbor']
+      : ['sunset-harbor', 'lantern-courtyard', 'foundry-floor'];
 const browser = await chromium.launch({ channel: 'chrome' });
 const errors = [];
 try {
@@ -37,7 +48,7 @@ try {
   for (const id of ids) {
     const source = `data:image/png;base64,${readFileSync(`${out}/${id}-source.png`).toString('base64')}`;
     let native = await resize(source, 192, 240);
-    if (harborV3) {
+    if (harborV3 || courtyardV2 || foundryV2) {
       const sharp = createRequire(import.meta.url)(process.env.RPS_SHARP_PATH || 'sharp');
       native = await sharp(native).png({ palette: true, colours: 40, dither: 0 }).toBuffer();
       const metadata = await sharp(native).metadata();

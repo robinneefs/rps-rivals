@@ -1,0 +1,122 @@
+{
+  "width": 192,
+  "height": 240,
+  "order": [
+    "sky-gradient",
+    "scenery-clean",
+    "stone-floor",
+    "lantern-left",
+    "lantern-right",
+    "lantern-far-right"
+  ],
+  "lanterns": [
+    {
+      "id": "left",
+      "x": 18,
+      "y": 89,
+      "width": 12,
+      "height": 22,
+      "pivot": [23, 89],
+      "source": [0, 0.5]
+    },
+    {
+      "id": "right",
+      "x": 163,
+      "y": 89,
+      "width": 11,
+      "height": 22,
+      "pivot": [168, 89],
+      "source": [0.5, 0.91]
+    },
+    {
+      "id": "far-right",
+      "x": 187,
+      "y": 100,
+      "width": 5,
+      "height": 20,
+      "pivot": [189, 100],
+      "source": [0.91, 1]
+    }
+  ],
+  "glow": {
+    "blend": "ADD",
+    "suggestedAlpha": [0.04, 0.15],
+    "followsLantern": true
+  },
+  "petals": {
+    "file": "petals.png",
+    "frameWidth": 8,
+    "frameHeight": 8,
+    "frames": 4,
+    "activeCount": [0, 3],
+    "minimumY": 72
+  },
+  "standingLine": 220,
+  "paletteLimitPerLayer": 40,
+  "binaryAlpha": true,
+  "checks": [
+    {
+      "name": "sky-gradient",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 46080,
+      "binaryAlpha": true
+    },
+    {
+      "name": "scenery-clean",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 18284,
+      "binaryAlpha": true
+    },
+    {
+      "name": "stone-floor",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 12480,
+      "binaryAlpha": true
+    },
+    {
+      "name": "lantern-left",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 128,
+      "binaryAlpha": true
+    },
+    {
+      "name": "glow-left",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 23,
+      "binaryAlpha": true
+    },
+    {
+      "name": "lantern-right",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 119,
+      "binaryAlpha": true
+    },
+    {
+      "name": "glow-right",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 25,
+      "binaryAlpha": true
+    },
+    {
+      "name": "lantern-far-right",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 45,
+      "binaryAlpha": true
+    },
+    {
+      "name": "glow-far-right",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 7,
+      "binaryAlpha": true
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "errors": [],
+  "results": [
+    {
+      "stage": "lantern-courtyard",
+      "music": "courtyard"
+    },
+    {
+      "decoded": [
+        {
+          "ext": "ogg",
+          "duration": 45.71427083333333,
+          "channels": 2
+        },
+        {
+          "ext": "mp3",
+          "duration": 45.71427083333333,
+          "channels": 2
+        }
+      ]
+    },
+    {
+      "stage": "sunset-harbor",
+      "music": "harbor"
+    },
+    {
+      "stage": "storm-field",
+      "music": "storm"
+    },
+    {
+      "stage": "rooftop",
+      "music": "fight"
+    }
+  ]
+}

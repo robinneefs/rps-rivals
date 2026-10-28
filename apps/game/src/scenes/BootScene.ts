@@ -9,6 +9,8 @@ import { registerPixelFont } from '../assets/pixelFont';
 import { palette } from '../config/palette';
 import {
   STAGES,
+  COURTYARD_LAYERS,
+  courtyardTexture,
   HARBOR_LAYERS,
   harborTexture,
   stageCloudTexture,
@@ -58,6 +60,32 @@ export class BootScene extends Phaser.Scene {
     this.load.image(HomeTex.arrow, `${home}arrow.png`);
     this.load.image('victory-title', `${home}victory-title.png`);
     for (const stage of STAGES) {
+      if (stage.foundry) {
+        for (const layer of ['background', 'occluders', 'warm-glow'])
+          this.load.image(`foundry-${layer}`, `${stage.foundry}${layer}.png`);
+        this.load.spritesheet('foundry-gear', `${stage.foundry}gear-turn.png`, {
+          frameWidth: 176,
+          frameHeight: 176,
+        });
+        this.load.spritesheet('foundry-fire', `${stage.foundry}fire.png`, {
+          frameWidth: 192,
+          frameHeight: 240,
+        });
+      }
+      if (stage.courtyard) {
+        for (const layer of COURTYARD_LAYERS) {
+          if (layer.startsWith('lantern-') || layer.startsWith('glow-'))
+            this.load.spritesheet(courtyardTexture(layer), `${stage.courtyard}${layer}-sway.png`, {
+              frameWidth: 192,
+              frameHeight: 240,
+            });
+          else this.load.image(courtyardTexture(layer), `${stage.courtyard}${layer}.png`);
+        }
+        this.load.spritesheet('courtyard-petals', `${stage.courtyard}petals.png`, {
+          frameWidth: 8,
+          frameHeight: 8,
+        });
+      }
       if (stage.harbor)
         for (const layer of HARBOR_LAYERS)
           this.load.image(harborTexture(layer), `${stage.harbor}${layer}.png`);

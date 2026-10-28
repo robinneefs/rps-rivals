@@ -12,6 +12,18 @@ export const HARBOR_LAYERS = [
   'dock-foreground',
 ] as const;
 export const harborTexture = (layer: (typeof HARBOR_LAYERS)[number]): string => `harbor-${layer}`;
+export const COURTYARD_LAYERS = [
+  'sky-gradient',
+  'scenery-clean',
+  'stone-floor',
+  'lantern-left',
+  'lantern-right',
+  'lantern-far-right',
+  'glow-left',
+  'glow-right',
+  'glow-far-right',
+] as const;
+export const courtyardTexture = (layer: (typeof COURTYARD_LAYERS)[number]): string => `courtyard-${layer}`;
 
 /** Stages authored at the native 192 x 240 resolution. */
 export interface StageDef {
@@ -30,6 +42,9 @@ export interface StageDef {
   storm?: { clouds: string; field: string; foreground: string; frames: number; frameMs: number };
   /** Directory of aligned 192 × 240 harbor layers. */
   harbor?: string;
+  /** Directory of aligned courtyard scenery, lanterns, glows and petals. */
+  courtyard?: string;
+  foundry?: string;
   /** Or a placeholder painted in code. */
   paint?: () => PixelBuffer;
 }
@@ -63,8 +78,21 @@ export const STAGES: readonly StageDef[] = [
     image: 'assets/stages/harbor/sky-gradient.png',
     harbor: 'assets/stages/harbor/',
   },
+  {
+    id: 'lantern-courtyard',
+    name: 'Lantern Courtyard',
+    music: 'courtyard',
+    image: 'assets/stages/courtyard/sky-gradient.png',
+    courtyard: 'assets/stages/courtyard/',
+  },
+  {
+    id: 'foundry-floor',
+    name: 'Foundry Floor',
+    music: 'foundry',
+    image: 'assets/stages/foundry/background.png',
+    foundry: 'assets/stages/foundry/',
+  },
 ];
-
 export const stageTexture = (id: string): string => `stage-${id}`;
 export const stageCloudTexture = (id: string): string => `stage-${id}-clouds`;
 export const stageFieldTexture = (id: string): string => `stage-${id}-field`;

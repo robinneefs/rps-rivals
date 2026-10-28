@@ -1,0 +1,580 @@
+{
+  "checks": [
+    "native lantern sway/glow and sparse petals advance; static scenery behind fighters; desktop/phone captured",
+    "live reduced motion immediately stops sway/glow, hides petals, and resumes",
+    "all four stages load correctly and courtyard re-entry resets effects"
+  ],
+  "errors": [],
+  "samples": [
+    {
+      "offsets": [7, 4, 0],
+      "glows": [0.4289267725122935, 0.22191182357519268, 0.20595640716513863],
+      "petals": [
+        {
+          "visible": true,
+          "x": 4,
+          "y": 90
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "elapsed": 1600,
+      "reducedMotion": false
+    },
+    {
+      "offsets": [5, 2, -3],
+      "glows": [0.3877693328251749, 0.1803383442178373, 0.25200778452977896],
+      "petals": [
+        {
+          "visible": true,
+          "x": 15,
+          "y": 93
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "elapsed": 2000,
+      "reducedMotion": false
+    },
+    {
+      "offsets": [3, -1, -5],
+      "glows": [0.32572493249431983, 0.1608842214947715, 0.3051452462031855],
+      "petals": [
+        {
+          "visible": true,
+          "x": 26,
+          "y": 97
+        },
+        {
+          "visible": true,
+          "x": 5,
+          "y": 105
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "elapsed": 2400,
+      "reducedMotion": false
+    },
+    {
+      "offsets": [0, -3, -6],
+      "glows": [0.25755862562417386, 0.16714553366269333, 0.35752300866229436],
+      "petals": [
+        {
+          "visible": true,
+          "x": 36,
+          "y": 101
+        },
+        {
+          "visible": true,
+          "x": 15,
+          "y": 109
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "elapsed": 2800,
+      "reducedMotion": false
+    },
+    {
+      "offsets": [-3, -6, -7],
+      "glows": [0.19949233077097814, 0.19796488242274424, 0.40140745850640563],
+      "petals": [
+        {
+          "visible": true,
+          "x": 45,
+          "y": 104
+        },
+        {
+          "visible": true,
+          "x": 24,
+          "y": 112
+        },
+        {
+          "visible": true,
+          "x": 3,
+          "y": 121
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "elapsed": 3200,
+      "reducedMotion": false
+    },
+    {
+      "offsets": [-5, -7, -7],
+      "glows": [0.16534440995580532, 0.24764533702459998, 0.4303190259054468],
+      "petals": [
+        {
+          "visible": true,
+          "x": 53,
+          "y": 108
+        },
+        {
+          "visible": true,
+          "x": 32,
+          "y": 116
+        },
+        {
+          "visible": true,
+          "x": 11,
+          "y": 124
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "elapsed": 3600,
+      "reducedMotion": false
+    },
+    {
+      "offsets": [-7, -7, -6],
+      "glows": [0.16324123551365588, 0.3070035071339954, 0.4399888976345875],
+      "petals": [
+        {
+          "visible": true,
+          "x": 61,
+          "y": 111
+        },
+        {
+          "visible": true,
+          "x": 40,
+          "y": 120
+        },
+        {
+          "visible": true,
+          "x": 19,
+          "y": 128
+        },
+        {
+          "visible": true,
+          "x": -3,
+          "y": 88
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "elapsed": 4000,
+      "reducedMotion": false
+    },
+    {
+      "offsets": [-7, -6, -4],
+      "glows": [0.19368331166834102, 0.36506708482800876, 0.4289893103439535],
+      "petals": [
+        {
+          "visible": true,
+          "x": 68,
+          "y": 115
+        },
+        {
+          "visible": true,
+          "x": 47,
+          "y": 123
+        },
+        {
+          "visible": true,
+          "x": 26,
+          "y": 132
+        },
+        {
+          "visible": true,
+          "x": 5,
+          "y": 92
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "elapsed": 4400,
+      "reducedMotion": false
+    },
+    {
+      "offsets": [-5, -4, -1],
+      "glows": [0.24942616673379855, 0.4111030665050963, 0.3989443608196461],
+      "petals": [
+        {
+          "visible": true,
+          "x": 76,
+          "y": 119
+        },
+        {
+          "visible": true,
+          "x": 55,
+          "y": 127
+        },
+        {
+          "visible": true,
+          "x": 34,
+          "y": 135
+        },
+        {
+          "visible": true,
+          "x": 13,
+          "y": 96
+        },
+        {
+          "visible": true,
+          "x": -8,
+          "y": 104
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "elapsed": 4800,
+      "reducedMotion": false
+    },
+    {
+      "offsets": [-2, -1, 2],
+      "glows": [0.3341479208151728, 0.43911577850522854, 0.3415821359444541],
+      "petals": [
+        {
+          "visible": true,
+          "x": 87,
+          "y": 123
+        },
+        {
+          "visible": true,
+          "x": 67,
+          "y": 132
+        },
+        {
+          "visible": true,
+          "x": 46,
+          "y": 140
+        },
+        {
+          "visible": true,
+          "x": 25,
+          "y": 100
+        },
+        {
+          "visible": true,
+          "x": 4,
+          "y": 108
+        },
+        {
+          "visible": false,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "elapsed": 5300,
+      "reducedMotion": false
+    },
+    {
+      "offsets": [1, 2, 4],
+      "glows": [0.39431739011051803, 0.4328544663373067, 0.28810145864107056],
+      "petals": [
+        {
+          "visible": true,
+          "x": 97,
+          "y": 127
+        },
+        {
+          "visible": true,
+          "x": 77,
+          "y": 135
+        },
+        {
+          "visible": true,
+          "x": 56,
+          "y": 143
+        },
+        {
+          "visible": true,
+          "x": 35,
+          "y": 104
+        },
+        {
+          "visible": true,
+          "x": 15,
+          "y": 112
+        },
+        {
+          "visible": true,
+          "x": -6,
+          "y": 120
+        }
+      ],
+      "elapsed": 5700,
+      "reducedMotion": false
+    },
+    {
+      "offsets": [4, 5, 6],
+      "glows": [0.43204162082597886, 0.40203511757725574, 0.2363776093231138],
+      "petals": [
+        {
+          "visible": true,
+          "x": 108,
+          "y": 131
+        },
+        {
+          "visible": true,
+          "x": 88,
+          "y": 139
+        },
+        {
+          "visible": true,
+          "x": 67,
+          "y": 147
+        },
+        {
+          "visible": true,
+          "x": 46,
+          "y": 107
+        },
+        {
+          "visible": true,
+          "x": 26,
+          "y": 116
+        },
+        {
+          "visible": true,
+          "x": 5,
+          "y": 124
+        }
+      ],
+      "elapsed": 6100,
+      "reducedMotion": false
+    },
+    {
+      "offsets": [6, 6, 7],
+      "glows": [0.43834316609137636, 0.3523546629754, 0.19404765065689006],
+      "petals": [
+        {
+          "visible": true,
+          "x": 120,
+          "y": 134
+        },
+        {
+          "visible": true,
+          "x": 99,
+          "y": 142
+        },
+        {
+          "visible": true,
+          "x": 79,
+          "y": 151
+        },
+        {
+          "visible": true,
+          "x": 58,
+          "y": 111
+        },
+        {
+          "visible": true,
+          "x": 38,
+          "y": 119
+        },
+        {
+          "visible": true,
+          "x": 17,
+          "y": 128
+        }
+      ],
+      "elapsed": 6500,
+      "reducedMotion": false
+    },
+    {
+      "offsets": [7, 7, 7],
+      "glows": [0.41172241181923347, 0.2929964928660046, 0.1673616307586732],
+      "petals": [
+        {
+          "visible": true,
+          "x": 132,
+          "y": 138
+        },
+        {
+          "visible": true,
+          "x": 111,
+          "y": 146
+        },
+        {
+          "visible": true,
+          "x": 91,
+          "y": 154
+        },
+        {
+          "visible": true,
+          "x": 70,
+          "y": 115
+        },
+        {
+          "visible": true,
+          "x": 50,
+          "y": 123
+        },
+        {
+          "visible": true,
+          "x": 29,
+          "y": 131
+        }
+      ],
+      "elapsed": 6900,
+      "reducedMotion": false
+    },
+    {
+      "offsets": [7, 7, 6],
+      "glows": [0.3585144482841498, 0.23493291517199114, 0.16025975920227442],
+      "petals": [
+        {
+          "visible": true,
+          "x": 144,
+          "y": 141
+        },
+        {
+          "visible": true,
+          "x": 123,
+          "y": 150
+        },
+        {
+          "visible": true,
+          "x": 103,
+          "y": 158
+        },
+        {
+          "visible": true,
+          "x": 82,
+          "y": 118
+        },
+        {
+          "visible": true,
+          "x": 61,
+          "y": 127
+        },
+        {
+          "visible": true,
+          "x": 41,
+          "y": 135
+        }
+      ],
+      "elapsed": 7300,
+      "reducedMotion": false
+    }
+  ]
+}

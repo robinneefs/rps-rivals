@@ -1,0 +1,22 @@
+{
+  "title": "Lantern Rush",
+  "previewOnly": true,
+  "bpm": 168,
+  "bars": 32,
+  "key": "D minor pentatonic; F major pentatonic bridge",
+  "sampleRate": 44100,
+  "channels": 2,
+  "durationSeconds": 45.714285714285715,
+  "peakDbFS": -1.1103466040620245,
+  "rmsDbFS": -14.424942813806718,
+  "seamSampleDelta": [0.00007469207048416138, 0.00010531395673751831],
+  "originalComposition": true,
+  "externalSamples": false,
+  "sections": [
+    "0:00 Plucked pentatonic hook",
+    "0:11 Breathy answering melody",
+    "0:23 Brighter bridge",
+    "0:34 Full reprise"
+  ],
+  "source": "tools/audio/make-courtyard-theme.mjs"
+}

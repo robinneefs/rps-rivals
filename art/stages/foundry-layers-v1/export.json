@@ -1,0 +1,22 @@
+{
+  "width": 192,
+  "height": 240,
+  "gear": {
+    "frameWidth": 176,
+    "frameHeight": 176,
+    "frames": 360,
+    "columns": 18,
+    "rows": 20,
+    "center": [-8, 138],
+    "revolutionMs": 90000
+  },
+  "fire": {
+    "frames": 12,
+    "frameWidth": 192,
+    "frameHeight": 240,
+    "frameMs": 150
+  },
+  "palette": 40,
+  "sampling": "nearest",
+  "top": "continuous architecture with gradual overhead shadow"
+}

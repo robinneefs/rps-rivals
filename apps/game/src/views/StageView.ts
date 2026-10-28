@@ -4,11 +4,15 @@ import { stageCloudTexture, stageTexture, type StageDef } from '../config/stages
 import { addStormStage } from './StormStageView';
 import { addHarborStage } from './HarborStageView';
 import { addDistantBirds } from './DistantBirds';
+import { addCourtyardStage } from './CourtyardStageView';
+import { addFoundryStage } from './FoundryStageView';
 
 /** Native-pixel layers: sky, drifting clouds, then the city/rail/floor that occludes them. */
 export function addStage(scene: Phaser.Scene, stage: StageDef, seed = 0): (() => void) | undefined {
   scene.data.set('stageId', stage.id);
   scene.data.set('stageEffects', null);
+  if (stage.foundry) return addFoundryStage(scene);
+  if (stage.courtyard) return addCourtyardStage(scene);
   if (stage.harbor) return addHarborStage(scene);
   if (stage.storm) return addStormStage(scene, stage, seed);
   if (stage.sky !== undefined)

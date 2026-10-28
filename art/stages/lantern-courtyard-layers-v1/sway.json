@@ -1,0 +1,22 @@
+{
+  "frames": 15,
+  "frameWidth": 192,
+  "frameHeight": 240,
+  "neutralFrame": 7,
+  "anglesDegrees": [-7, 7],
+  "sampling": "nearest",
+  "lanterns": [
+    {
+      "id": "left",
+      "pivot": [23, 89]
+    },
+    {
+      "id": "right",
+      "pivot": [168, 89]
+    },
+    {
+      "id": "far-right",
+      "pivot": [189, 100]
+    }
+  ]
+}

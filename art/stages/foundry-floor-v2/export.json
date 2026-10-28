@@ -1,0 +1,8 @@
+{
+  "width": 192,
+  "height": 240,
+  "paletteLimit": 40,
+  "dither": 0,
+  "sampling": "nearest",
+  "reference": "rooftop-v2"
+}

@@ -1,0 +1,22 @@
+{
+  "title": "Pressure Point",
+  "previewOnly": true,
+  "bpm": 156,
+  "bars": 32,
+  "key": "E Phrygian with chromatic/tritone accents",
+  "sampleRate": 44100,
+  "channels": 2,
+  "durationSeconds": 49.23077097505669,
+  "peakDbFS": -1.1103466040620245,
+  "rmsDbFS": -14.239803237969863,
+  "seamSampleDelta": [0.00005099549889564514, 0.00005593150854110718],
+  "originalComposition": true,
+  "externalSamples": false,
+  "sections": [
+    "0:00 Machine riff / main hook",
+    "0:12 Second pass / rising pressure",
+    "0:25 Half-time press breakdown",
+    "0:37 Full-force reprise"
+  ],
+  "source": "tools/audio/make-foundry-theme.mjs"
+}

@@ -43,7 +43,10 @@ for (let pixel = 0; pixel < 184 * 52; pixel++) {
       }
     }
   }
-  if (component.length < 9) for (const p of component) native[p * 4 + 3] = 0;
+  // A detached gold source-art fragment below the C/T is decorative debris,
+  // not lettering. Keep the exclamation dot and all actual brush strokes.
+  const belowCT = component.every((p) => p % 184 >= 66 && p % 184 <= 74 && Math.floor(p / 184) >= 46);
+  if (component.length < 9 || belowCT) for (const p of component) native[p * 4 + 3] = 0;
 }
 await sharp(native, { raw: { width: 184, height: 52, channels: 4 } })
   .png()
