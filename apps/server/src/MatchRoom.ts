@@ -30,6 +30,7 @@ interface Seat {
   version: string;
   ready: boolean;
   rematch: boolean;
+  heartbeat?: Cancel;
 }
 
 export interface RoomTimeouts {
@@ -80,6 +81,14 @@ export class MatchRoom {
     }
     const seat = this.seats[side]!;
     switch (msg?.type) {
+      case 'ping':
+        seat.heartbeat?.();
+        seat.heartbeat = this.clock.schedule(20000, () => {
+          this.leave(conn);
+          conn.close(CloseCode.timeout, 'connection check timed out');
+        });
+        conn.send({ type: 'pong' });
+        break;
       case 'ready':
         seat.ready = true;
         this.startIfReady();
@@ -101,6 +110,7 @@ export class MatchRoom {
   leave(conn: Connection): void {
     const side = this.sideOf(conn);
     if (!side) return;
+    this.seats[side]?.heartbeat?.();
     this.seats[side] = null;
     const other = this.seats[opponentOf(side)];
     if (other) {
@@ -214,7 +224,6 @@ export class MatchRoom {
     this.idle = this.clock.schedule(ms, () => {
       this.idle = null;
       for (const s of SIDES) this.seats[s]?.conn.close(CloseCode.timeout, 'timed out');
-      this.seats.p1 = this.seats.p2 = null;
       this.reset();
     });
   }
@@ -230,6 +239,9 @@ export class MatchRoom {
     this.referee = null;
     this.selection = initialCharacterSelection();
     this.selectionLocked = false;
-    for (const s of SIDES) this.seats[s] = null;
+    for (const s of SIDES) {
+      this.seats[s]?.heartbeat?.();
+      this.seats[s] = null;
+    }
   }
 }

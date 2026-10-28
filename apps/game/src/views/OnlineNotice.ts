@@ -46,6 +46,6 @@ export function rematchNotice(scene: Phaser.Scene): (waiting: boolean) => void {
   return (waiting) => {
     panel.setVisible(true);
     title.setText(waiting ? 'REMATCH REQUESTED' : 'RIVAL WANTS A REMATCH');
-    hint.setText(waiting ? 'WAITING FOR RIVAL...' : 'SELECT RETRY TO ACCEPT');
+    hint.setText(waiting ? 'WAITING FOR RIVAL...' : 'SELECT REMATCH TO ACCEPT');
   };
 }

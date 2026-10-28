@@ -44,6 +44,12 @@
       }
       /* the cabinet (cabinet/CabinetView.ts) is painted art, scaled smoothly; the game canvas in
          its screen is shrunk from a whole-number blow-up of the pixel art, smoothly too */
+      #cabinet,
+      #cabinet * {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-user-select: none;
+        user-select: none;
+      }
       #cabinet img {
         -webkit-touch-callout: none;
       }

@@ -34,6 +34,7 @@ export type ClientMessage =
   /** First message on a new connection. `create` opens an empty room, `join` enters one that is waiting. */
   | { type: 'hello'; protocol: number; version: string; intent: 'create' | 'join' }
   /** The fight screen is listening; the match starts when both players are ready. */
+  | { type: 'ping' }
   | { type: 'ready' }
   | { type: 'character'; character: PlayableCharacterId; confirmed: boolean }
   | { type: 'pick'; move: Move }
@@ -60,6 +61,7 @@ export type ServerMessage =
   | { type: 'welcome'; side: Side; rules: RulesConfig; timings: PhaseTimings }
   | { type: 'error'; error: JoinError }
   /** The opponent is in the room (sent to both when the second player joins). */
+  | { type: 'pong' }
   | { type: 'opponentJoined' }
   /** The opponent left or lost their connection. The match is over. */
   | { type: 'opponentLeft' }
@@ -104,6 +106,8 @@ export function parseClientMessage(raw: unknown): ClientMessage | null {
         (m.intent === 'create' || m.intent === 'join')
         ? { type: 'hello', protocol: m.protocol, version: m.version, intent: m.intent }
         : null;
+    case 'ping':
+      return { type: 'ping' };
     case 'ready':
       return { type: 'ready' };
     case 'character':

@@ -50,6 +50,19 @@ describe('MatchRoom', () => {
     send(room, b, { type: 'ready' });
   };
 
+  it('notifies the rival when a silent phone stops sending heartbeats', () => {
+    seatBoth();
+    send(room, a, { type: 'ping' });
+    send(room, b, { type: 'ping' });
+    expect(a.last).toEqual({ type: 'pong' });
+    clock.advance(10000);
+    send(room, a, { type: 'ping' });
+    clock.advance(10000);
+    expect(a.last).toEqual({ type: 'opponentLeft' });
+    expect(b.closed?.code).toBe(CloseCode.timeout);
+    expect(room.isEmpty).toBe(true);
+  });
+
   it('seats the creator as p1 and the joiner as p2, then tells both', () => {
     seatBoth();
     expect(a.inbox[0]).toMatchObject({ type: 'welcome', side: 'p1' });

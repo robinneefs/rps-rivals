@@ -10,12 +10,17 @@ import { tuning } from '../config/tuning';
  */
 const FRAG = `
 #define SHADER_NAME RPS_CRT_FS
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
 precision mediump float;
+#endif
 
 uniform sampler2D uMainSampler;
 uniform vec2 uResolution;
 uniform vec4 uViewport;
 uniform float uTime;
+uniform float uRollPhase;
 uniform float uGlow;
 uniform float uVignette;
 uniform float uCorner;
@@ -99,7 +104,7 @@ void main() {
   vec2 d = max(abs(c) - (0.5 - uCorner), 0.0);
 
   // A broad, soft light band rolling down the screen, bounded by remaining highlight headroom.
-  float band = 1.0 - abs(fract(local.y + uTime * 0.12) - 0.5) * 2.0;
+  float band = 1.0 - abs(fract(local.y + uRollPhase) - 0.5) * 2.0;
   col += (1.0 - col) * uRoll * smoothstep(0.74, 1.0, band);
   // Apply the glass mask last so the rolling light cannot illuminate the cut-off corners.
   col *= 1.0 - smoothstep(0.8, 1.0, length(d) / uCorner);
@@ -128,7 +133,10 @@ export class CrtPipeline extends Phaser.Renderer.WebGL.Pipelines.PostFXPipeline 
     const c = tuning.crt;
     this.set2f('uResolution', w, h);
     if (cam) this.set4f('uViewport', cam.x, h - cam.y - cam.height, cam.width, cam.height);
-    this.set1f('uTime', this.game.loop.time / 1000);
+    // Wrap each periodic animation before uploading, preserving precision after long sessions.
+    const seconds = this.game.loop.time / 1000;
+    this.set1f('uTime', seconds % ((Math.PI * 2) / 60));
+    this.set1f('uRollPhase', (seconds * 0.12) % 1);
     this.set1f('uGlow', c.glow);
     this.set1f('uVignette', c.vignette);
     this.set1f('uCorner', c.cornerRadius);

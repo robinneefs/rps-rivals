@@ -6,7 +6,7 @@ import { RandomCpu } from './cpu/RandomCpu';
 import { LocalSession } from './LocalSession';
 import type { MatchSession, MatchSetup } from './MatchSession';
 import { OnlineSession } from './OnlineSession';
-import { openBrowserSocket } from './socket';
+import { openBrowserSocket } from './openBrowserSocket';
 
 /**
  * Builds the session a match setup describes.
