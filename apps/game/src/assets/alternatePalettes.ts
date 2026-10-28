@@ -41,6 +41,38 @@ const ANCHOR_TANK = [
   [61, 88, 89, 110],
 ] as const;
 
+// White source fabric is shared by wrist wraps and tiny tunic highlights. Limit
+// red wrap recoloring to the actual wrists in each approved pose (not the chest).
+const TAIKO_WRISTS = [
+  [
+    [57, 87, 72, 103],
+    [97, 86, 113, 105],
+  ],
+  [
+    [57, 87, 72, 103],
+    [97, 86, 113, 105],
+  ],
+  [
+    [57, 87, 72, 103],
+    [111, 77, 120, 87],
+  ],
+  [[78, 70, 96, 85]],
+  [[101, 81, 116, 97]],
+  [
+    [44, 93, 57, 107],
+    [78, 82, 90, 93],
+  ],
+  [[81, 140, 94, 155]],
+  [
+    [54, 50, 67, 70],
+    [98, 88, 113, 108],
+  ],
+  [
+    [36, 91, 48, 104],
+    [62, 83, 72, 91],
+  ],
+] as const;
+
 function inRegion(x: number, y: number, region: readonly number[] | undefined): boolean {
   return !!region && x >= region[0]! && x <= region[2]! && y >= region[1]! && y <= region[3]!;
 }
@@ -77,12 +109,29 @@ export function swapClothingPalette(pixels: Uint8ClampedArray, character: Charac
     const pose = Math.floor(Math.floor(pixel / width) / 160) * 3 + Math.floor((pixel % width) / 160);
     let color: RGB | undefined;
     if (character === 'taiko') {
-      if (saturation > 0.65 && high > 55 && (hue >= 345 || hue <= 7)) color = shade(high, 65, 235, IVORY);
-      else if (saturation > 0.9 && hue > 12 && hue < 28)
+      // Warm interpolation specks inside the tunic are fabric, not headband/skin.
+      if (
+        [0, 1, 2, 7].includes(pose) &&
+        x >= 75 &&
+        x <= 84 &&
+        y >= 82 &&
+        y <= 92 &&
+        saturation > 0.7 &&
+        high > 90 &&
+        (hue < 45 || hue >= 330)
+      )
+        color = shade(high, 65, 235, IVORY);
+      else if (saturation > 0.65 && high > 55 && (hue >= 330 || hue <= 7))
+        color = shade(high, 65, 235, IVORY);
+      else if (saturation > 0.82 && r > g * 2.5 && hue > 12 && hue < 28)
         color = shade(high, 90, 255, RED); // orange headband
       else if (saturation > 0.6 && hue >= 28 && hue < 58)
         color = shade(high, 70, 255, BLACK); // gold belt and tunic trim
-      else if (low > 160 && chroma < 65 && (pose === 6 ? x < 90 : y < 130))
+      else if (
+        high > 145 &&
+        saturation < 0.35 &&
+        TAIKO_WRISTS[pose]?.some((region) => inRegion(x, y, region))
+      )
         color = shade(high, 165, 255, RED); // wrist wraps; ankle wraps stay ivory
     } else if (character === 'riot') {
       if (saturation > 0.45 && high > 40 && hue >= 255 && hue <= 305) color = shade(high, 45, 235, BLUE);

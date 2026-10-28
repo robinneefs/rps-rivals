@@ -1,0 +1,3 @@
+# Taiko alternate palette cleanup
+
+Runtime palette correction only; approved source sprite art and other fighter palettes are unchanged. Taiko's white wrist fabric is now mapped to red only inside measured per-pose wrist regions. This prevents pale tunic highlights and the kick's raised ankle from becoming red. A broader saturated orange range catches headband interpolation specks, while bounded torso correction recolors warm chest artifacts to ivory. All nine poses were captured before/after with tools/art/check-taiko-palette.mjs and visually inspected at native and 3× scale. Regression tests include noisy headband/wrap shades, chest flecks, raised ankle and skin preservation.

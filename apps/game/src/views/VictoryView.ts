@@ -52,7 +52,7 @@ export class VictoryView {
     paint.fillStyle(C.pink, 0.65).fillTriangle(0, 176, 0, 173, 48, 173);
     paint.fillStyle(C.edge, 0.7).fillTriangle(149, 169, 192, 163, 192, 166);
     new MenuText(scene, 96, 8, winnerLabel ?? `${character.name} WINS`, C.cream);
-    const title = scene.add.image(4, 22, 'victory-title').setOrigin(0);
+    const title = scene.add.image(4, 22, 'victory-title').setOrigin(0).setName('victory-title');
     // Status sits on a dark backing only while needed, leaving the local portrait unobscured.
     const backing = scene.add.graphics().fillStyle(C.ink, 0.9).fillRect(0, 163, 192, 15).setVisible(false);
     this.note = new MenuText(scene, 96, 165, '', C.cyan);
@@ -61,11 +61,45 @@ export class VictoryView {
       backing.setVisible(Boolean(text));
       return setText(text);
     };
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let hoverStart: number | null = motion.matches ? 0 : null;
+    let hoverElapsed = 0;
+    const bob = (_time: number, delta: number) => {
+      if (motion.matches) {
+        title.setY(22);
+        return;
+      }
+      if (hoverStart === null) return;
+      hoverElapsed += Math.min(delta, 100);
+      title.setY(22 + Math.round(Math.sin((hoverElapsed / 2400) * Math.PI * 2) * 2));
+    };
+    const settle = () => {
+      if (!motion.matches) return;
+      scene.tweens.killTweensOf(title);
+      title.setY(22).setAlpha(1);
+      hoverStart = 0;
+    };
+    scene.events.on('update', bob);
+    motion.addEventListener('change', settle);
+    scene.events.once('shutdown', () => {
+      scene.events.off('update', bob);
+      motion.removeEventListener('change', settle);
+    });
+    if (!motion.matches) {
       portrait.setX(28).setAlpha(0);
       title.setY(10).setAlpha(0);
       scene.tweens.add({ targets: portrait, x: 0, alpha: 1, duration: 850, ease: 'Cubic.Out' });
-      scene.tweens.add({ targets: title, y: 22, alpha: 1, delay: 350, duration: 750, ease: 'Cubic.Out' });
+      scene.tweens.add({
+        targets: title,
+        y: 22,
+        alpha: 1,
+        delay: 350,
+        duration: 750,
+        ease: 'Cubic.Out',
+        onComplete: () => {
+          hoverStart = 0;
+        },
+      });
     }
   }
 }

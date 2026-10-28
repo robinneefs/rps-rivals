@@ -47,11 +47,36 @@ describe('mirror match palettes', () => {
       [255, 70, 0],
       [253, 248, 240],
     ]) {
-      const red = recolor('taiko', rgb, 80, 90);
+      const red = recolor('taiko', rgb, 64, 95);
       expect(red[0]).toBeGreaterThan(red[1]! * 3);
     }
     expect(Math.max(...recolor('taiko', [255, 185, 0]))).toBeLessThan(70);
     expect(recolor('taiko', [253, 248, 240], 50, 145)).toEqual([253, 248, 240]);
+  });
+
+  it('keeps Taiko chest highlights ivory and recolors noisy headband/wrist shades consistently', () => {
+    expect(recolor('taiko', [253, 248, 240], 84, 80)).toEqual([253, 248, 240]);
+    expect(recolor('taiko', [253, 248, 240], 244, 395)).toEqual([253, 248, 240]);
+    for (const [rgb, x, y] of [
+      [[249, 108, 32], 236, 84],
+      [[202, 70, 26], 400, 84],
+      [[191, 56, 23], 240, 409],
+    ] as const) {
+      const shirt = recolor('taiko', rgb, x, y);
+      expect(Math.max(...shirt) - Math.min(...shirt)).toBeLessThan(25);
+    }
+    for (const [x, y] of [
+      [434, 82],
+      [367, 260],
+      [365, 417],
+    ]) {
+      const red = recolor('taiko', [238, 218, 198], x, y);
+      expect(red[0]).toBeGreaterThan(red[1]! * 3);
+    }
+    const band = recolor('taiko', [245, 80, 35], 70, 68);
+    expect(band[0]).toBeGreaterThan(band[1]! * 3);
+    // The kicking pose's lifted ankle must not be treated as a wrist.
+    expect(recolor('taiko', [253, 248, 240], 420, 410)).toEqual([253, 248, 240]);
   });
 
   it('gives Riot blue purple areas, white yellow areas and golden blonde hair', () => {
