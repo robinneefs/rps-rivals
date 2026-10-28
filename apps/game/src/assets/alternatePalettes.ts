@@ -165,7 +165,7 @@ export function swapClothingPalette(pixels: Uint8ClampedArray, character: Charac
   }
 }
 
-/** One cached atlas per character, shared by all scenes; no extra image files or shaders. */
+/** Installed reviewed atlases are reused; generate only when a placeholder lacks an alternate. */
 export function generateAlternatePalettes(scene: Phaser.Scene): void {
   for (const character of CHARACTERS)
     cacheAlternateAtlas(scene, character.combat, (pixels, width) =>

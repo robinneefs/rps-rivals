@@ -7,6 +7,10 @@ import type { MatchSession, MatchSetup } from '../session/MatchSession';
 import type { OnlineSession } from '../session/OnlineSession';
 import { MONITOR_SCENES, SceneKey } from './keys';
 import type { TransitionScene } from './TransitionScene';
+import { VersusView } from '../views/VersusView';
+import { stageFor } from '../config/stages';
+import { getContext } from './context';
+import { tuning } from '../config/tuning';
 
 /** The music each screen plays (Result switches to the menu loop after the win or lose jingle). */
 const SCENE_MUSIC: Record<string, MusicKey | null> = {
@@ -25,6 +29,7 @@ const RESULT_MUSIC_DELAY_MS = 2200;
 export interface FightData {
   setup: MatchSetup;
   session: MatchSession;
+  versus?: VersusView;
 }
 export interface CharacterSelectData {
   setup: MatchSetup;
@@ -93,12 +98,30 @@ export class SceneFlow {
 
   /** Starts a match; pass the existing session for a rematch (Retry). */
   toFight(setup: MatchSetup, session?: MatchSession): void {
-    this.wipe(() => {
-      if (session !== this.session) this.endSession();
-      this.session = session ?? createSession(setup);
-      const data: FightData = { setup, session: this.session };
-      this.show(SceneKey.fight, data);
-    });
+    if (this.busy) return;
+    this.busy = true;
+    if (session !== this.session) this.endSession();
+    this.session = session ?? createSession(setup);
+    const active = this.session;
+    const stage = stageFor(active.stageSeed(), new URLSearchParams(location.search).get('stage'));
+    const transition = this.game.scene.getScene(SceneKey.transition) as TransitionScene;
+    this.game.scene.bringToTop(SceneKey.transition);
+    const versus = new VersusView(
+      transition,
+      active,
+      stage.name,
+      () => this.show(SceneKey.fight, { setup, session: active, versus } satisfies FightData),
+      () => {
+        if (!active.endedReason) active.ready();
+      },
+      () => {
+        this.audio.play('clash');
+        getContext(transition).cabinetShake.kick(tuning.versus.cabinetPx, tuning.versus.cabinetMs);
+      },
+      () => {
+        this.busy = false;
+      },
+    );
   }
 
   /** The result screen opens over the last fight frame (the fight is paused, not stopped). */

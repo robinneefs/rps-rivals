@@ -1,0 +1,33 @@
+{
+  "base": "http://127.0.0.1:5196",
+  "checks": [
+    {
+      "id": "taiko",
+      "combatTextures": [
+        "fighter-p1",
+        "fighter-p1-alternate"
+      ],
+      "fightPassed": true,
+      "originalAndAlternateVictoryPassed": true
+    },
+    {
+      "id": "riot",
+      "combatTextures": [
+        "fighter-p2",
+        "fighter-p2-alternate"
+      ],
+      "fightPassed": true,
+      "originalAndAlternateVictoryPassed": true
+    },
+    {
+      "id": "anchor",
+      "combatTextures": [
+        "fighter-anchor",
+        "fighter-anchor-alternate"
+      ],
+      "fightPassed": true,
+      "originalAndAlternateVictoryPassed": true
+    }
+  ],
+  "errors": []
+}

@@ -1,6 +1,18 @@
 // Every number that changes how the game *feels*. Changing these never changes who wins
 // (rules and phase timings live in packages/core/src/config.ts). A magic number in a view is a bug.
 export const tuning = {
+  versus: {
+    closeMs: 420,
+    holdMs: 2800,
+    openMs: 240,
+    impactMs: 260,
+    impactPx: 5,
+    cabinetPx: 4,
+    cabinetMs: 280,
+    sparkCount: 36,
+    sparkMs: 650,
+    crtJoltMs: 120,
+  },
   reveal: {
     /**
      * Move badges pop in beside the fighters (badgeOutPx out from them, at badgeY), wait, then fly

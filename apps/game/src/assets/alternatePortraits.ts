@@ -1,7 +1,7 @@
 import type Phaser from 'phaser';
 import type { CharacterId } from '@rps/core';
 import { characterPresentation } from '../config/characters';
-import { cacheAlternateAtlas } from './alternatePalettes';
+import { alternateTexture } from './alternatePalettes';
 import {
   type RGB,
   shade,
@@ -210,7 +210,7 @@ export function swapPortraitPalette(pixels: Uint8ClampedArray, character: Charac
 }
 
 export function cacheAlternatePortrait(scene: Phaser.Scene, character: CharacterId): string {
-  return cacheAlternateAtlas(scene, characterPresentation(character).portrait, (pixels, width) =>
-    swapPortraitPalette(pixels, character, width),
-  );
+  const key = alternateTexture(characterPresentation(character).portrait);
+  if (!scene.textures.exists(key)) throw new Error(`Missing alternate portrait: ${character}`);
+  return key;
 }

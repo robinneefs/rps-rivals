@@ -1,0 +1,196 @@
+{
+  "character": "riot",
+  "size": [
+    480,
+    480
+  ],
+  "palette": {
+    "1": [
+      [
+        20,
+        "091326"
+      ],
+      [
+        55,
+        "152957"
+      ],
+      [
+        100,
+        "224681"
+      ],
+      [
+        145,
+        "3264ac"
+      ],
+      [
+        195,
+        "4b86ca"
+      ],
+      [
+        235,
+        "73a8e2"
+      ],
+      [
+        255,
+        "a4ccf1"
+      ]
+    ],
+    "2": [
+      [
+        40,
+        "3b3940"
+      ],
+      [
+        90,
+        "736f72"
+      ],
+      [
+        140,
+        "aaa39c"
+      ],
+      [
+        190,
+        "d4cdc0"
+      ],
+      [
+        230,
+        "eee7d9"
+      ],
+      [
+        255,
+        "fff8ea"
+      ]
+    ],
+    "3": [
+      [
+        18,
+        "241b1b"
+      ],
+      [
+        35,
+        "594026"
+      ],
+      [
+        60,
+        "956136"
+      ],
+      [
+        85,
+        "ca9954"
+      ],
+      [
+        110,
+        "e8c279"
+      ],
+      [
+        145,
+        "ffe4a3"
+      ],
+      [
+        180,
+        "fff0c6"
+      ]
+    ]
+  },
+  "frames": [
+    {
+      "pose": "idle0",
+      "changed": 1095,
+      "outsideChanges": 0,
+      "alphaChanges": 0,
+      "materials": {
+        "1": 655,
+        "2": 130,
+        "3": 310
+      }
+    },
+    {
+      "pose": "idle1",
+      "changed": 1057,
+      "outsideChanges": 0,
+      "alphaChanges": 0,
+      "materials": {
+        "1": 622,
+        "2": 130,
+        "3": 305
+      }
+    },
+    {
+      "pose": "rock",
+      "changed": 1052,
+      "outsideChanges": 0,
+      "alphaChanges": 0,
+      "materials": {
+        "1": 663,
+        "2": 118,
+        "3": 271
+      }
+    },
+    {
+      "pose": "paper",
+      "changed": 850,
+      "outsideChanges": 0,
+      "alphaChanges": 0,
+      "materials": {
+        "1": 597,
+        "2": 29,
+        "3": 224
+      }
+    },
+    {
+      "pose": "scissors",
+      "changed": 1002,
+      "outsideChanges": 0,
+      "alphaChanges": 0,
+      "materials": {
+        "1": 670,
+        "2": 45,
+        "3": 287
+      }
+    },
+    {
+      "pose": "hurt",
+      "changed": 985,
+      "outsideChanges": 0,
+      "alphaChanges": 0,
+      "materials": {
+        "1": 617,
+        "2": 109,
+        "3": 259
+      }
+    },
+    {
+      "pose": "ko",
+      "changed": 646,
+      "outsideChanges": 0,
+      "alphaChanges": 0,
+      "materials": {
+        "1": 364,
+        "2": 81,
+        "3": 201
+      }
+    },
+    {
+      "pose": "win",
+      "changed": 1037,
+      "outsideChanges": 0,
+      "alphaChanges": 0,
+      "materials": {
+        "1": 664,
+        "2": 149,
+        "3": 224
+      }
+    },
+    {
+      "pose": "kick",
+      "changed": 815,
+      "outsideChanges": 0,
+      "alphaChanges": 0,
+      "materials": {
+        "1": 494,
+        "2": 74,
+        "3": 247
+      }
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 # Sunset Harbor — separated animation layers
 
+Latest motion polish (28 October): water ripple amplitude4px,12 frames at200ms each. Shared harbor/rooftop flocks start after1.2s and arrive every7s, with overlapping16s crossings and staggered sky rows. This supersedes the older motion timings below. Rebuild water only with tools/art/prepare-ground-shadows-and-water.mjs --water-only.
+
 Based on approved sunset-harbor-v3. Built-in imagegen produced a clean background plate with the requested darker-top/lighter-horizon sky, an isolated boat, and an isolated dock. Original generations and exact prompts are preserved in source/. Native export script: tools/art/prepare-harbor-layers.mjs (requires Sharp, optionally RPS_SHARP_PATH).
 
 All eight PNGs in layers/ are aligned full-canvas 192 × 240, origin (0,0), nearest-neighbor sampled, capped at 40 colors per layer without dithering, with binary alpha. Composite bottom-to-top:

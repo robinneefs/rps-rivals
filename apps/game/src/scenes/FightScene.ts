@@ -77,6 +77,7 @@ export class FightScene extends Phaser.Scene {
       names,
       {
         clearPick: () => lights.select(null),
+        versusIntro: Boolean(this.fight.versus),
         // online, the rival can leave in the moment between the K.O. and the result screen
         matchOver: (winner, state) => {
           if (!endedEarly) flow.toResult({ setup, session, winner, state });
@@ -91,12 +92,16 @@ export class FightScene extends Phaser.Scene {
     const endEarly = (text: string) => {
       if (endedEarly || !this.scene.isActive()) return;
       endedEarly = true;
+      this.fight.versus?.destroy();
       lights.select(null);
       showDisconnect(this, text === 'RIVAL LEFT', () => flow.toHome());
     };
     const offs = [
+      session.on('phase', (event) => {
+        if (event.phase === 'roundIntro') this.fight.versus?.open();
+      }),
       input.on('action', (a) => {
-        if (endedEarly || !this.scene.isActive() || a.type !== 'pick') return;
+        if (endedEarly || flow.transitioning || !this.scene.isActive() || a.type !== 'pick') return;
         const before = session.snapshot().myPick;
         session.submitPick(a.move);
         const picked = session.snapshot().myPick;
@@ -115,6 +120,7 @@ export class FightScene extends Phaser.Scene {
     this.game.events.on(Phaser.Core.Events.HIDDEN, hide);
     this.game.events.on(Phaser.Core.Events.VISIBLE, show);
     this.events.once('shutdown', () => {
+      this.fight.versus?.destroy();
       offs.forEach((off) => off());
       this.game.events.off(Phaser.Core.Events.HIDDEN, hide);
       this.game.events.off(Phaser.Core.Events.VISIBLE, show);
@@ -127,7 +133,7 @@ export class FightScene extends Phaser.Scene {
       this.time.delayedCall(0, () =>
         endEarly(session.endedReason === 'opponentLeft' ? 'RIVAL LEFT' : 'OFFLINE'),
       );
-    else session.ready();
+    else if (!this.fight.versus) session.ready();
   }
 
   override update(): void {

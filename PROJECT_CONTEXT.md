@@ -1,5 +1,91 @@
 # RPS Rivals: Project Context
 
+## Final acceptance and wrap-up (2026-10-28)
+
+- User accepted the final Taiko combat-speck cleanup and ended this work. Alternate palettes/portraits and bird formation variations are complete and accepted. This supersedes older entries reopening alternate-colour quality. Release checklist and revamp follow-ups now reflect completion.
+- Next chat: set up the CRT shader control panel, including the previously requested effects playground alongside real gameplay. Broader combat visual makeover remains open. User explicitly authorized publishing all completed project work to main. Pre-push validation: all 181 unit tests, full typecheck/lint and production build passed; prior real-browser reviews are recorded above. Local credential configuration and temporary caches are ignored and remain local. No deployment or version bump was requested.
+
+## Wrap-up / next chat: CRT control panel (2026-10-28)
+
+- User is wrapping up and will start a new chat to set up a control panel for the CRT shader. Do not start that work in this chat. Existing shader: `apps/game/src/fx/crt.ts`; settings/tuning panel wiring: `apps/game/src/main.ts`, `apps/game/src/dev/tuningPanel.ts`, `apps/game/src/config/tuning.ts`. Review existing uncommitted CRT work before changing it.
+- Final Taiko combat-only cleanup: found dark red headband pixels misclassified as ivory cloth, plus missed blue/neutral wrist-wrap shadow pixels. Added bounded neighbor corrections to `tools/art/prepare-taiko-masked-atlas.mjs`, regenerated the fixed mask/review and installed Taiko alternate sheet. 136 pixels corrected across nine poses; pixel audit confirms only red-material locations changed and alpha stayed identical. Portraits and other fighters untouched. Audit: `art/fighters/mask-study-v1/red-speck-cleanup-audit.json`. Palette/installed-asset tests: 25 passed.
+- All three alternate combat sheets and generated portraits are already installed. Live game preview remains http://127.0.0.1:5196; review hub `art/review/installed-alternates/preview.html`. Bird formation variation is implemented with the approved unchanged frequency. No deployment, push or version bump.
+
+## Bird formation variety (2026-10-28)
+
+- Harbor and rooftop now cycle four flyby patterns: three-bird stagger, four-bird V, loose pair and five-bird arc. Direction alternates; heights, gentle paths and wing timing vary. Rooftop starts at a different point in the cycle. Existing first arrival at 1.2s, new flock every 7s, 16s crossings and reduced-motion behavior are retained.
+- Bird/harbor tests (3), production build and focused lint passed. Preview server remains on http://127.0.0.1:5196.
+
+## Reviewed alternate art installed (2026-10-28)
+
+- User approved masked combat palettes and requested generated alternate portraits, then authorized installing all of them. Installed three masked nine-pose combat sheets as `public/assets/{id}-alternate.png`; BootScene preloads existing alternate texture keys so runtime guessing is bypassed for real artwork.
+- Generated portrait edits use the exact installed `rest` frames used by Victory/Home/Versus. Native 192 × 240 alternates are installed under `public/assets/menus/action/{id}-alternate.png` with single-rest-frame atlas metadata. Victory and P2 mirror-match versus panels use these textures. Original portraits, Home rest/shader, character-select art and historical breathing frames are preserved.
+- Live review hub: `art/review/installed-alternates/preview.html`, embedding actual game views at http://127.0.0.1:5196 with all three fighter selectors and combat/original victory/alternate victory controls. Dev menu review supports fighter-specific mirror combat and waits for versus completion before opening victory; tuning panel hidden for review links.
+- Validation: 25 focused palette/installed-asset tests, production build and focused lint passed. Real Chrome checks cover all three mirror combat texture pairs and original/alternate victory scenes; screenshots and checks in `art/review/installed-alternates`. Generated portrait source/prompt/alignment review in `art/portraits/generated-alternates-v1`. No deployment, push or version bump.
+
+## Handoff: versus integration and stage polish (2026-10-28)
+
+- User is wrapping this chat and will start a new chat to review alternate colours. **Next task: alternate fighter palette quality**; the user says current recolours are not good enough and is open to a different recolouring technique. Review existing implementation, every fighter/pose and mirror-match readability before choosing the approach. Do not treat implemented palettes as accepted visuals. See docs/design/release-checklist.md.
+- Versus transition is integrated for CPU/online selection and rematches, with revised outward-facing portraits/outward spacing, YOU/CPU/RIVAL labels, custom gold VS, opaque stage-name plate, longer hold, harder closure, cabinet/screen jolt, seam sparks and short K.O.-style CRT split. User liked the design; the final effects are implemented for continued in-game polish. Original isolated motion study retained in art/menus/versus-v1.
+- Harbor water ripple displacement increased to4px with200ms frames. Harbor and rooftop bird flocks start after1.2s and arrive every7s with overlapping crossings. Courtyard now has subtle smoke from two distant mountain roof clusters; user explicitly approved this effect ("Perfect"). Reduced-motion behavior retained throughout.
+- Latest validation:176 unit tests, full lint/typecheck passed after courtyard smoke; actual courtyard browser check confirmed motion and reduced-motion clearing with no errors. Build passed after bird/water work; not rerun after the final courtyard-only change. Earlier versus CPU match/rematch and actual local Worker readiness/disconnect checks passed. Full older smoke suite still has stale Home navigation/entrance assumptions; do not claim it passes.
+- Local previews: game http://127.0.0.1:5194/ ; courtyard ?menuReview=stage&stage=lantern-courtyard ; isolated versus http://127.0.0.1:5193/art/menus/versus-v1/preview.html. Servers may need restarting in the next session. Changes remain uncommitted locally; no push, deployment or version bump was requested/performed. Preserve all existing edits and local .claude/.codex/.tmp files.
+
+## Courtyard distant smoke trial (2026-10-28)
+
+- User requested subtle smoke suggesting fires in the distant mountain buildings. Added two small cool-grey native-pixel plumes anchored at distant roof clusters (140,96 and123,107), slow8s rise/drift, maximum20% opacity, behind the foreground/lanterns/fighters. Existing scene clock/lifecycle; live reduced motion clears smoke immediately. Trial awaits visual feedback.
+-176 tests, typecheck/lint passed; actual courtyard browser check confirmed10 moving puffs, zero reduced-motion puffs and no page errors. Existing courtyard preview URL unchanged.
+
+## Harbor water and frequent birds (2026-10-28)
+
+- User requested more pronounced harbor water wiggle and much more frequent birds on harbor and rooftop. Rebuilt the12-frame water sheet at4px ripple amplitude (previously1.6px), with200ms frame steps instead of240ms. Integer sampling and existing scenery/boat/dock separation preserved. Export tool supports --water-only to leave fighter footprints untouched.
+- Shared birds now start after1.2s and launch a three-bird flock every7s instead of36s.16s crossings overlap, with slightly staggered sky heights below the HUD. Reduced motion still freezes water and hides birds.176 tests, typecheck/lint and build passed; existing bundle advisory remains.
+
+## Versus seam collision effects (2026-10-28)
+
+- User approved the latest labels/VS/stage plate for the game and requested a more readable close plus a harder contact. Close now420ms, followed by existing2800ms hold. Contact adds a260ms5px decaying panel/screen jolt,280ms4px cabinet kick,36 native-pixel ballistic seam sparks (mostly line gold, cream/orange/pink accents), existing clash sound and restrained flash.
+- Follow-up request: same CRT effect as match K.O., as a short jolt. Added120ms split pulse using existing tuning.crt.koSplitPx. Shared screenPulse now returns cleanup and removes finished shutdown listeners, avoiding accumulated effects on the persistent transition scene. Versus cleanup cancels its pulse.
+- Panel movement now shares the scene clock with cover/readiness timers so a slow frame cannot swap the arena ahead of visible contact. Reduced motion suppresses collision effects and uses panel fades. Main match rules/timings unchanged.
+- Full focused desktop/phone/reduced-motion CPU match/rematch check passed after timing synchronization; final real-browser normal/reduced checks confirmed clean opening and no page errors. CRT split is visible in art/menus/versus-v1/seam-impact-normal.png; reduced capture retained alongside. Build/typecheck/lint passed; existing bundle advisory remains. No release/push/version bump.
+
+## Versus labels, lettering and stage plate (2026-10-28)
+
+- Removed P1/P2 prefixes from versus ownership labels: YOU and CPU/RIVAL only. Replaced the miscentred bitmap VS with bespoke angular gold letters, warm extrusion, dark outline, highlights and impact accents, centred by visible geometry. Stage label now sits on an opaque bordered plate above the diagonal seam.
+- In-game browser capture reviewed at art/menus/versus-v1/polished-monitor.png and polished-cabinet.png; no page errors. Typecheck/lint passed. Portrait orientation/spacing and latest longer-hold/impact timing retained.
+
+## Versus impact and longer hold (2026-10-28)
+
+- User requested more time to inspect the matchup and more violent closing/opening. Central tuning.versus now sets 220ms accelerating close, 2800ms hold (previously1300), 240ms accelerating opening, with a short3px decaying panel jolt and restrained75ms impact flash. Existing clash sound retained. Reduced motion omits impact flash/jolt and fades the panels. First-round title follows the configured opening duration.
+- Real-game stills: art/menus/versus-v1/long-hold-cabinet.png and long-hold-monitor.png. Browser check confirmed phase idle while held, then picking with transition gate cleared and no page errors. Build/typecheck/lint passed; existing bundle advisory remains.
+
+## Versus transition integrated for polish (2026-10-28)
+
+- User authorized integrating the mockup into the game. SceneFlow now uses VersusView on the persistent transition scene instead of the black CRT wipe when entering a match, including rematches. Retains latest flipped portraits and 24px outward adjustment per side from the first flipped layout. Uses selected identities, P1/P2 with YOU/CPU/RIVAL labels, actual seeded/overridden stage name and existing clash SFX.
+- Panels enter over selection/result, cover the arena handoff, hold through readiness, then open on shared roundIntro. Input is gated during transition; disconnect clears the overlay and preserves the notice/return flow. First-round title waits for the opening; the old simple versus card is omitted. Rules/protocol/phase durations unchanged. Reduced motion fades instead of sliding.
+- Validation: 176 unit tests, full lint/typecheck and production build passed. Focused real-browser checks passed desktop and phone/reduced-motion selection, idle gate, reveal, complete CPU match/rematch; actual local Worker/two clients verified delayed peer readiness, correct Anchor/Riot identities and disconnect during intro. Art/check reports in art/menus/versus-v1. Existing full smoke suite has stale Home navigation/entrance expectations and failed before this path in 12/15 tests; do not claim it passed.
+- Current integrated dev preview http://127.0.0.1:5194/. Isolated mockup remains on5193. Final polish remains open; no deployment, push or version bump.
+
+## Alternate-colour quality review reopened (2026-10-28)
+
+- User says alternate colours do not look good enough. Added a pre-release review for all fighters/poses and possible replacement of the recolouring technique. Existing implementation does not imply visual acceptance. User also requested a versus mockup/recommendation; prefer an animated isolated preview before match-flow integration.
+- Animated isolated versus study created at art/menus/versus-v1/preview.html, with existing portraits, fighter selectors, replay/hold/scrub, optional impact sound and reduced-motion fade. Panels reveal a rooftop/idle-fighter fixture directly. Production selection/matches unchanged; composition/timing await user review.
+
+## Versus transition requested (2026-10-28)
+
+- Added to docs/design/release-checklist.md for discussion before implementation. After character selection, P1's panel enters from the left and P2's from the right; each shows its fighter facing the other. Panels smash together with VS at center, then open back out directly onto the match, with no black screen. User invited suggestions for relevant extra information. Timing, artwork, online readiness and rematch behavior remain to discuss.
+
+## Consolidated release agenda (2026-10-28)
+
+- Current checklist: [docs/design/release-checklist.md](docs/design/release-checklist.md). It supersedes older next-step lists while retaining historical decisions and validation evidence.
+- User highlighted the actual gameplay visual makeover as a major remaining part of the revamp. Priority: combat storyboard, HUD/move reveal/round graphics and feedback redesign, then implementation and the planned pacing page/tuning pass. New fighters/stages do not close this work.
+- Other remaining work/decisions: CRT brightness/performance/control dials and effects playground, How to Play, marquee review, older balance-tool/CPU proposal, optional installable web app, final verification/documentation and coordinated client/server release preparation.
+- Remaining redesigned menus were already approved on 27 October; alternate combat palettes and five stages are implemented. Online playtest passed according to the user. Do not reopen these as missing implementation from stale notes.
+
+## Online playtest follow-up (2026-10-28)
+
+- After the online disconnect/rematch fixes and stale-connection detection, the user reported completing the recommended playtest: "It all seems to be working fine now." Record this as a user-reported pass; individual scenarios/devices were not separately enumerated.
+- This supersedes the online-flow/playtest next-step recommendation below. Next: consolidate the remaining release checklist, retaining CRT-effect experiments, marquee review, and outstanding menu/How to Play decisions until resolved. This playtest report does not authorize release or deployment.
+
 ## Handoff: five-stage lineup complete (2026-10-28)
 
 - All five stages are playable and rotate on CPU/online rematches: City Rooftop, Storm Field, Sunset Harbor, Lantern Courtyard and Foundry Floor. Each has its own installed track: Ready to Rival, Under the Storm, Golden Hour, Lantern Rush and Pressure Point. Foundry is fully registered, not a static preview.

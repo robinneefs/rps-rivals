@@ -16,6 +16,15 @@ it('pins strings, bounds sway/petals and settles immediately on reduced motion w
       setOrigin() {
         return this;
       },
+      clear() {
+        return this;
+      },
+      fillStyle() {
+        return this;
+      },
+      fillRect() {
+        return this;
+      },
       setName(name: string) {
         this.name = name;
         return this;
@@ -56,10 +65,11 @@ it('pins strings, bounds sway/petals and settles immediately on reduced motion w
     glows: number[];
     elapsed: number;
     petals: { visible: boolean; x: number; y: number }[];
+    smoke: { x: number; y: number }[];
   };
   const remove = vi.fn();
   const scene = {
-    add: { image: object, sprite: object },
+    add: { image: object, sprite: object, graphics: object },
     data: {
       set: (_: string, value: typeof state) => {
         state = value;
@@ -83,6 +93,10 @@ it('pins strings, bounds sway/petals and settles immediately on reduced motion w
     maxPetals = 0;
   for (let i = 0; i < 400; i++) {
     tick();
+    expect(state!.smoke).toHaveLength(10);
+    expect(
+      state!.smoke.every((p) => Number.isInteger(p.x) && Number.isInteger(p.y) && p.y >= 76 && p.y <= 107),
+    ).toBe(true);
     state!.offsets.forEach((x) => offsets.add(x));
     for (const petal of state!.petals.filter((p) => p.visible)) {
       sawPetals = true;
@@ -102,6 +116,7 @@ it('pins strings, bounds sway/petals and settles immediately on reduced motion w
   expect(state!.offsets).toEqual([0, 0, 0]);
   expect(state!.glows).toEqual([0.3, 0.3, 0.3]);
   expect(state!.petals.some((p) => p.visible)).toBe(false);
+  expect(state!.smoke).toEqual([]);
   shutdown();
   expect(remove).toHaveBeenCalledOnce();
   expect(media.removeEventListener).toHaveBeenCalledOnce();

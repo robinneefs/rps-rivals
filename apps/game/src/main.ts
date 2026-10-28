@@ -161,7 +161,7 @@ if (import.meta.env.DEV) {
       ],
       restartMatch: () => flow.toFight({ mode: 'cpu', cpu: 'random' }),
     });
-    if (new URLSearchParams(location.search).get('menuReview') === 'stage') pane.hidden = true;
+    if (new URLSearchParams(location.search).get('menuReview')) pane.hidden = true;
   });
 }
 
@@ -169,6 +169,7 @@ if (import.meta.env.DEV) {
 (window as unknown as { __rps: object }).__rps = {
   scenes: () => game.scene.getScenes(true).map((s) => s.scene.key),
   phase: () => flow.activeSession?.snapshot().phase ?? null,
+  transitioning: () => flow.transitioning,
   renderScale: () => cabinet.renderScale,
   music: () => audio.music,
   fighters: () => flow.activeSession?.fighters ?? null,

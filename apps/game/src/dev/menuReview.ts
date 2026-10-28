@@ -18,9 +18,15 @@ export function mountMenuReview(game: Phaser.Game, flow: SceneFlow): void {
     const home = game.scene.getScene(SceneKey.home);
     home.time.delayedCall(700, () => {
       if (review === 'characters') flow.toCharacterSelect({ mode: 'cpu', cpu: 'random' });
-      else if (review === 'stage')
-        flow.toFight({ mode: 'cpu', cpu: 'random', fighters: { p1: 'riot', p2: 'taiko' } });
-      else if (review === 'win' || review === 'loss' || review === 'victory') {
+      else if (review === 'stage') {
+        const requested = new URLSearchParams(location.search).get('fighter');
+        const fighter = requested && isPlayableCharacter(requested) ? requested : null;
+        flow.toFight({
+          mode: 'cpu',
+          cpu: 'random',
+          fighters: fighter ? { p1: fighter, p2: fighter } : { p1: 'riot', p2: 'taiko' },
+        });
+      } else if (review === 'win' || review === 'loss' || review === 'victory') {
         const requested = new URLSearchParams(location.search).get('fighter');
         const fighter = requested && isPlayableCharacter(requested) ? requested : 'riot';
         const alternate =
@@ -34,7 +40,7 @@ export function mountMenuReview(game: Phaser.Game, flow: SceneFlow): void {
         } as const;
         flow.toFight(setup);
         const result = () => {
-          if (!game.scene.isActive(SceneKey.fight) || opened) return;
+          if (!game.scene.isActive(SceneKey.fight) || flow.transitioning || opened) return;
           opened = true;
           game.events.off('step', result);
           game.scene.getScene(SceneKey.fight).time.delayedCall(700, () => {

@@ -1,0 +1,16 @@
+{
+  "source": "apps/game/public/assets/menus/action/taiko-sheet.png",
+  "size": [
+    192,
+    240
+  ],
+  "changed": 12223,
+  "protectedChanged": 0,
+  "alphaUnchanged": true,
+  "materialPixels": {
+    "1": 4627,
+    "2": 3870,
+    "3": 1936,
+    "4": 2164
+  }
+}

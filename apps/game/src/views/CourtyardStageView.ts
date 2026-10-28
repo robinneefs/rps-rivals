@@ -8,6 +8,7 @@ export function addCourtyardStage(scene: Phaser.Scene): undefined {
     scene.add.image(0, 0, courtyardTexture(layer)).setOrigin(0).setName(`courtyard-${layer}`);
   image('sky-gradient');
   image('scenery-clean');
+  const smoke = scene.add.graphics().setName('courtyard-distant-smoke');
   image('stone-floor');
   const lanterns = [
     { id: 'left', x: 18, y: 89, width: 12, height: 22 },
@@ -29,6 +30,29 @@ export function addCourtyardStage(scene: Phaser.Scene): undefined {
   const update = () => {
     const reduced = motion.matches,
       t = reduced ? 0 : elapsed;
+    smoke.clear();
+    const smokePositions: { x: number; y: number }[] = [];
+    if (!reduced) {
+      // Tiny cool-grey puffs emerge from two distant roof clusters, behind the courtyard.
+      for (const [chimney, source] of [
+        { x: 140, y: 96 },
+        { x: 123, y: 107 },
+      ].entries()) {
+        for (let i = 0; i < 5; i++) {
+          const age = (t + i * 1550 + chimney * 700) % 8000;
+          const progress = age / 8000;
+          const x = Math.round(source.x + progress * 4 + Math.sin(progress * Math.PI * 2 + chimney) * 1.5);
+          const y = Math.round(source.y - progress * (chimney === 0 ? 20 : 15));
+          const width = 2 + Math.floor(progress * 3);
+          const alpha = Math.sin(progress * Math.PI) * 0.2;
+          smoke.fillStyle(0xb6abbc, alpha);
+          smoke.fillRect(x, y, width, 1);
+          smoke.fillRect(x - 1, y + 1, width + 1, 1);
+          smoke.fillRect(x, y + 2, width, 1);
+          smokePositions.push({ x, y });
+        }
+      }
+    }
     const offsets = lanterns.map((_, i) =>
       reduced ? 0 : Math.round(7 * Math.sin((t / (5600 + i * 650)) * Math.PI * 2 + i * 0.85)),
     );
@@ -57,6 +81,7 @@ export function addCourtyardStage(scene: Phaser.Scene): undefined {
       offsets,
       glows,
       petals: petalPositions,
+      smoke: smokePositions,
       elapsed: t,
       reducedMotion: reduced,
     });

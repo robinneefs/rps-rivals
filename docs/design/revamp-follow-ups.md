@@ -1,14 +1,21 @@
 # Game revamp follow-ups
 
+The consolidated, current agenda is [release-checklist.md](release-checklist.md), including the outstanding gameplay visual makeover. This file retains the original follow-up details.
+
 ## Final release requirement
 
 Before the final release of the new game version, review and address every outstanding item noted in this file, `PROJECT_CONTEXT.md`, and the other project planning notes. Consolidate outstanding items into a release checklist and resolve each one before releasing; do not leave previously noted work silently deferred. If an item needs a decision, settle it with the user before the final release.
 
 ## Follow-ups
 
-- Before finishing the revamp, review the player experience when someone leaves an online match and clean up the exit/disconnection flow.
-- As part of that online-flow review, notify a player on the rematch screen when their online opponent has pressed Rematch and is waiting for them to accept.
-- When building the CRT experiment/control panel, add a separate effects panel with a selection of proposed intense, short-burst CRT effects for possible use in the game. Provide a preview of the main gameplay screen where each effect can be triggered and tested before choosing which to use.
+- [x] Alternate colours accepted: three masked combat atlases and three reference-generated alternate rest portraits installed, with final Taiko headband/wrist speck cleanup. Reviewed in actual game scenes. Next chat: CRT shader control panel.
+- [x] Versus transition integrated and refined: simplified ownership labels, custom centred VS, protected stage label, longer hold, readable closing slam, screen/cabinet shake, seam sparks and short K.O.-style CRT pulse. CPU/online/rematches and reduced motion covered. Remaining gameplay HUD/reveal/round presentation work stays open in the release checklist.
+- [x] Harbor water motion strengthened; harbor and rooftop bird flocks made much more frequent. Four alternating flock formations/directions/paths are implemented and accepted, retaining the seven-second cadence.
+- [x] Courtyard distant-building smoke implemented and explicitly approved.
+
+- Completed: online exit/disconnection flow and stale-connection detection implemented. On 2026-10-28 the user reported completing the recommended playtest and that everything seemed to work fine; individual scenarios/devices were not separately enumerated.
+- Completed: rematch-screen notification when the online opponent has pressed Rematch and is waiting for acceptance; included in the online-flow work preceding the user's playtest report.
+- [ ] When building the CRT experiment/control panel, add a separate effects panel with a selection of proposed intense, short-burst CRT effects for possible use in the game. Provide a preview of the main gameplay screen where each effect can be triggered and tested before choosing which to use. The specifically requested versus K.O.-style jolt is already implemented; this broader experiment remains open.
 - Implemented: approved fighting-game victory splash with all three existing large character portraits, Rematch/Main Menu, darker title shadow, blended portrait edge and prolonged entrance. Enabled for normal CPU/online match results; mirror headers identify the winning player.
 
 ## Marquee downscale trial

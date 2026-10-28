@@ -23,7 +23,7 @@ export function addHarborStage(scene: Phaser.Scene): undefined {
     const t = reduced ? 0 : elapsed;
     const bob = reduced ? 0 : Math.round(Math.sin((t * Math.PI * 2) / 7200));
     boat.setY(bob);
-    const waterFrame = reduced ? 0 : Math.floor(t / 240) % 12;
+    const waterFrame = reduced ? 0 : Math.floor(t / 200) % 12;
     water.setFrame(waterFrame);
     const birdsVisible = drawBirds(t, reduced);
     const flutter = reduced ? 0 : Math.round(Math.sin((t * Math.PI * 2) / 2600));

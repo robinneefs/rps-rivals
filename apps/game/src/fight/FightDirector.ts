@@ -49,6 +49,7 @@ export class FightDirector {
     /** Short names over the fighters and on the VS card ("YOU", "RIVAL"). */
     private readonly labels: Record<Side, string>,
     private readonly hooks: {
+      versusIntro?: boolean;
       clearPick: () => void;
       matchOver: (winner: Side, state: MatchState) => void;
       /** Rattles the whole cabinet against the room. */
@@ -107,8 +108,11 @@ export class FightDirector {
         if (e.round === 1) {
           // who is who before anything happens: the VS card, then the round
           tags.showTags(tagged);
-          banner.showVs(this.labels);
-          this.introStep = this.scene.time.delayedCall(tuning.identity.vsCardMs, showTitle);
+          if (!this.hooks.versusIntro) banner.showVs(this.labels);
+          this.introStep = this.scene.time.delayedCall(
+            this.hooks.versusIntro ? tuning.versus.openMs : tuning.identity.vsCardMs,
+            showTitle,
+          );
         } else {
           if (e.round === tuning.identity.tagRounds + 1) tags.blinkOut();
           else tags.showTags(tagged);

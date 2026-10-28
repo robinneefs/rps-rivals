@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { audioFiles } from '../audio/sounds';
-import { generateAlternatePalettes } from '../assets/alternatePalettes';
+import { alternateTexture, generateAlternatePalettes } from '../assets/alternatePalettes';
 import { FONT_SIZES, Tex } from '../assets/keys';
 import { HOME_CHARACTERS, HOME_FONT_STUDY, HomeTex } from '../assets/homeArt';
 import { MENU_TYPOGRAPHY } from '../config/menuTypography';
@@ -46,12 +46,20 @@ export class BootScene extends Phaser.Scene {
     this.load.atlas(Tex.fighterP1, 'assets/taiko.png', 'assets/taiko.json');
     this.load.atlas(Tex.fighterP2, 'assets/riot.png', 'assets/riot.json');
     this.load.atlas(Tex.fighterAnchor, 'assets/anchor.png', 'assets/anchor.json');
+    for (const [id, texture] of [
+      ['taiko', Tex.fighterP1],
+      ['riot', Tex.fighterP2],
+      ['anchor', Tex.fighterAnchor],
+    ] as const)
+      this.load.atlas(alternateTexture(texture), `assets/${id}-alternate.png`, `assets/${id}.json`);
     const home = 'assets/menus/action/';
     this.load.json(HomeTex.layout, `${home}manifest.json`);
     this.load.bitmapFont(MENU_TYPOGRAPHY.fontKey, `${home}menu-font.png`, `${home}menu-font.fnt`);
     this.load.atlas(HomeTex.background, `${home}background-sheet.png`, `${home}background-sheet.json`);
     for (const { id, texture } of HOME_CHARACTERS)
       this.load.atlas(texture, `${home}${id}-sheet.png`, `${home}${id}-sheet.json`);
+    for (const { id, texture } of HOME_CHARACTERS)
+      this.load.atlas(alternateTexture(texture), `${home}${id}-alternate.png`, `${home}${id}-alternate.json`);
     this.load.atlas(HomeTex.labels, `${home}labels.png`, `${home}labels.json`);
     for (const font of HOME_FONT_STUDY)
       this.load.atlas(`${HomeTex.labels}-${font}`, `${home}labels-${font}.png`, `${home}labels.json`);

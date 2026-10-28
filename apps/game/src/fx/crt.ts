@@ -174,15 +174,25 @@ export function useScreenShader(cam: Phaser.Cameras.Scene2D.Camera): void {
  * An impact effect on the monitor: `split` pulls the colours apart, `warp` makes the rows wobble.
  * Starts at `px` and fades to nothing over `ms` on the scene's tweens (so slow motion slows it).
  */
-export function screenPulse(scene: Phaser.Scene, kind: 'split' | 'warp', px: number, ms: number): void {
+export function screenPulse(scene: Phaser.Scene, kind: 'split' | 'warp', px: number, ms: number): () => void {
   scene.tweens.killTweensOf(screenFx);
   screenFx[kind] = px;
-  scene.tweens.add({
+  const reset = () => {
+    screenFx[kind] = 0;
+    scene.events.off('shutdown', cancel);
+  };
+  const cancel = () => {
+    tween.stop();
+    reset();
+  };
+  const tween = scene.tweens.add({
     targets: screenFx,
     [kind]: 0,
     duration: ms,
     ease: 'Quad.easeIn',
-    onStop: () => (screenFx[kind] = 0),
+    onStop: reset,
+    onComplete: reset,
   });
-  scene.events.once('shutdown', () => (screenFx[kind] = 0));
+  scene.events.once('shutdown', cancel);
+  return cancel;
 }
