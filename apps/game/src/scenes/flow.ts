@@ -80,7 +80,8 @@ export class SceneFlow {
 
   /** Online: create or join a room. The lobby hands its connected session to toFight. */
   toLobby(): void {
-    this.wipe(() => this.show(SceneKey.lobby));
+    // Phaser keeps a restarted scene's last data; never reopen a previous room form.
+    this.wipe(() => this.show(SceneKey.lobby, { mode: 'menu' }));
   }
 
   toCharacterSelect(setup: MatchSetup, session?: OnlineSession): void {

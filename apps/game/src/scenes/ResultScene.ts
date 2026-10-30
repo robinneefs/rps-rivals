@@ -6,6 +6,7 @@ import { getContext } from './context';
 import type { ResultData } from './flow';
 import { SceneKey } from './keys';
 import { useMonitorCamera } from './monitor';
+import { watchSessionEnd } from './watchSessionEnd';
 import { VictoryView } from '../views/VictoryView';
 
 /** Winner portrait splash with the existing local/online rematch and exit actions. */
@@ -73,8 +74,7 @@ export class ResultScene extends Phaser.Scene {
       session.on('rematchRequested', ({ side }) => {
         if (!leaving && !asked && side !== session.me) notice(false);
       }),
-      session.on('opponentLeft', () => ended(true)),
-      session.on('disconnected', () => ended(false)),
+      watchSessionEnd(this, session, ended),
       input.on('action', (a) => {
         if (a.type === 'back' && this.scene.isActive() && !leaving) {
           audio.play('menuBack');
@@ -84,8 +84,7 @@ export class ResultScene extends Phaser.Scene {
         }
       }),
     ];
-    if (session.endedReason) ended(session.endedReason === 'opponentLeft');
-    else if (session.rivalRequestedRematch) notice(false);
+    if (!session.endedReason && session.rivalRequestedRematch) notice(false);
     this.events.once('shutdown', () => offs.forEach((off) => off()));
   }
 }

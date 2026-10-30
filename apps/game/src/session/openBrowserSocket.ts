@@ -10,6 +10,7 @@ export const openBrowserSocket: OpenSocket = (url, handlers) => {
     clearInterval(timer);
     document.removeEventListener('visibilitychange', resume);
     window.removeEventListener('pageshow', resume);
+    window.removeEventListener('focus', resume);
     window.removeEventListener('offline', fail);
   };
   const finish = (code: number) => {
@@ -34,6 +35,7 @@ export const openBrowserSocket: OpenSocket = (url, handlers) => {
   const timer = setInterval(check, 5000);
   document.addEventListener('visibilitychange', resume);
   window.addEventListener('pageshow', resume);
+  window.addEventListener('focus', resume);
   window.addEventListener('offline', fail);
   ws.addEventListener('open', () => handlers.open());
   ws.addEventListener('message', (e) => {

@@ -63,4 +63,10 @@ describe('browser connection checks', () => {
     document.dispatchEvent(new Event('visibilitychange'));
     expect(close).toHaveBeenCalledExactlyOnceWith(4002);
   });
+  it('checks a suspended connection on focus even without a visibilitychange event', () => {
+    const { close } = connect();
+    vi.setSystemTime(Date.now() + 20000);
+    window.dispatchEvent(new Event('focus'));
+    expect(close).toHaveBeenCalledExactlyOnceWith(4002);
+  });
 });

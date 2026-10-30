@@ -48,12 +48,13 @@ export class LobbyScene extends Phaser.Scene {
   private mode: Mode = 'menu';
   private session: OnlineSession | null = null;
   private handedOff = false;
+  private sessionOffs: (() => void)[] = [];
 
   constructor() {
     super(SceneKey.lobby);
   }
 
-  init(data: LobbyData): void {
+  init(data: LobbyData = {}): void {
     this.mode = data.mode ?? 'menu';
     this.session = null;
     this.handedOff = false;
@@ -64,6 +65,8 @@ export class LobbyScene extends Phaser.Scene {
     menuBackdrop(this);
     menuPanel(this, 47, 180);
     this.events.once('shutdown', () => {
+      this.sessionOffs.forEach((off) => off());
+      this.sessionOffs = [];
       if (!this.handedOff) this.session?.dispose();
       this.session = null;
     });
@@ -124,12 +127,13 @@ export class LobbyScene extends Phaser.Scene {
   private listen(fn: (a: Action) => void): void {
     const { input } = getContext(this);
     const off = input.on('action', (a) => {
-      if (this.scene.isActive()) fn(a);
+      if (this.scene.isActive() && !getContext(this).flow.transitioning) fn(a);
     });
     this.events.once('shutdown', off);
   }
 
   private toMode(mode: Mode): void {
+    if (getContext(this).flow.transitioning) return;
     if (mode === 'menu') getContext(this).audio.play('menuBack');
     this.scene.restart({ mode } satisfies LobbyData);
   }
@@ -191,12 +195,14 @@ export class LobbyScene extends Phaser.Scene {
       status(['CONNECTING...', '']);
       const session = connectOnline(roomCode, 'create');
       this.session = session;
-      session.on('opponentJoined', () => this.toFight(session));
-      session.on('refused', ({ error }) => {
-        if (error === 'taken' && tries < CREATE_TRIES) open();
-        else fail(PROBLEM[error]);
-      });
-      session.on('disconnected', () => fail(PROBLEM.offline));
+      this.sessionOffs.push(session.on('opponentJoined', () => this.toFight(session)));
+      this.sessionOffs.push(
+        session.on('refused', ({ error }) => {
+          if (error === 'taken' && tries < CREATE_TRIES) open();
+          else fail(PROBLEM[error]);
+        }),
+      );
+      this.sessionOffs.push(session.on('disconnected', () => fail(PROBLEM.offline)));
       // the hello goes out when the socket opens; until the rival arrives, just wait
       this.time.delayedCall(300, () => {
         if (this.session === session && !failed) status(['WAITING FOR', 'YOUR RIVAL']);
@@ -282,9 +288,11 @@ export class LobbyScene extends Phaser.Scene {
         syncField();
         draw();
       };
-      session.on('opponentJoined', () => this.toFight(session));
-      session.on('refused', ({ error }) => fail(PROBLEM[error]));
-      session.on('disconnected', () => fail(PROBLEM.offline));
+      this.sessionOffs.push(
+        session.on('opponentJoined', () => this.toFight(session)),
+        session.on('refused', ({ error }) => fail(PROBLEM[error])),
+        session.on('disconnected', () => fail(PROBLEM.offline)),
+      );
       syncField();
       draw();
     };

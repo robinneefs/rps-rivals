@@ -1,5 +1,13 @@
 # RPS Rivals: Project Context
 
+## Online exit and phone-resume recovery — 30 October 2026
+
+- User requested main-menu return after online matches/disconnects, and fresh Online entry instead of retaining Create/Join mode. SceneFlow now sends explicit menu mode; input is guarded during transitions.
+- Fixed dangling lobby session callbacks after handoff: disconnect could update destroyed room text and throw before the fight handler received the event. All lobby connection listeners now unsubscribe on shutdown.
+- Fight/result screens reconcile persistent endedReason on visible/focus/preupdate and defer hidden notices until visible. Socket heartbeat also checks on focus. Disconnect notice retains its main-menu countdown.
+- Validation: 193 unit tests, all 24 local browser checks using installed Chrome, lint, typecheck, formatting and build pass. Actual-phone background/resume still needs user confirmation on staging. Existing hosted complete-match timeouts are documented separately below.
+- Added eight scripted-WebSocket browser regressions for normal exit, rival departure/connection loss during fight/results, hidden/resume recovery, and clean Online/Create/Join re-entry. Added unit regressions for deferred notices, missed events, cleanup and focus-only heartbeat detection. These are simulated browser tests, not physical phone suspension evidence.
+
 ## Mobile countdown alignment — 30 October 2026
 
 - User reported off-centre digits on phones while desktop looked correct. Countdown now anchors to cached rendered ink bounds, including stroke, instead of a fixed text-box top offset. Current fonts/animation preserved. 189 unit tests, lint/typecheck/build and focused CPU/phone browser checks pass locally.

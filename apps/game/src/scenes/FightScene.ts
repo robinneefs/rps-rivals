@@ -17,6 +17,7 @@ import { getContext } from './context';
 import type { FightData } from './flow';
 import { SceneKey } from './keys';
 import { useMonitorCamera } from './monitor';
+import { watchSessionEnd } from './watchSessionEnd';
 import type { MatchSession, MatchSetup } from '../session/MatchSession';
 
 /** Wiring only: builds the views, connects the session, input and director, then says ready. */
@@ -112,8 +113,7 @@ export class FightScene extends Phaser.Scene {
         }
         if (picked && picked !== before) audio.play('lockIn');
       }),
-      session.on('opponentLeft', () => endEarly('RIVAL LEFT')),
-      session.on('disconnected', () => endEarly('OFFLINE')),
+      watchSessionEnd(this, session, (rivalLeft) => endEarly(rivalLeft ? 'RIVAL LEFT' : 'OFFLINE')),
     ];
     // a hidden tab stops drawing, so a CPU match waits for the player to come back
     const hide = () => session.setPaused(true);
@@ -130,12 +130,7 @@ export class FightScene extends Phaser.Scene {
     });
     this.hud = hud;
     this.tags = tags;
-    if (session.endedReason)
-      // create() runs before the scene becomes active; report after its first update.
-      this.time.delayedCall(0, () =>
-        endEarly(session.endedReason === 'opponentLeft' ? 'RIVAL LEFT' : 'OFFLINE'),
-      );
-    else if (!this.fight.versus) session.ready();
+    if (!session.endedReason && !this.fight.versus) session.ready();
   }
 
   override update(): void {
