@@ -1,5 +1,11 @@
 # RPS Rivals: Project Context
 
+## Documentation and screenshot refresh — 30 October 2026
+
+- User asked to bring all docs, the README and screenshots up to date with the revamp before weekend staging playtests. Work is on branch `docs/release-refresh` from origin/main (96b8be5). The local `main` branch was stale (old 2.2.0 marquee commits) and was not used.
+- `sources/screenshots/capture.mjs` rewritten for the current flow: builds with a placeholder `VITE_SERVER_URL` so PLAY ONLINE is enabled, serves the production build, plays a seeded CPU match as Anchor and saves logo, home, online, select, versus, fight, pick, reveal, K.O. and victory at desktop and phone sizes, plus a phone shot of each stage. Shots are WebP (shared helper `webp.mjs`, Chromium's encoder) because PNGs of the painted cabinet were about 2 MB each. Runs are close to, not exactly, identical. `capture-effects-studio.mjs` captures the dev Effects Studio for the tuning guide. How To and legacy tuning-panel PNGs removed.
+- README rewritten for the shipped game (fighters table, match flow, screenshot gallery, stage gallery, credits for generated fighters/stages/menus/marquee, dev URL options, staging link: production still runs 1.1.1). ARCHITECTURE.md has a new current-architecture section; the v0.11 reference below it is kept and marked historical. AUDIO.md lists all six tracks and their build scripts; TUNING-PANEL.md leads with Effects Studio and the review routes; art/ui README notes v6 is in the game; Play Store listing text updated (store screenshots still 1.x, Android parked). Release-checklist documentation item ticked.
+
 ## Online exit and phone-resume recovery — 30 October 2026
 
 - User requested main-menu return after online matches/disconnects, and fresh Online entry instead of retaining Create/Join mode. SceneFlow now sends explicit menu mode; input is guarded during transitions.
