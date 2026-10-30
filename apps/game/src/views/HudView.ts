@@ -5,6 +5,7 @@ import { moveColors, palette, sideColors } from '../config/palette';
 import { tuning } from '../config/tuning';
 import { PixelText } from './PixelText';
 import { MenuText } from './MenuStyle';
+import { textInkOrigin } from '../util/textInkOrigin';
 
 interface BarState {
   shown: number;
@@ -26,6 +27,7 @@ export class HudView {
   private readonly timerFace: Phaser.GameObjects.Graphics;
   private timerMs: number | null = null;
   private timerSecond = -1;
+  private readonly timerOrigins = new Map<string, { x: number; y: number }>();
   private readonly timerBeat = { kick: 0 };
   private readonly flashUntil: Record<Side, number> = { p1: 0, p2: 0 };
   private roundsWon: Record<Side, number> = { p1: 0, p2: 0 };
@@ -231,7 +233,16 @@ export class HudView {
     if (kick > 0) {
       g.lineStyle(1, color, kick * 0.6).strokeCircle(x, y, 17 + (1 - kick) * 5);
     }
-    this.timer.setTint(kick > 0.65 ? 0xffffff : color).setY(3 - Math.round(kick * 2));
+    // Text-box height and bearings differ on mobile fallback fonts. Anchor the actual ink.
+    let origin = this.timerOrigins.get(this.timer.text);
+    if (!origin) {
+      origin = textInkOrigin(this.timer.canvas, this.timer.style.resolution);
+      this.timerOrigins.set(this.timer.text, origin);
+    }
+    this.timer
+      .setDisplayOrigin(origin.x, origin.y)
+      .setPosition(x, y - Math.round(kick * 2))
+      .setTint(kick > 0.65 ? 0xffffff : color);
   }
 
   slamTimer(): void {

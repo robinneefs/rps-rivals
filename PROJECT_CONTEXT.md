@@ -1,5 +1,10 @@
 # RPS Rivals: Project Context
 
+## Mobile countdown alignment — 30 October 2026
+
+- User reported off-centre digits on phones while desktop looked correct. Countdown now anchors to cached rendered ink bounds, including stroke, instead of a fixed text-box top offset. Current fonts/animation preserved. 189 unit tests, lint/typecheck/build and focused CPU/phone browser checks pass locally.
+- Hosted CI for bc89e46 finished with 13 browser tests passing and three complete-match test timeouts on the software-rendered runner. Local full browser suite passed; hosted checks must not be described as green. Staging publication succeeded.
+
 ## Polish review decisions — 30 October 2026
 
 - User accepted combat pacing, exchange readability, and phone controls/layout in this chat. These are user-reported playtest results; no exhaustive device/stage matrix is implied.

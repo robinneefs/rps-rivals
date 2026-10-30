@@ -4,6 +4,8 @@ Every build that goes online gets a new version number (in `apps/game/package.js
 
 ## Unreleased — staging update (2026-10-30)
 
+- Centre countdown digits using rendered ink bounds rather than platform-dependent font padding, fixing mobile alignment while preserving the typeface and tick animation.
+
 - Integrated approved v6 embossed hand pictograms and generated K.O. lettering into normal gameplay. Preserved all studies and the 19-beat development review harness.
 - Revised the gold HUD, larger countdown dial, synchronized coin ticks, persistent countdown audio, picking prompt and local-player marker. Round openings now last 2.8 seconds with red-highlighted FIGHT lettering and a 350ms clear pause; picking still allows three full seconds.
 - Attack coins pull back, rotate inward and arc into an accelerating collision with intense trails, sparks and shockwaves. They return to their round shape at impact. Ties trigger a one-shot CRT burst; redundant attack text is removed.
