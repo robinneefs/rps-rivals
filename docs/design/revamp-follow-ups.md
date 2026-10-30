@@ -8,7 +8,11 @@ Before the final release of the new game version, review and address every outst
 
 ## Follow-ups
 
-- [x] Alternate colours accepted: three masked combat atlases and three reference-generated alternate rest portraits installed, with final Taiko headband/wrist speck cleanup. Reviewed in actual game scenes. Next chat: CRT shader control panel.
+- Current continuation: [29 October round-loop handoff](../checkpoints/2026-10-29-round-loop-handoff.md). User is reviewing actual-game previews point by point. HUD/intro/prompt/coins have been iterated; later combat beats and final acceptance remain open.
+- [ ] Finish selected v6 pictogram hand integration into production asset loading and agree later reveal/badge treatment. The current embossed hand coin textures are dev-review-only. v7/v8 were rejected in favour of v6; preserve all studies.
+- [x] Anchor always auto-picks Rock on timeout in shared local/online referee logic; manual choices stay valid and other fighters retain random timeout picks. Updated server code is not deployed yet.
+
+- [x] Alternate colours accepted: three masked combat atlases and three reference-generated alternate rest portraits installed, with final Taiko headband/wrist speck cleanup. Reviewed in actual game scenes. The subsequent CRT shader control panel is also complete.
 - [x] Versus transition integrated and refined: simplified ownership labels, custom centred VS, protected stage label, longer hold, readable closing slam, screen/cabinet shake, seam sparks and short K.O.-style CRT pulse. CPU/online/rematches and reduced motion covered. Remaining gameplay HUD/reveal/round presentation work stays open in the release checklist.
 - [x] Harbor water motion strengthened; harbor and rooftop bird flocks made much more frequent. Four alternating flock formations/directions/paths are implemented and accepted, retaining the seven-second cadence.
 - [x] Courtyard distant-building smoke implemented and explicitly approved.

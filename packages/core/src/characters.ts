@@ -27,6 +27,10 @@ export function characterStats(character: CharacterId, rules: RulesConfig) {
 export function rulesForFighters(rules: RulesConfig, fighters: Fighters): RulesConfig {
   return {
     ...rules,
+    autoPickBySide: {
+      ...(fighters.p1 === 'anchor' ? { p1: 'rock' as const } : {}),
+      ...(fighters.p2 === 'anchor' ? { p2: 'rock' as const } : {}),
+    },
     healthBySide: { p1: characterStats(fighters.p1, rules).hp, p2: characterStats(fighters.p2, rules).hp },
     damageBySide: {
       p1: { ...characterStats(fighters.p1, rules).damage },

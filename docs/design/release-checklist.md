@@ -6,7 +6,13 @@ CRT control panel, effects playground and CRT fine tuning are complete and accep
 
 ## 1. Gameplay visual makeover — main remaining work
 
-The new fighters, stages and menus are installed. They do not complete the planned combat-screen and match-flow redesign. HudView, ClashView, BannerView and TagView still provide the existing presentation; the original plan calls for a storyboard, implementation and a dedicated pacing page.
+The combat makeover is in progress through the actual-game, 19-beat round-review harness. See [29 October handoff](../checkpoints/2026-10-29-round-loop-handoff.md). HUD, intro/FIGHT, countdown, coins, reveal/clash, damage and K.O. were reviewed with the user and integrated into normal gameplay on 30 October. Broader device/online acceptance remains open. This harness is not the full planned pacing editor.
+
+- [x] Build selectable real-game round-loop previews with held frames, Replay/Previous/Next and hand-icon comparison controls.
+- [x] Implement requested intro ownership marker, menu-font round labels, red-edged FIGHT lettering and clear 350ms gap before the picking countdown.
+- [x] Implement requested picking prompt, waving move-colour triangles, prompt dismissal on pick, coin pop, move-colour coin shading and solid gray/ready question mark.
+- [x] User accepted the reviewed combat UI and requested normal-game integration (30 October). Approved v6 pictograms and generated K.O. load through BootScene; attack coins use the same art. Broader release verification below remains open.
+- [x] Implement Anchor's deterministic Rock timeout exception in shared local/online referee rules; keep manual picks and other fighters' random fallbacks. Covered by the 186-test suite. Updated server is not deployed yet.
 
 - [x] Implement and polish the post-selection versus transition: revised portrait orientation/spacing, YOU/CPU/RIVAL labels, custom centred gold VS, stage-name plate, 420ms closing slam, 2800ms hold, sharp opening, screen/cabinet shake, gold seam sparks and 120ms K.O.-style CRT pulse. Uses actual fighters/stage, shared online readiness, rematches and reduced motion; no black handoff or duplicate VS card. User approved the visual design; requested collision refinements are implemented.
 - [ ] Agree the remaining combat storyboard before implementation: round introduction → picking/countdown → lock-in → reveal/clash → hit and damage → recovery → round end/K.O. → next round or existing victory screen. Build on the completed versus transition and give each beat one clear focus.
@@ -22,7 +28,7 @@ These are design/review tasks, not approval of particular replacement artwork or
 
 ## 2. CRT review and effects playground
 
-- [x] Reuse the existing K.O. colour-split effect as a short versus-impact jolt, with cleanup and reduced-motion suppression. This specific requested effect is complete; the broader playground below remains open.
+- [x] Reuse the existing K.O. colour-split effect as a short versus-impact jolt, with cleanup and reduced-motion suppression. The broader playground is also complete below.
 
 - [x] CRT fine tuning complete and accepted by the user, closing the earlier brightness/readability and filter-tuning request.
 - [x] Development Effects Studio provides CRT controls, presets and persisted settings; accepted defaults are saved in tuning.ts.
@@ -52,7 +58,7 @@ These are design/review tasks, not approval of particular replacement artwork or
 
 - [x] Approved cabinet/control layout, joystick and engraving; Pixel Perfect option implemented.
 - [x] Home, Options, Online, Create Room and Join Room restyled; the user approved the remaining menus on 27 October. Older requests for that sign-off are superseded.
-- [x] Three selectable, playable fighters with approved combat sheets, character selection and user-specified HP/damage. Alternate palette implementation exists, but its visual review is reopened above.
+- [x] Three selectable, playable fighters with approved combat sheets, character selection and user-specified HP/damage. Alternate palettes/portraits are accepted; Anchor's timeout exception is implemented above.
 - [x] Five animated stages and their installed soundtracks: City Rooftop, Storm Field, Sunset Harbor, Lantern Courtyard and Foundry Floor.
 - [x] Approved victory splash integrated for all three fighters and mirror-match ownership.
 - [x] Online exit/disconnection notices, rematch waiting notification and stale-connection detection implemented. User reported the recommended playtest worked fine on 28 October; individual devices/scenarios were not enumerated.
@@ -64,7 +70,7 @@ These are design/review tasks, not approval of particular replacement artwork or
 
 ## Source reconciliation
 
-- PROJECT_CONTEXT.md: latest handoffs supersede older missing-stage, missing-sheet, equal-stat, unapproved-menu and deferred-palette notes. Alternate-colour review is the user's next task; remaining gameplay/storyboard/pacing work stays open after the completed versus transition.
-- docs/design/revamp-follow-ups.md: online items completed; CRT playground and marquee review retained above.
+- PROJECT_CONTEXT.md: latest handoff supersedes older next-chat instructions. Continue round-loop UI review, not CRT setup or alternate-colour review. Gameplay/storyboard/pacing work stays open.
+- docs/design/revamp-follow-ups.md: previous online playtest and CRT playground completed; current coin review, production hand integration and marquee review retained above.
 - docs/checkpoints/2026-10-27-overhaul.md: historical validation and exclusions retained; later menu approval, fighter integration and online work supersede its outstanding-status notes.
 - docs/mockups/v2/VISUAL-DIRECTION.md: retain the colour/energy and character references, with current runtime dimensions, roster implementation, stats and five-stage lineup taking precedence over its older provisional values.

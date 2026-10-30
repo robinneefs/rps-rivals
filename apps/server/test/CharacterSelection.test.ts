@@ -58,6 +58,26 @@ function network() {
 }
 
 describe('character selection over the match protocol', () => {
+  it('authoritatively auto-picks Rock for an online Anchor and reports it to both clients', () => {
+    const { a, b, clock } = network();
+    a.session.selectCharacter('riot', true);
+    b.session.selectCharacter('anchor', true);
+    const reveals: unknown[] = [];
+    a.session.on('reveal', (event) => reveals.push(event));
+    b.session.on('reveal', (event) => reveals.push(event));
+    a.session.ready();
+    b.session.ready();
+    clock.advance(defaultTimings.roundIntroMs);
+    a.session.submitPick('paper');
+    clock.advance(defaultTimings.pickMs);
+    expect(reveals).toHaveLength(2);
+    for (const event of reveals)
+      expect(event).toMatchObject({
+        picks: { p1: 'paper', p2: 'rock' },
+        autoPicked: { p1: false, p2: true },
+      });
+    expect(b.session.snapshot().state).toEqual(a.session.snapshot().state);
+  });
   it('uses the advertised selected character damage for both clients and retains it on rematch', () => {
     const { a, b, clock } = network();
     a.session.selectCharacter('riot', true);

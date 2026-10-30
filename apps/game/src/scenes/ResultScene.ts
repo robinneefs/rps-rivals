@@ -28,9 +28,9 @@ export class ResultScene extends Phaser.Scene {
     const won = winner === session.me;
     audio.play(won ? 'winJingle' : 'loseJingle');
 
-    // In a mirror, the portrait/name alone cannot identify which player won.
+    // Identify the winning player consistently, including mirrors.
     const mirror = session.fighters.p1 === session.fighters.p2;
-    const winnerLabel = mirror ? (won ? 'YOU WIN!' : `${session.opponentName} WINS`) : undefined;
+    const winnerLabel = won ? 'YOU WIN!' : `${session.opponentName} WINS`;
     const victory = new VictoryView(this, session.fighters[winner], winnerLabel, mirror && winner === 'p2');
     // Status remains visible while the online rematch handshake is pending.
     const notice = rematchNotice(this);

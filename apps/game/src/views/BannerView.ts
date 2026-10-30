@@ -5,6 +5,8 @@ import type { Side } from '@rps/core';
 import { palette, sideColors } from '../config/palette';
 import { tuning } from '../config/tuning';
 import { PixelText } from './PixelText';
+import { MenuText } from './MenuStyle';
+import { createFightLettering } from './fightLettering';
 
 /** Where each name sits on the VS card (centre x). */
 const VS_X = { p1: 46, p2: MONITOR.width - 46 } as const;
@@ -12,6 +14,9 @@ const VS_X = { p1: 46, p2: MONITOR.width - 46 } as const;
 /** Big centre text that slams in: "ROUND 1", "FIGHT!", the K.O. letters, and the "YOU VS RIVAL" card. */
 export class BannerView {
   private readonly text: PixelText;
+  private readonly fightText: Phaser.GameObjects.Graphics;
+  private readonly roundText: Phaser.GameObjects.Container;
+  private readonly roundLayers: MenuText[] = [];
   private readonly sub: PixelText;
   private readonly ko: Phaser.GameObjects.Image;
   private readonly vs: { p1: PixelText; p2: PixelText; mid: PixelText };
@@ -21,7 +26,22 @@ export class BannerView {
   constructor(
     private readonly scene: Phaser.Scene,
     private readonly y: number,
+    private readonly titleY = y,
   ) {
+    this.fightText = createFightLettering(scene).setPosition(MONITOR.width / 2, this.titleY);
+    this.roundText = scene.add.container(MONITOR.width / 2, y).setVisible(false);
+    for (const [dx, dy, color] of [
+      [1, 2, palette.shadow],
+      [-1, 0, palette.ink],
+      [1, 0, palette.ink],
+      [0, -1, palette.ink],
+      [0, 1, palette.ink],
+      [0, 0, palette.gold],
+    ]) {
+      const label = new MenuText(scene, dx!, dy!, '', color!);
+      this.roundLayers.push(label);
+      this.roundText.add(label.image);
+    }
     this.text = new PixelText(scene, MONITOR.width / 2, y, '', {
       size: 2,
       color: palette.gold,
@@ -60,7 +80,8 @@ export class BannerView {
       .setVisible(false);
   }
 
-  show(text: string, opts: { color?: number; sub?: string; holdMs?: number } = {}): void {
+  show(text: string, opts: { color?: number; sub?: string; holdMs?: number; y?: number } = {}): void {
+    const y = opts.y ?? this.titleY;
     this.tween?.stop();
     this.hideTimer?.remove();
     this.hide();
@@ -68,14 +89,27 @@ export class BannerView {
       .setText(text)
       .setColor(opts.color ?? palette.gold)
       .setVisible(true)
-      .setY(this.y - 40);
+      .setY(y - 40);
     this.sub.setText(opts.sub ?? '').setVisible(Boolean(opts.sub));
+    const isRound = /^(ROUND \d+|FINAL ROUND)$/.test(text);
+    const isFight = text === 'FIGHT!';
+    const target = isFight ? this.fightText : isRound ? this.roundText : this.text;
+    if (isFight) {
+      this.text.setVisible(false);
+      this.fightText.setVisible(true).setY(y - 40);
+    }
+    if (isRound) {
+      this.text.setVisible(false);
+      for (const label of this.roundLayers) label.setText(text);
+      this.roundLayers[this.roundLayers.length - 1]!.setColor(opts.color ?? palette.gold);
+      this.roundText.setVisible(true).setY(y - 40);
+    }
     this.tween = this.scene.tweens.add({
-      targets: this.text,
-      y: this.y,
+      targets: target,
+      y,
       duration: tuning.banner.slamMs,
       ease: 'Back.easeOut',
-      onUpdate: () => this.text.setY(Math.round(this.text.y)),
+      onUpdate: () => target.setY(Math.round(target.y)),
     });
     if (opts.holdMs !== Infinity)
       this.hideTimer = this.scene.time.delayedCall(
@@ -89,10 +123,12 @@ export class BannerView {
     this.tween?.stop();
     this.hideTimer?.remove();
     this.hide();
-    this.ko.setVisible(true).setY(this.y - 40);
+    this.ko.setDisplaySize(152, (152 * this.ko.height) / this.ko.width);
+    const koY = 42;
+    this.ko.setVisible(true).setY(koY - 34);
     this.tween = this.scene.tweens.add({
       targets: this.ko,
-      y: this.y - 6,
+      y: koY,
       duration: tuning.banner.slamMs,
       ease: 'Back.easeOut',
       onUpdate: () => this.ko.setY(Math.round(this.ko.y)),
@@ -135,6 +171,8 @@ export class BannerView {
     }
     this.ko.setVisible(false);
     this.text.setVisible(false);
+    this.fightText.setVisible(false);
+    this.roundText.setVisible(false);
     this.sub.setVisible(false);
   }
 }

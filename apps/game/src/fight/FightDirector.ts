@@ -1,10 +1,19 @@
-import { opponentOf, seededRng, type MatchState, type Move, type Rng, type Side } from '@rps/core';
+import {
+  defaultTimings,
+  opponentOf,
+  seededRng,
+  type MatchState,
+  type Move,
+  type Rng,
+  type Side,
+} from '@rps/core';
 import type Phaser from 'phaser';
 import { HIT_SFX, type SfxPlayer } from '../audio/sounds';
 import { STAGE } from '../config/layout';
 import { moveColors, palette } from '../config/palette';
 import { tuning } from '../config/tuning';
 import { screenPulse } from '../fx/crt';
+import { playScreenEffect } from '../fx/screenEffects';
 import { flash } from '../fx/flash';
 import { koImpact } from '../fx/koImpact';
 import { burst } from '../fx/particles';
@@ -32,7 +41,7 @@ export interface FightViews {
 export class FightDirector {
   private readonly offs: (() => void)[] = [];
   private koSide: Side | null = null;
-  private firstPickOfRound = false;
+  private fightStep: Phaser.Time.TimerEvent | null = null;
   /** Picks so far this match, so the arrows to the buttons show only for the first few. */
   private turns = 0;
   /** "ROUND 1" waits for the VS card; a phase change cancels it. */
@@ -46,8 +55,6 @@ export class FightDirector {
     private readonly views: FightViews,
     private readonly sfx: SfxPlayer,
     private readonly roundsToWin: number,
-    /** Short names over the fighters and on the VS card ("YOU", "RIVAL"). */
-    private readonly labels: Record<Side, string>,
     private readonly hooks: {
       versusIntro?: boolean;
       clearPick: () => void;
@@ -83,13 +90,13 @@ export class FightDirector {
   private onPhase = (e: SessionEvents['phase']): void => {
     const { fighters, clash, hud, banner, tags } = this.views;
     const state = this.session.snapshot().state;
-    const tagged = e.round <= tuning.identity.tagRounds;
     this.introStep?.remove();
     this.introStep = null;
+    this.fightStep?.remove();
+    this.fightStep = null;
     switch (e.phase) {
       case 'roundIntro': {
         this.koSide = null;
-        this.firstPickOfRound = true;
         this.hooks.clearPick();
         for (const side of ['p1', 'p2'] as const) {
           fighters[side].toIdle();
@@ -103,21 +110,25 @@ export class FightDirector {
         const title = e.finalRound ? 'FINAL ROUND' : `ROUND ${e.round}`;
         const showTitle = () => {
           this.sfx.play('roundStart');
-          banner.show(title, { color: palette.gold, holdMs: Infinity });
+          banner.show(title, { color: palette.gold, holdMs: Infinity, y: 54 });
         };
-        if (e.round === 1) {
-          // who is who before anything happens: the VS card, then the round
-          tags.showTags(tagged);
-          if (!this.hooks.versusIntro) banner.showVs(this.labels);
-          this.introStep = this.scene.time.delayedCall(
-            this.hooks.versusIntro ? tuning.versus.openMs : tuning.identity.vsCardMs,
-            showTitle,
-          );
+        tags.showYou(this.session.me);
+        if (e.round === 1 && this.hooks.versusIntro) {
+          this.introStep = this.scene.time.delayedCall(tuning.versus.openMs, showTitle);
         } else {
-          if (e.round === tuning.identity.tagRounds + 1) tags.blinkOut();
-          else tags.showTags(tagged);
           showTitle();
         }
+        // FIGHT belongs to the intro. Picking starts only after it clears and a short breath.
+        const introLeft = this.session.snapshot().msLeft || defaultTimings.roundIntroMs;
+        const fightAt = Math.max(
+          0,
+          introLeft - tuning.banner.slamMs - tuning.banner.fightHoldMs - tuning.banner.afterFightMs,
+        );
+        this.fightStep = this.scene.time.delayedCall(fightAt, () => {
+          tags.showTags(false);
+          this.sfx.play('fight');
+          banner.show('FIGHT!', { color: palette.pink, holdMs: tuning.banner.fightHoldMs });
+        });
         break;
       }
       case 'picking': {
@@ -128,15 +139,11 @@ export class FightDirector {
         }
         clash.hide();
         this.turns++;
-        hud.showPrompt(true, this.turns <= tuning.prompt.arrowTurns);
-        tags.showTags(tagged);
+        hud.showPrompt(true);
+        tags.showTags(false);
         tags.setChip('p1', 'waiting');
         tags.setChip('p2', 'waiting');
-        if (this.firstPickOfRound) {
-          this.sfx.play('fight');
-          banner.show('FIGHT!', { color: palette.pink, holdMs: 350 });
-        } else banner.hide();
-        this.firstPickOfRound = false;
+        banner.hide();
         break;
       }
       case 'reveal':
@@ -179,7 +186,7 @@ export class FightDirector {
     const r = tuning.reveal;
     const at = (ms: number, fn: () => void) => this.scene.time.delayedCall(ms, fn);
     // the badges pop in (with the slam when the timer ran out on someone), then whoosh to the middle
-    clash.present(e.picks, e.autoPicked);
+    clash.present(e.picks);
     if (e.autoPicked.p1 || e.autoPicked.p2) {
       this.sfx.play('timeUp');
       hud.slamTimer();
@@ -188,7 +195,10 @@ export class FightDirector {
     }
     at(r.flyAtMs, () => {
       clash.fly(r.impactAtMs - r.flyAtMs);
-      this.sfx.play('whoosh');
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      at(reduced ? 0 : Math.min(r.coinWindupMs, (r.impactAtMs - r.flyAtMs) * 0.6), () =>
+        this.sfx.play('whoosh'),
+      );
     });
 
     const outcome = e.outcome;
@@ -204,6 +214,9 @@ export class FightDirector {
     at(r.impactAtMs, () => {
       clash.collide(outcome);
       if (outcome.kind === 'tie') {
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          playScreenEffect(this.scene, 'clash');
+        }
         fighters[action.defender].block();
         fighters[action.defender].setOffset(r.guardStepPx - r.recoilPx);
         shake(this.scene, this.scene.cameras.main, 1, tuning.shake.durationMs / 2);

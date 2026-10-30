@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { createMoveHands } from '../assets/createMoveHands';
 import { audioFiles } from '../audio/sounds';
 import { alternateTexture, generateAlternatePalettes } from '../assets/alternatePalettes';
 import { FONT_SIZES, Tex } from '../assets/keys';
@@ -41,6 +42,9 @@ export class BootScene extends Phaser.Scene {
       bar.fillStyle(palette.pink).fillRect(x, y, Math.round(w * p), 4);
     });
     // Real art: load sprite sheets here under the keys in assets/keys.ts; their placeholders are then skipped.
+    this.load.image(Tex.koLetters, 'assets/combat/ko-v1.png');
+    for (const move of ['rock', 'paper', 'scissors'])
+      this.load.image(`move-hand-source-${move}`, `assets/combat/${move}-source-v6.png`);
     this.load.image(Tex.logo, 'assets/logo.png');
     this.load.atlas(Tex.logoSheen, 'assets/logo-sheen.png', 'assets/logo-sheen.json');
     this.load.atlas(Tex.fighterP1, 'assets/taiko.png', 'assets/taiko.json');
@@ -123,6 +127,7 @@ export class BootScene extends Phaser.Scene {
   create(): void {
     for (const size of FONT_SIZES) registerPixelFont(this, size);
     generatePlaceholders(this);
+    createMoveHands(this.game);
     generateAlternatePalettes(this);
     const art = new URLSearchParams(window.location.search).get('art');
     if (import.meta.env.DEV && (art === 'anchor-sheet' || art === 'riot-sheet' || art === 'taiko-sheet')) {

@@ -15,6 +15,8 @@ export interface RulesConfig {
   healthBySide?: Record<Side, number>;
   /** Damage bound to the selected identities when a match starts. */
   damageBySide?: Record<Side, Record<Move, number>>;
+  /** Character-specific timeout picks; an absent side keeps the random fallback. */
+  autoPickBySide?: Partial<Record<Side, Move>>;
   startHealth: number;
   /** Rounds needed to win the match (2 = best of three). */
   roundsToWin: number;

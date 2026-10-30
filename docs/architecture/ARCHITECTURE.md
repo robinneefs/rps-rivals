@@ -1,5 +1,17 @@
 # Architecture
 
+## Current implementation notes (29 October 2026)
+
+The detailed architecture below is a historical v0.11 snapshot. These current notes and the [round-loop handoff](../checkpoints/2026-10-29-round-loop-handoff.md) take precedence where it differs from the v2 code:
+
+- The game monitor is a native **192 × 240** framebuffer. `CrtDisplay.ts` presents that framebuffer with nearest enlargement and a separate display-resolution CRT pass. New UI graphics/icons are drawn inside the native game raster.
+- `rulesForFighters` binds each selected character's health, damage and optional timeout move into match rules. `RulesConfig.autoPickBySide` fixes Anchor's missing pick to Rock; absent overrides keep the referee's random fallback. Both LocalSession and MatchRoom use this path; manual choices are not overwritten.
+- FightDirector schedules ROUND and FIGHT during `roundIntro`, leaving a 250ms clear pause before `picking`. Referee phase deadlines and the full picking allowance remain authoritative.
+- HudView/TagView/BannerView implement the in-progress HUD, player marker, prompt and coins. Hand art is currently loaded/processed only by the dev `roundReview.ts` harness, not production BootScene. The normal asset pipeline must be completed after final artwork acceptance.
+- `?roundReview&beat=N` mounts a development-only DOM review panel and scripted MatchSession fixtures around actual game views. It cannot replace referee tests or full CPU/online playtests. Effects Studio is the default dev panel; `?legacyTuning` retains the older all-values panel.
+
+## Historical architecture reference
+
 _Status: describes the code as it is in v0.11.0 (2026-10-11), the last build before the 1.0 release. The core, the cabinet game, online play (section 10), audio, the dev tuning panel and the polish passes are built. Anything not built yet is marked **(planned)**. Change this document when the code or a decision changes._
 
 How the RPS Rivals code is organised so that it stays readable as it grows: from a local game against a random CPU, to online play, to an Android app. It builds on the decisions in [`PROJECT_CONTEXT.md`](../../PROJECT_CONTEXT.md) (Phaser 3, TypeScript, Vite, Vitest, arcade cabinet layout, pixel perfect, polish as a core goal). Where online matches could be hosted for free is compared in [`ONLINE-OPTIONS.md`](ONLINE-OPTIONS.md).

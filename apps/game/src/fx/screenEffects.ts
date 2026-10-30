@@ -3,6 +3,7 @@ import { screenPulse } from './crt';
 
 /** Reusable recipes: preview these in the panel or trigger them from game choreography. */
 export const screenEffects = {
+  clash: { split: 6, warp: 7, flash: 0.35, mono: 0.8, durationMs: 280 },
   hit: { split: 1.2, warp: 0.5, flash: 0.15, mono: 0, durationMs: 180 },
   heavyHit: { split: 2, warp: 2, flash: 0.3, mono: 0, durationMs: 320 },
   knockout: { split: 3, warp: 1, flash: 0.65, mono: 0.4, durationMs: 900 },

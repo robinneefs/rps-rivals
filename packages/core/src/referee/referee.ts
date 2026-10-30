@@ -97,7 +97,7 @@ export class Referee {
     const autoPicked = { p1: false, p2: false };
     for (const side of SIDES) {
       if (this.picks[side] === undefined) {
-        this.picks[side] = this.randomMove();
+        this.picks[side] = this.cfg.autoPickBySide?.[side] ?? this.randomMove();
         autoPicked[side] = true;
       }
     }

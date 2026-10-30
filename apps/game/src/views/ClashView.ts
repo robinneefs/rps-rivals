@@ -1,133 +1,242 @@
 import type { Move, ExchangeOutcome, Side } from '@rps/core';
 import type Phaser from 'phaser';
+import { drawMoveCoin } from './moveCoin';
 import { Tex } from '../assets/keys';
 import { MONITOR, STAGE } from '../config/layout';
-import { palette, sideColors } from '../config/palette';
+import { moveColors } from '../config/palette';
 import { tuning } from '../config/tuning';
 import { snap } from '../util/snap';
-import { PixelText } from './PixelText';
+import { MENU_TYPOGRAPHY } from '../config/menuTypography';
 
 const SIDES = ['p1', 'p2'] as const;
 /** Half a badge's width minus the overlap where the two touch at the collision. */
-const CONTACT_PX = 15;
-/** Half a badge's height. */
-const BADGE_HALF = 20;
+const CONTACT_PX = 24;
 
 /**
- * The reveal: each side's move badge pops in beside its fighter with its owner's name over it, both
- * fly to the middle and collide, the winner stays and the loser is knocked away, "ROCK BEATS
- * SCISSORS" and "YOU HIT!" slam in and the damage number falls from the loser's head. The director
- * decides when each step plays.
+ * Move coins wind up with particle trails, accelerate into a burst, and knock the loser away.
+ * The director decides when each step plays.
  */
 export class ClashView {
   private readonly badges: Record<Side, Phaser.GameObjects.Image>;
-  private readonly autos: Record<Side, PixelText>;
-  /** "YOU" / "RIVAL" over each badge until they collide. */
-  private readonly owners: Record<Side, PixelText>;
-  private readonly rule: PixelText;
-  private readonly verdict: PixelText;
-  private readonly damage: PixelText;
+  private trails: Phaser.GameObjects.Particles.ParticleEmitter[] = [];
+  private effects: (Phaser.GameObjects.Particles.ParticleEmitter | Phaser.GameObjects.Graphics)[] = [];
+  private readonly damage: Phaser.GameObjects.Container;
+  private readonly damageLayers: Phaser.GameObjects.BitmapText[] = [];
   private moves: Record<Side, Move> = { p1: 'rock', p2: 'rock' };
   private readonly home: Record<Side, number>;
   private readonly centre = MONITOR.width / 2;
   /** Tweens on plain progress objects (the loser's flight, the damage fall), stopped by hide(). */
   private paths: Phaser.Tweens.Tween[] = [];
+  private flights: Phaser.Tweens.Tween[] = [];
 
-  constructor(
-    private readonly scene: Phaser.Scene,
-    private readonly labels: Record<Side, string>,
-    private readonly me: Side,
-  ) {
+  constructor(private readonly scene: Phaser.Scene) {
     const r = tuning.reveal;
+    this.createCoinTextures();
+    if (!scene.textures.exists('coin-spark-pixel')) {
+      const pixel = scene.make.graphics({ x: 0, y: 0 });
+      pixel.fillStyle(0xffffff).fillRect(0, 0, 3, 3);
+      pixel.generateTexture('coin-spark-pixel', 3, 3);
+      pixel.destroy();
+    }
     this.home = { p1: STAGE.fighterX.p1 - r.badgeOutPx, p2: STAGE.fighterX.p2 + r.badgeOutPx };
     this.badges = {
-      p1: scene.add.image(this.home.p1, r.badgeY, Tex.badges, 'rock-normal').setVisible(false),
-      p2: scene.add.image(this.home.p2, r.badgeY, Tex.badges, 'rock-normal').setVisible(false),
+      p1: scene.add.image(this.home.p1, r.badgeY, 'attack-coin-rock-normal').setVisible(false),
+      p2: scene.add.image(this.home.p2, r.badgeY, 'attack-coin-rock-normal').setVisible(false),
     };
-    this.autos = {
-      p1: this.label(this.home.p1),
-      p2: this.label(this.home.p2),
-    };
-    const owner = (side: Side) =>
-      new PixelText(scene, this.home[side], 0, labels[side], {
-        color: sideColors[side],
-        align: 'center',
-        outline: palette.ink,
-      }).setVisible(false);
-    this.owners = { p1: owner('p1'), p2: owner('p2') };
-    this.rule = new PixelText(scene, this.centre, r.ruleY, '', {
-      align: 'center',
-      outline: palette.ink,
-    }).setVisible(false);
-    this.verdict = new PixelText(scene, this.centre, r.verdictY, '', {
-      size: 2,
-      align: 'center',
-      outline: palette.ink,
-      shadow: palette.shadow,
-    }).setVisible(false);
-    this.damage = new PixelText(scene, 0, 0, '', {
-      size: 2,
-      align: 'center',
-      outline: palette.ink,
-    }).setVisible(false);
+    this.damage = scene.add.container(0, 0).setScale(2).setDepth(10).setVisible(false);
+    for (const [dx, dy, color] of [
+      [1, 2, 0x6b4525],
+      [-1, 0, 0x160c20],
+      [1, 0, 0x160c20],
+      [0, -1, 0x160c20],
+      [0, 1, 0x160c20],
+      [0, 0, 0xffffff],
+    ]) {
+      const layer = scene.add
+        .bitmapText(dx!, dy!, MENU_TYPOGRAPHY.fontKey, '', MENU_TYPOGRAPHY.size)
+        .setOrigin(0.5, 0)
+        .setTint(color!);
+      if (color === 0xffffff) layer.setTint(0xfff3a0, 0xfff3a0, 0xc67b1c, 0xc67b1c);
+      this.damage.add(layer);
+      this.damageLayers.push(layer);
+    }
   }
 
-  /** "AUTO" under a badge when the timer picked for that side. */
-  private label(x: number): PixelText {
-    const y = tuning.reveal.badgeY + BADGE_HALF + 2;
-    return new PixelText(this.scene, x, y, 'AUTO', {
-      color: palette.lilac,
-      align: 'center',
-      shadow: palette.ink,
-    }).setVisible(false);
+  private createCoinTextures(): void {
+    for (const move of ['rock', 'paper', 'scissors'] as const) {
+      for (const flash of [false, true]) {
+        const key = `attack-coin-${move}-${flash ? 'flash' : 'normal'}`;
+        if (this.scene.textures.exists(key)) this.scene.textures.remove(key);
+        const face = this.scene.make.graphics({ x: 0, y: 0 });
+        drawMoveCoin(face, move, 25, 25, 25, flash);
+        const handKey = `move-hand-${move}`;
+        const hasHand = this.scene.textures.exists(handKey);
+        const hand = this.scene.make.image({
+          x: 25,
+          y: 25,
+          key: hasHand ? handKey : Tex.pickChips,
+          frame: hasHand ? undefined : move,
+          add: false,
+        });
+        if (!hasHand) hand.setScale(2);
+        const texture = this.scene.add.renderTexture(0, 0, 51, 51).setVisible(false);
+        texture.draw(face).draw(hand).saveTexture(key);
+        face.destroy();
+        hand.destroy();
+        texture.destroy();
+      }
+    }
   }
 
   /** The badges pop in beside the fighters. */
-  present(picks: Record<Side, Move>, autoPicked: Record<Side, boolean>): void {
+  present(picks: Record<Side, Move>): void {
     const r = tuning.reveal;
     this.hide();
     this.moves = picks;
     for (const side of SIDES) {
       const badge = this.badges[side]
-        .setFrame(`${picks[side]}-flash`)
+        .setTexture(`attack-coin-${picks[side]}-flash`)
         .setPosition(this.home[side], r.badgeY - r.badgePopFromPx)
         .setAngle(0)
+        .setScale(1)
+        .setDepth(6)
         .setVisible(true);
-      this.autos[side].setVisible(autoPicked[side]);
-      this.owners[side].setVisible(true);
-      this.follow(side, this.home[side], r.badgeY - r.badgePopFromPx);
-      this.tween(badge, { y: r.badgeY }, r.badgePopMs, 'Back.easeOut', () =>
-        this.follow(side, badge.x, badge.y),
-      );
-      this.scene.time.delayedCall(r.flashMs, () => badge.setFrame(`${picks[side]}-normal`));
+      this.tween(badge, { y: r.badgeY }, r.badgePopMs, 'Back.easeOut');
+      this.scene.time.delayedCall(r.flashMs, () => badge.setTexture(`attack-coin-${picks[side]}-normal`));
     }
   }
 
-  /** The owner's name sits over its badge, wherever the badge is (until the collision hides it). */
-  private follow(side: Side, x: number, y: number): void {
-    this.owners[side].setAnchorX(snap(x)).setY(snap(y) - BADGE_HALF - tuning.reveal.ownerGapPx);
-  }
-
-  /** Both badges fly to the middle, arriving (touching) after `ms`. */
+  /** Pull back and aim inward, then accelerate hard into contact within the same impact window. */
   fly(ms: number): void {
     const r = tuning.reveal;
+    const windupMs = Math.min(r.coinWindupMs, ms * 0.6);
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     for (const side of SIDES) {
-      this.autos[side].setVisible(false);
-      const x = this.centre + (side === 'p1' ? -CONTACT_PX : CONTACT_PX);
+      const direction = side === 'p1' ? 1 : -1;
+      const x = this.centre - direction * CONTACT_PX;
       const badge = this.badges[side];
-      this.tween(badge, { x, y: r.clashY }, ms, 'Quad.easeIn', () => this.follow(side, badge.x, badge.y));
+      if (reduced) {
+        badge.setAngle(direction * r.coinTurnDegrees);
+        this.tween(badge, { x, y: r.clashY }, ms, 'Cubic.easeIn');
+        continue;
+      }
+      this.startTrail(side);
+      this.scene.tweens.add({
+        targets: badge,
+        x: badge.x - direction * r.coinPullbackPx,
+        angle: direction * (r.coinTurnDegrees + r.coinWindupTiltDegrees),
+        scaleX: 1.12,
+        scaleY: 0.92,
+        duration: windupMs,
+        ease: 'Sine.easeOut',
+        onComplete: () => {
+          badge.setAngle(direction * r.coinTurnDegrees);
+          const startX = badge.x;
+          const startY = badge.y;
+          const launch = { t: 0 };
+          this.flights.push(
+            this.scene.tweens.add({
+              targets: launch,
+              t: 1,
+              duration: ms - windupMs,
+              ease: 'Quart.easeIn',
+              onUpdate: () => {
+                const t = launch.t;
+                badge.setPosition(
+                  snap(startX + (x - startX) * t),
+                  snap(startY + (r.clashY - startY) * t - Math.sin(Math.PI * t) * r.coinArcPx),
+                );
+                badge.setAngle(direction * r.coinTurnDegrees);
+                badge.setScale(1.12 + 0.08 * t, 0.92 - 0.04 * t);
+              },
+            }),
+          );
+        },
+      });
     }
+  }
+
+  private startTrail(side: Side): void {
+    const direction = side === 'p1' ? 1 : -1;
+    const color = moveColors[this.moves[side]].main;
+    const trail = this.scene.add
+      .particles(0, 0, 'coin-spark-pixel', {
+        lifespan: tuning.reveal.coinTrailLifeMs,
+        frequency: tuning.reveal.coinTrailFrequencyMs,
+        quantity: 9,
+        speedX: { min: -direction * 75 - 45, max: -direction * 75 + 45 },
+        speedY: { min: -60, max: 60 },
+        scale: { start: 3.2, end: 0 },
+        alpha: { start: 1, end: 0 },
+        tint: [color, color, 0xfff1ce],
+        follow: this.badges[side],
+        followOffset: { x: -direction * 18, y: 0 },
+      })
+      .setDepth(5);
+    this.trails.push(trail);
+    this.effects.push(trail);
+  }
+
+  private impactBurst(): void {
+    const r = tuning.reveal;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const colors = [0xffffff, 0xffefae, moveColors[this.moves.p1].main, moveColors[this.moves.p2].main];
+    const sparks = this.scene.add
+      .particles(this.centre, r.clashY, 'coin-spark-pixel', {
+        emitting: false,
+        lifespan: reduced ? 180 : r.coinImpactLifeMs,
+        speed: { min: 45, max: reduced ? 65 : 300 },
+        angle: { min: 0, max: 360 },
+        gravityY: 75,
+        scale: { start: reduced ? 1.7 : 4, end: 0 },
+        alpha: { start: 1, end: 0 },
+        tint: colors,
+      })
+      .setDepth(8);
+    sparks.explode(reduced ? 8 : r.coinImpactParticles);
+    this.effects.push(sparks);
+    if (reduced) return;
+    const ring = this.scene.add.graphics().setDepth(9);
+    this.effects.push(ring);
+    const wave = { t: 0 };
+    this.paths.push(
+      this.scene.tweens.add({
+        targets: wave,
+        t: 1,
+        duration: r.coinShockwaveMs,
+        ease: 'Quad.easeOut',
+        onUpdate: () => {
+          const radius = Math.round(5 + wave.t * 76);
+          ring.clear().lineStyle(wave.t < 0.3 ? 7 : 3, 0xfff4d7, 1 - wave.t);
+          ring.strokeCircle(this.centre, r.clashY, radius);
+          ring.lineStyle(3, 0xff9c35, (1 - wave.t) * 0.85);
+          ring.strokeCircle(this.centre, r.clashY, Math.round(radius * 0.7));
+          if (wave.t < 0.45) {
+            ring.fillStyle(0xffffff, 1 - wave.t / 0.45);
+            ring.fillRect(this.centre - 5, r.clashY - 40, 10, 80);
+            ring.fillRect(this.centre - 48, r.clashY - 5, 96, 10);
+          }
+        },
+        onComplete: () => ring.clear(),
+      }),
+    );
   }
 
   /** The collision: a white flash, then the loser is knocked away (or both bounce on a tie). */
   collide(outcome: ExchangeOutcome): void {
     const r = tuning.reveal;
+    this.flights.forEach((flight) => flight.stop());
+    this.flights = [];
+    this.trails.forEach((trail) => trail.stop());
+    this.impactBurst();
     for (const side of SIDES) {
-      const badge = this.badges[side];
-      badge.setFrame(`${this.moves[side]}-flash`);
-      this.scene.time.delayedCall(r.flashMs, () => badge.setFrame(`${this.moves[side]}-normal`));
+      this.scene.tweens.killTweensOf(this.badges[side]);
+      const badge = this.badges[side].setScale(1).setAngle((side === 'p1' ? 1 : -1) * r.coinTurnDegrees);
+      badge.setTexture(`attack-coin-${this.moves[side]}-flash`);
+      this.scene.time.delayedCall(r.flashMs, () =>
+        badge.setTexture(`attack-coin-${this.moves[side]}-normal`),
+      );
     }
-    for (const side of SIDES) this.owners[side].setVisible(false);
     if (outcome.kind === 'tie') {
       for (const side of SIDES) {
         const out = side === 'p1' ? -1 : 1;
@@ -138,7 +247,6 @@ export class ClashView {
           'Quad.easeOut',
         );
       }
-      this.slamVerdict('CLASH!', palette.lilac, 'NO DAMAGE', 'below');
       return;
     }
     const winner = this.badges[outcome.winner];
@@ -163,22 +271,16 @@ export class ClashView {
         onComplete: () => loser.setVisible(false),
       }),
     );
-    const won = outcome.picks[outcome.winner];
-    const lost = outcome.picks[outcome.loser];
-    const hit =
-      outcome.winner === this.me ? `${this.labels[this.me]} HIT!` : `${this.labels[outcome.winner]} HITS!`;
-    this.slamVerdict(hit, sideColors[outcome.winner], `${won} BEATS ${lost}`, 'above');
   }
 
-  /** "-15" in red hops up off the loser's head, then falls. */
+  /** Menu-sized damage fades in above the fighter and drifts gently downward. */
   showDamage(loser: Side, amount: number): void {
     const r = tuning.reveal;
-    const y = STAGE.floorY - 80;
+    const y = STAGE.floorY - r.damageAboveFloorPx;
+    for (const layer of this.damageLayers) layer.setText(`-${amount}`);
     this.damage
-      .setText(`-${amount}`)
-      .setColor(palette.red)
-      .setAnchorX(STAGE.fighterX[loser] + (loser === 'p1' ? -10 : 10))
-      .setY(y)
+      .setPosition(STAGE.fighterX[loser] + (loser === 'p1' ? -10 : 10), y)
+      .setAlpha(0)
       .setVisible(true);
     const drop = { t: 0 };
     this.paths.push(
@@ -188,57 +290,28 @@ export class ClashView {
         duration: r.damageFallMs,
         ease: 'Linear',
         onUpdate: () => {
-          // a small hop, then gravity: a parabola that ends damageFallPx below the start
+          // Short downward drift: fade in at the top, hold, then soften away.
           const t = drop.t;
-          const hop = r.damageHopPx;
-          const fall = r.damageFallPx;
-          const v = 2 * (hop + Math.sqrt(hop * (hop + fall)));
-          this.damage.setY(snap(y - v * t + (v - fall) * t * t));
+          this.damage.setY(snap(y + r.damageFallPx * t));
+          this.damage.setAlpha(t < 0.18 ? t / 0.18 : t > 0.65 ? (1 - t) / 0.35 : 1);
         },
       }),
     );
   }
 
   hide(): void {
+    this.flights.forEach((flight) => flight.stop());
+    this.flights = [];
     this.paths.forEach((t) => t.stop());
     this.paths = [];
+    this.effects.forEach((effect) => effect.destroy());
+    this.effects = [];
+    this.trails = [];
     for (const side of SIDES) {
       this.scene.tweens.killTweensOf(this.badges[side]);
-      this.badges[side].setVisible(false).setAngle(0);
-      this.autos[side].setVisible(false);
-      this.owners[side].setVisible(false);
+      this.badges[side].setVisible(false).setAngle(0).setScale(1);
     }
-    this.scene.tweens.killTweensOf(this.verdict);
-    this.scene.tweens.killTweensOf(this.rule);
-    this.verdict.setVisible(false);
-    this.rule.setVisible(false);
     this.damage.setVisible(false);
-  }
-
-  /**
-   * The big line ("YOU HIT!", "CLASH!") and a small one: the rule above it, slammed in first with
-   * the big line a beat later; or a note below it ("NO DAMAGE"), slammed in a beat after.
-   */
-  private slamVerdict(big: string, color: number, small: string, where: 'above' | 'below'): void {
-    const r = tuning.reveal;
-    const [first, firstY, second, secondY] =
-      where === 'above'
-        ? ([this.rule, r.ruleY, this.verdict, r.verdictY] as const)
-        : ([this.verdict, r.ruleY, this.rule, r.ruleY + 16] as const);
-    this.verdict.setText(big).setColor(color);
-    this.rule.setText(small).setColor(where === 'above' ? color : palette.text);
-    this.slam(first, firstY);
-    this.paths.push(
-      this.scene.tweens.addCounter({
-        duration: r.hitLineDelayMs,
-        onComplete: () => this.slam(second, secondY),
-      }),
-    );
-  }
-
-  private slam(text: PixelText, y: number): void {
-    text.setY(y - 24).setVisible(true);
-    this.tween(text, { y }, tuning.banner.slamMs, 'Back.easeOut');
   }
 
   private tween(

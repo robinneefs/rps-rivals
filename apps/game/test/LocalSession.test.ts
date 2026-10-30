@@ -27,6 +27,30 @@ function setup(seed = 3) {
 }
 
 describe('LocalSession', () => {
+  it('auto-picks Rock for the local Anchor when the player lets the timer expire', () => {
+    const clock = new FakeClock();
+    const session = new LocalSession(
+      defaultRules,
+      timings,
+      clock,
+      seededRng(7),
+      {
+        onPickingStarted: (_context, submit) => submit('scissors'),
+        cancel: () => {},
+      },
+      { p1: 'anchor', p2: 'riot' },
+    );
+    const reveals: SessionEvents['reveal'][] = [];
+    session.on('reveal', (event) => reveals.push(event));
+    session.ready();
+    clock.advance(timings.roundIntroMs + timings.pickMs);
+    expect(reveals[0]).toMatchObject({
+      picks: { p1: 'rock', p2: 'scissors' },
+      autoPicked: { p1: true, p2: false },
+      outcome: { kind: 'win', winner: 'p1', damage: 50 },
+    });
+    session.dispose();
+  });
   it('cycles through every stage on rematch without consecutive repeats', () => {
     const { session } = setup();
     const stages = [stageFor(session.stageSeed()).id];

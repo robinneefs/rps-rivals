@@ -1,5 +1,27 @@
 # RPS Rivals: Project Context
 
+## Current state — approved combat UI integrated (2026-10-30)
+
+- User approved the reviewed combat visuals and requested integration into normal gameplay, followed by committing all pending changes and pushing to main. This supersedes the historical 29 October handoff below.
+- v6 embossed pictograms and the generated K.O. now load through BootScene from public/assets/combat. The review harness uses the same assets as normal gameplay. All studies remain under art/ui/.
+- Shared presentation includes the revised HUD and countdown, coin ticks, continuous countdown sound, red FIGHT lettering, 2.8-second round intros, inward-facing arcing coin attacks, intense trails/impact effects, tie CRT pulse and larger gold damage numbers with a short downward fade. Results use YOU/CPU/RIVAL labels. K.O. sits above the fighters at native y=42.
+- Settings defaults already match the request: CRT true, pixelPerfect false, vibration true, muted false. Existing saved preferences are not reset.
+- The preview resets camera scroll before holding a frame to avoid freezing midway through shake. Health-bar corner geometry is mirrored.
+- Validation: 186 unit tests, lint, typecheck, build and focused CPU-match browser smoke pass. Full browser suite: 4 pass, 12 fail (navigation/timing/base URL assumptions). Repository-wide formatting is also not green, including many historical generated study files. Do not claim full release verification.
+- Pushing main triggers staging publication; production release/version bump is not requested. Broader device, online presentation and release-checklist checks remain open.
+
+## Anchor timeout exception (2026-10-29)
+
+- User requested that Anchor always auto-pick Rock when the picking timer expires without a submitted move. Taiko and Riot retain random timeout picks; manually submitted Anchor moves remain unchanged.
+- Implemented in the shared referee using the side-specific timeout profile bound by rulesForFighters. LocalSession and the authoritative online MatchRoom both use that binding. AUTO reporting stays intact. Updated server code is required for this behavior in deployed online matches; no deployment performed.
+- Validation: 186 unit tests pass, including both Anchor sides, mirror/manual-pick behavior, local CPU and two-client online transport coverage; full lint/typecheck and production build pass. Existing bundle-size advisory remains.
+
+## Round-loop UI review preview (2026-10-28)
+
+- User requested a preview of every step of the RPS round loop to review UI changes point by point. Development-only entry: `?roundReview&beat=0`; local preview at http://127.0.0.1:5300/?roundReview&beat=0.
+- Nineteen numbered beats cover round intro, FIGHT, picking, own/opponent lock-in, AUTO, reveal, flight/wind-up, collision, damage, clash, recovery, next exchange, lethal hit, K.O., next/final round and victory/defeat. Each plays into a held frame with Previous/Next/Replay controls and a shareable beat index.
+- Uses the real FightScene/FightDirector and existing result screen with scripted review fixtures. Subsequent shared-view/director changes affect normal gameplay too; the generated hand textures are still review-only. This is a review aid, not completion or acceptance of the combat visual makeover.
+
 ## CRT completed and accepted (2026-10-28)
 
 - User confirmed the CRT control panel and CRT fine tuning are complete and requested pushing the changes. This supersedes earlier CRT next-chat/open-task notes.

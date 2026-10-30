@@ -30,7 +30,7 @@ export interface PhaseTimings {
 }
 
 export const defaultTimings: PhaseTimings = {
-  roundIntroMs: 1600,
+  roundIntroMs: 2800,
   pickMs: 3000,
   revealMs: 1800,
   roundOverMs: 2200,

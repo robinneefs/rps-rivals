@@ -23,6 +23,7 @@ import type { MatchSession, MatchSetup } from '../session/MatchSession';
 export class FightScene extends Phaser.Scene {
   private fight!: FightData;
   private hud!: HudView;
+  private tags!: TagView;
   /** The last whole second shown on the timer, for the countdown ticks. */
   private lastSecs = 0;
 
@@ -32,6 +33,7 @@ export class FightScene extends Phaser.Scene {
 
   init(data: FightData): void {
     this.fight = data;
+    this.lastSecs = 0;
   }
 
   create(): void {
@@ -63,8 +65,8 @@ export class FightScene extends Phaser.Scene {
         p2: characterPresentation(session.fighters.p2).name,
       },
     );
-    const clash = new ClashView(this, names, session.me);
-    const banner = new BannerView(this, 90);
+    const clash = new ClashView(this);
+    const banner = new BannerView(this, 90, 62);
     /** Online, the rival left or the connection dropped: the match is over without a result. */
     let endedEarly = false;
 
@@ -74,7 +76,6 @@ export class FightScene extends Phaser.Scene {
       { fighters, clash, hud, banner, tags },
       audio,
       session.rules.roundsToWin,
-      names,
       {
         clearPick: () => lights.select(null),
         versusIntro: Boolean(this.fight.versus),
@@ -128,6 +129,7 @@ export class FightScene extends Phaser.Scene {
       lights.select(null);
     });
     this.hud = hud;
+    this.tags = tags;
     if (session.endedReason)
       // create() runs before the scene becomes active; report after its first update.
       this.time.delayedCall(0, () =>
@@ -139,9 +141,10 @@ export class FightScene extends Phaser.Scene {
   override update(): void {
     const view = this.fight.session.snapshot();
     this.hud.setTimer(view.phase === 'picking' ? view.msLeft : null);
-    // a tick for each of the last seconds, higher as time runs out (quiet once you've picked)
+    // Keep each countdown beat audible, including after the local move is locked.
     const secs = view.phase === 'picking' ? Math.ceil(view.msLeft / 1000) : 0;
-    if (secs !== this.lastSecs && secs > 0 && view.msLeft <= tuning.hud.timerWarnMs && !view.myPick)
+    if (secs !== this.lastSecs && secs > 0) this.tags.tick();
+    if (secs !== this.lastSecs && secs > 0 && view.msLeft <= tuning.hud.timerWarnMs)
       getContext(this).audio.play('tick', { detune: (tuning.hud.timerWarnMs / 1000 - secs) * 200 });
     this.lastSecs = secs;
   }

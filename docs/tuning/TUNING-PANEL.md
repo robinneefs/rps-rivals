@@ -1,5 +1,15 @@
 # Tuning panel
 
+## Current development tools (29 October 2026)
+
+The default dev panel is now **Effects Studio**, toggled with **F4**. Its CRT controls, presets, persisted settings and one-shot effects playground are complete and accepted. The older all-values Tweakpane documented below is available with `?legacyTuning`; its backquote toggle still applies to that panel.
+
+The current combat UI work uses `?roundReview&beat=0` (local preview: http://127.0.0.1:5300/?roundReview&beat=0). It provides 19 selectable real-game beats, held frames, Replay/Previous/Next and Try Rock/Paper/Scissors controls. The `beat` parameter is zero-based. Effects Studio is omitted on this review route. This visual harness is not a complete pacing editor or an authoritative referee match.
+
+Current presentation controls in `tuning.ts` include `banner.fightHoldMs` (350), `banner.afterFightMs` (250), `identity.introFlickerMs` (60), `identity.circlePopMs` (280), `hud.pickPromptFlickerMs` (1600), and the `hud.pickBounce*` wave parameters. FIGHT is scheduled inside the round introduction so the pause does not consume picking time. YOU stays steady while its arrow flickers. Reduced-motion mode suppresses these new flickers/bounces/pops.
+
+See [current handoff](../checkpoints/2026-10-29-round-loop-handoff.md) for selected hand artwork and preview-only limitations. The sections below describe the legacy tuning panel.
+
 A small panel that sits over the game while you play and lets you change every feel value, the match rules and the phase timings with sliders, without editing code. It is for the game-feel pass. It exists only when the game runs with `npm run dev`; the online build does not include it.
 
 ![Where the panel sits: top-right corner, next to the cabinet](../screenshots/browser-tuning-panel.png)

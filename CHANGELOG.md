@@ -2,6 +2,16 @@
 
 Every build that goes online gets a new version number (in `apps/game/package.json`, shown small on the home screen) and an entry here. Version numbers follow semver: a new feature bumps the middle number (1.0.0 → 1.1.0), a fix-only build bumps the last (1.0.0 → 1.0.1). Each version that goes live is tagged `vX.Y.Z` with a GitHub release, made automatically from its entry here when it reaches the `production` branch.
 
+## Unreleased — staging update (2026-10-30)
+
+- Integrated approved v6 embossed hand pictograms and generated K.O. lettering into normal gameplay. Preserved all studies and the 19-beat development review harness.
+- Revised the gold HUD, larger countdown dial, synchronized coin ticks, persistent countdown audio, picking prompt and local-player marker. Round openings now last 2.8 seconds with red-highlighted FIGHT lettering and a 350ms clear pause; picking still allows three full seconds.
+- Attack coins pull back, rotate inward and arc into an accelerating collision with intense trails, sparks and shockwaves. They return to their round shape at impact. Ties trigger a one-shot CRT burst; redundant attack text is removed.
+- Raised damage numbers use larger menu lettering with a gold gradient and a short downward fade. Results identify YOU, CPU or RIVAL instead of the fighter's name.
+- Anchor always auto-picks Rock on timeout; manual picks and other fighters' random fallbacks are preserved. The shared server rules are included.
+- Confirmed fresh-install defaults: CRT on, pixel perfect off, haptics on, sound on. Saved player preferences remain respected.
+- Validation: 186 unit tests, lint, typecheck, production build and focused CPU-match browser smoke pass. The full 16-test browser suite has 12 failures involving older navigation/timing assumptions and missing base URL configuration; repository-wide formatting also reports existing source/generated-study issues. These wider checks are not green.
+
 ## 2.2.0 (2026-10-25)
 
 - **New marquee.** Fresh marquee art with Taiko, Anchor and Riot beside the flame-lettered RPS RIVALS title. It now fills the whole marquee window: before, the art was a little too short, so a strip of the cabinet's empty marquee showed underneath it.

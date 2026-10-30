@@ -1,5 +1,13 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { defaultRules as gameRules, Referee, seededRng, type PhaseTimings, type RefereeEvents } from '../src';
+import {
+  defaultRules as gameRules,
+  Referee,
+  rulesForFighters,
+  seededRng,
+  type Fighters,
+  type PhaseTimings,
+  type RefereeEvents,
+} from '../src';
 import { FakeClock } from './fakeClock';
 
 const timings: PhaseTimings = { roundIntroMs: 1000, pickMs: 5000, revealMs: 2000, roundOverMs: 3000 };
@@ -24,6 +32,38 @@ function setup(rules = defaultRules, seed = 1) {
 }
 
 describe('Referee', () => {
+  it.each(['p1', 'p2'] as const)(
+    'always auto-picks Rock for Anchor on %s, keeping other fighters random',
+    (side) => {
+      const fighters: Fighters = { p1: 'taiko', p2: 'riot' };
+      fighters[side] = 'anchor';
+      const other = side === 'p1' ? 'p2' : 'p1';
+      const otherMoves = new Set<string>();
+      for (let seed = 1; seed <= 24; seed++) {
+        const s = setup(rulesForFighters(defaultRules, fighters), seed);
+        s.referee.start();
+        s.clock.advance(timings.roundIntroMs + timings.pickMs);
+        const reveal = s.log.reveal[0]!;
+        expect(reveal.picks[side]).toBe('rock');
+        expect(reveal.autoPicked).toEqual({ p1: true, p2: true });
+        otherMoves.add(reveal.picks[other]);
+        s.referee.dispose();
+      }
+      expect(otherMoves).toEqual(new Set(['rock', 'paper', 'scissors']));
+    },
+  );
+
+  it('keeps manual Anchor picks and auto-picks Rock for the other Anchor in a mirror match', () => {
+    const s = setup(rulesForFighters(defaultRules, { p1: 'anchor', p2: 'anchor' }));
+    s.referee.start();
+    s.clock.advance(timings.roundIntroMs);
+    s.referee.submitPick('p1', 'paper');
+    s.clock.advance(timings.pickMs);
+    expect(s.log.reveal[0]).toMatchObject({
+      picks: { p1: 'paper', p2: 'rock' },
+      autoPicked: { p1: false, p2: true },
+    });
+  });
   let t: ReturnType<typeof setup>;
   beforeEach(() => {
     t = setup();

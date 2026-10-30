@@ -26,6 +26,16 @@ export const tuning = {
     badgeY: 102,
     clashY: 96,
     flyAtMs: 300,
+    coinWindupMs: 180,
+    coinPullbackPx: 12,
+    coinTurnDegrees: 90,
+    coinWindupTiltDegrees: 18,
+    coinArcPx: 14,
+    coinTrailLifeMs: 340,
+    coinTrailFrequencyMs: 8,
+    coinImpactParticles: 140,
+    coinImpactLifeMs: 520,
+    coinShockwaveMs: 320,
     loserFlyMs: 480,
     loserSpinMs: 70,
     tieBouncePx: 14,
@@ -41,11 +51,12 @@ export const tuning = {
     hitLineDelayMs: 140,
     ownerGapPx: 10,
     /** The damage number hops up damageHopPx, then falls damageFallPx over damageFallMs. */
+    damageAboveFloorPx: 130,
     damageHopPx: 4,
-    damageFallPx: 22,
+    damageFallPx: 6,
     damageFallMs: 620,
     /** Fighters swing into their move at this point of the reveal... */
-    strikeAtMs: 420,
+    strikeAtMs: 620,
     /** ...and the hit lands here (the badges collide here too). */
     impactAtMs: 620,
     /** Back to idle (the reveal phase itself is timed by the referee). */
@@ -91,6 +102,11 @@ export const tuning = {
   dust: { count: 5, speedMin: 12, speedMax: 30, gravity: -20, lifeMs: 360, sizePx: 3 },
   /** HUD health animation and fixed-size timer. Ticks start at timerWarnMs; red from timerRedMs. */
   hud: {
+    pickBouncePx: 3,
+    pickPromptFlickerMs: 1600,
+    pickBounceMs: 360,
+    pickBounceStaggerMs: 140,
+    pickBounceCycleMs: 900,
     drainMs: 600,
     trailDelayMs: 120,
     lowHealth: 15,
@@ -131,13 +147,17 @@ export const tuning = {
   transitions: { closeMs: 120, lineMs: 80, offMs: 60, stepMs: 20 },
   /** Menus; the backdrop's diagonal stripes move one pixel every stripeStepMs. */
   menu: { cursorBlinkMs: 400, repeatDelayMs: 300, stripeStepMs: 90 },
-  banner: { slamMs: 180, holdMs: 900 },
+  banner: { slamMs: 180, holdMs: 900, fightHoldMs: 650, afterFightMs: 350 },
   /**
    * Who is who. Before round 1 a "YOU VS RIVAL" card holds for vsCardMs, then "ROUND 1" slams in.
    * A "YOU" / "RIVAL" tag with an arrow bobs over each fighter (by bobPx every bobMs) through the
    * first tagRounds rounds; at the start of the next round it blinks out (blinkTimes, blinkMs each).
    */
   identity: {
+    circlePopMs: 280,
+    coinTickPx: 2,
+    coinTickMs: 180,
+    introFlickerMs: 60,
     vsCardMs: 850,
     vsSlideMs: 220,
     tagRounds: 0,

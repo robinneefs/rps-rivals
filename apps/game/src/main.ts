@@ -146,7 +146,9 @@ if (import.meta.env.DEV) {
   if (new URLSearchParams(location.search).has('menuReview')) {
     void import('./dev/menuReview').then(({ mountMenuReview }) => mountMenuReview(game, flow));
   }
-  void import('./dev/effectsPanel').then(({ mountEffectsPanel }) => mountEffectsPanel(game, settings));
+  if (new URLSearchParams(location.search).has('roundReview'))
+    void import('./dev/roundReview').then(({ mountRoundReview }) => mountRoundReview(game));
+  else void import('./dev/effectsPanel').then(({ mountEffectsPanel }) => mountEffectsPanel(game, settings));
   if (new URLSearchParams(location.search).has('legacyTuning'))
     void import('./dev/tuningPanel').then(({ mountTuningPanel }) => {
       const pane = mountTuningPanel({

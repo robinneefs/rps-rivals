@@ -90,12 +90,14 @@ test('boots to the logo, the home menu, and plays an exchange against the CPU', 
 
   await untilScene(page, 'Home'); // the logo leaves on its own (about 2.7s)
 
-  await page.keyboard.press('Enter'); // START GAME (VS CPU)
+  await page.keyboard.press('ArrowUp'); // Online is selected initially; choose CPU.
+  await page.keyboard.press('Enter'); // PLAY VERSUS CPU
   await untilFight(page);
   expect(await scenes(page)).toContain('Fight');
+  // The approved versus entrance finishes before the round intro and FIGHT beat.
+  for (let t = 0; t < 6000 && (await phase(page)) !== 'roundIntro'; t += 50) await run(page, 50);
   expect(await phase(page)).toBe('roundIntro');
-
-  await run(page, 1800);
+  for (let t = 0; t < 4000 && (await phase(page)) !== 'picking'; t += 50) await run(page, 50);
   expect(await phase(page)).toBe('picking');
   await page.keyboard.press('Digit2'); // Scissors
   await run(page, 3000); // the pick countdown
