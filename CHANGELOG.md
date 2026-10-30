@@ -4,6 +4,8 @@ Every build that goes online gets a new version number (in `apps/game/package.js
 
 ## Unreleased — staging update (2026-10-30)
 
+- Documentation refresh: new README, screenshots of every screen and all five stages from the production build (`sources/screenshots/capture.mjs`, now WebP), a current-architecture section, and updated audio, tuning and store-listing notes.
+
 - Online match exits and disconnect recovery return to the main menu; Play Online always starts at the Online menu. Removed stale room-screen callbacks that could interrupt disconnect handling, and reconcile ended sessions after phone background/resume or focus.
 
 - Centre countdown digits using rendered ink bounds rather than platform-dependent font padding, fixing mobile alignment while preserving the typeface and tick animation.

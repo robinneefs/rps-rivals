@@ -1,18 +1,33 @@
 # Tuning panel
 
-## Current development tools (29 October 2026)
+## Current development tools (30 October 2026)
 
-The default dev panel is now **Effects Studio**, toggled with **F4**. Its CRT controls, presets, persisted settings and one-shot effects playground are complete and accepted. The older all-values Tweakpane documented below is available with `?legacyTuning`; its backquote toggle still applies to that panel.
+![Effects Studio beside a match on Sunset Harbor](../screenshots/browser-effects-studio.webp)
 
-The current combat UI work uses `?roundReview&beat=0` (local preview: http://127.0.0.1:5300/?roundReview&beat=0). It provides 19 selectable real-game beats, held frames, Replay/Previous/Next and Try Rock/Paper/Scissors controls. The `beat` parameter is zero-based. Effects Studio is omitted on this review route. This visual harness is not a complete pacing editor or an authoritative referee match.
+`npm run dev` opens the game with **Effects Studio** in the top-right corner; **F4** hides or shows it. It has two tabs:
 
-Current presentation controls in `tuning.ts` include `banner.fightHoldMs` (350), `banner.afterFightMs` (250), `identity.introFlickerMs` (60), `identity.circlePopMs` (280), `hud.pickPromptFlickerMs` (1600), and the `hud.pickBounce*` wave parameters. FIGHT is scheduled inside the round introduction so the pause does not consume picking time. YOU stays steady while its arrow flickers. Reduced-motion mode suppresses these new flickers/bounces/pops.
+- **CRT screen:** CRT on/off, presets (Balanced arcade, Clean glass, Warm tube, Worn arcade) and sliders for phosphor glow, gamma, colour fringe, texture pitch, scanlines, RGB mask, edge darkening, glass corners and the other CRT values. The accepted defaults live in `tuning.crt` (`apps/game/src/config/tuning.ts`).
+- **One-shot effects:** short CRT bursts (`fx/screenEffects.ts`) you can trigger over the running game and tune recipe by recipe.
 
-See [current handoff](../checkpoints/2026-10-29-round-loop-handoff.md) for selected hand artwork and preview-only limitations. The sections below describe the legacy tuning panel.
+Edits are saved in this browser (key `rps.effects-workbench.v1`), never in a file. To make a value the new default, write it into `tuning.ts` or `screenEffects.ts`.
+
+Other development routes:
+
+| URL | What it opens |
+| --- | --- |
+| `?roundReview&beat=0` | The 19-beat round review: every step of a round (intro, FIGHT, picking, lock-in, AUTO, reveal, collision, damage, clash, K.O., victory and more) on the real fight views, held, with Previous / Next / Replay and a shareable zero-based `beat` index. Effects Studio is hidden there. It is a visual review, not a referee-driven match |
+| `?menuReview=characters` | One screen directly: `online`, `create`, `join`, `characters`, `victory` (optionally `&fighter=anchor`, `&palette=alternate`), `win`, `loss`, or `stage&stage=<id>` |
+| `?stage=<id>` | Forces the stage of every match (also in production builds) |
+| `?legacyTuning` | The older all-values Tweakpane panel described below; the backquote key toggles it |
+
+Presentation timings for the round live in `tuning.ts` too, for example `banner.fightHoldMs`, `banner.afterFightMs`, `identity.*` and `hud.pickBounce*`. FIGHT is scheduled inside the round intro, so its pause never eats into picking time. Reduced-motion mode suppresses flickers, bounces and pops.
+
+## Legacy tuning panel (`?legacyTuning`)
+
+The rest of this guide describes the older panel. Its sections and buttons still work, but some value names and examples date from before the revamp.
 
 A small panel that sits over the game while you play and lets you change every feel value, the match rules and the phase timings with sliders, without editing code. It is for the game-feel pass. It exists only when the game runs with `npm run dev`; the online build does not include it.
 
-![Where the panel sits: top-right corner, next to the cabinet](../screenshots/browser-tuning-panel.png)
 
 ## Using it
 
@@ -20,7 +35,7 @@ A small panel that sits over the game while you play and lets you change every f
 
 ```sh
 npm install        # once, or after pulling (installs Tweakpane)
-npm run dev        # http://localhost:5173
+npm run dev        # then open http://localhost:5173/?legacyTuning
 ```
 
 The panel appears in the top-right corner. The backquote key (`` ` ``, left of 1) hides and shows it. Typing in the panel's number fields never reaches the game, so typing a 1 there doesn't pick Rock.
@@ -69,14 +84,14 @@ pickMs: 3000 (was 5000)
 5. Hide the panel for the final check, and try it again a little later with fresh eyes.
 6. When it feels right, press **Copy changes** and paste the note into the project thread. Claude writes the values into the code as the new defaults in the next version. You don't need to edit files yourself.
 
-Open questions to settle with it: a 5 or 3 second countdown (`pickMs`), and whether 100 start health is right (`startHealth`).
+Health and damage are now set per fighter (`CHARACTER_HEALTH` and `CHARACTER_DAMAGE` in `packages/core/src/characters.ts`), so the panel's `startHealth` and `damage` values no longer decide a match.
 
 ### Watch out for
 
 - The reveal animation plays inside the reveal phase. If you shorten `revealMs`, keep `reveal.recoverAtMs` and the hit timings below it, or the animation gets cut off.
 - Rules decide who wins, so changes there are balance changes, not just feel. With different damage values the best mix of moves shifts too (see "The mind game" in the README).
 - If the game seems off after a tuning session, press **Reset all to defaults**: old edits stay in effect until you do.
-- Rules and timings changes only apply to a new match (Restart match, or START GAME from the home menu). **Retry** on the result screen replays with the same rules as the match before.
+- Rules and timings changes only apply to a new match (Restart match, or PLAY VERSUS CPU from the home menu). **Rematch** on the result screen replays with the same rules as the match before.
 - Slider limits are picked from each value's name (milliseconds, pixels, health, counts). Typing a number in the field still works up to the limit. If a slider runs out of room, ask for it to be widened (see `rangeFor` below).
 
 ## How it is set up

@@ -8,7 +8,7 @@ Everything needed for the RPS Rivals store page on Google Play, in one place.
 | `forms.md` | Answers for every "Set up your app" form (content rating, data safety, ads, target audience...) | Policy > App content |
 | `icon-512.png` | App icon, 512x512 | Main store listing > App icon |
 | `feature-graphic.png` | Banner, 1024x500 | Main store listing > Feature graphic |
-| `screenshots/` | Six phone screenshots, 1080x1920, in the order to upload them | Main store listing > Phone screenshots |
+| `screenshots/` | Six phone screenshots, 1080x1920, in the order to upload them. **Still from the 1.x game**: retake them before submitting (the Android release is parked; `sources/play-store/capture.mjs` needs the same update as `sources/screenshots/capture.mjs`) | Main store listing > Phone screenshots |
 
 The privacy policy is a page of the game itself (`apps/game/public/privacy.html`), live at
 `https://robinneefs.github.io/rps-rivals/privacy.html`.

@@ -1,18 +1,83 @@
 # Architecture
 
-## Current implementation notes (29 October 2026)
+## Current architecture (v2 revamp, 30 October 2026)
 
-The detailed architecture below is a historical v0.11 snapshot. These current notes and the [round-loop handoff](../checkpoints/2026-10-29-round-loop-handoff.md) take precedence where it differs from the v2 code:
+This section describes the code as it is now. The longer reference further down is a v0.11 snapshot (11 October): its principles (four layers, the referee, sessions, menus as data, tuning in one place, the lint rules) still hold, but its sizes, scenes, rules values and file lists are out of date wherever they differ from this section.
 
-- The game monitor is a native **192 × 240** framebuffer. `CrtDisplay.ts` presents that framebuffer with nearest enlargement and a separate display-resolution CRT pass. New UI graphics/icons are drawn inside the native game raster.
-- `rulesForFighters` binds each selected character's health, damage and optional timeout move into match rules. `RulesConfig.autoPickBySide` fixes Anchor's missing pick to Rock; absent overrides keep the referee's random fallback. Both LocalSession and MatchRoom use this path; manual choices are not overwritten.
-- FightDirector schedules ROUND and FIGHT during `roundIntro`, leaving a 250ms clear pause before `picking`. Referee phase deadlines and the full picking allowance remain authoritative.
-- HudView/TagView/BannerView implement the in-progress HUD, player marker, prompt and coins. Hand art is currently loaded/processed only by the dev `roundReview.ts` harness, not production BootScene. The normal asset pipeline must be completed after final artwork acceptance.
-- `?roundReview&beat=N` mounts a development-only DOM review panel and scripted MatchSession fixtures around actual game views. It cannot replace referee tests or full CPU/online playtests. Effects Studio is the default dev panel; `?legacyTuning` retains the older all-values panel.
+### What changed since the v0.11 reference
+
+| Area | v0.11 reference | Now |
+|---|---|---|
+| Screen | One Phaser canvas drew the pixel cabinet and a 216 × 216 monitor | The cabinet is a painted HTML/CSS layer (`cabinet/CabinetView.ts`, `cabinet/geometry.ts`) with hit zones for the buttons and joystick. Phaser draws only the monitor: a native **192 × 240** framebuffer |
+| CRT | A camera shader on the native canvas | `fx/CrtDisplay.ts` nearest-enlarges the finished framebuffer into a separate WebGL canvas and runs the CRT pass (`fx/crt.ts`) at display resolution. Without WebGL, the native camera shader is the fallback |
+| Scaling | Fill height or Pixel perfect for the whole pixel cabinet | The cabinet fits the window. **Pixel perfect** (Options, off by default) picks the largest whole-device-pixel multiple of 192 × 240 and scales the cabinet around it |
+| Rules | One shared damage table (15/10/20) and 50 health | Per-fighter health and damage (`packages/core/src/characters.ts`), bound into the match rules for each side |
+| Flow | Home → Fight → Result | Home → Character select → Versus → Fight → Victory splash. How to Play was removed on 30 October |
+| Fighters | Two placeholder fighters, 64 px | Taiko, Riot and Anchor: nine-pose generated sheets in 160 px cells (about 100–114 px tall), with masked alternate palettes for mirror matches |
+| Stages | Three painted stages | Five animated stages, each with its own view, effects and music |
+| Online | No character choice | Protocol **4**: the server confirms both fighter choices, freezes the identities and plays per-side rules; disconnects and phone suspension are reconciled |
+
+### Code map (game client)
+
+```
+apps/game/src/
+├── main.ts       builds CabinetView, InputRouter, settings, the Phaser game, SceneFlow, audio, haptics; mounts the CRT display; loads dev/ in dev builds
+├── cabinet/      CabinetView (DOM cabinet, buttons, joystick, marquee, engraving) and its geometry
+├── config/       tuning.ts (feel), stages.ts, characters.ts (menu roster), fighterGeometry.ts, layout.ts, palette.ts, menuTypography.ts, online.ts
+├── scenes/       Boot, Logo, Home, Options, CharacterSelect, Lobby, Fight, Result, Transition + flow.ts, monitor.ts, watchSessionEnd.ts
+├── views/        FighterView, HudView, ClashView, BannerView, VersusView, VictoryView, StageView + Storm/Harbor/Courtyard/Foundry views, menu views
+├── fight/        FightDirector and choreography.ts (session events → the round's beats)
+├── fx/           CrtDisplay, crt, screenEffects (one-shot CRT bursts), shake, cabinetShake, flash, particles, koImpact, portraitBreathing
+├── session/      MatchSession, LocalSession, OnlineSession + socket, RandomCpu, PausableClock, createSession
+├── assets/       texture keys, alternate palettes and portraits, move-hand coins, pixel font, legacy placeholders
+├── audio/        AudioService and sounds.ts (effects and the six music tracks)
+├── platform/     settings.ts, haptics.ts, native.ts (Capacitor back button and app state)
+└── dev/          Effects Studio, round review, menu review, legacy tuning panel (dev builds only)
+```
+
+### Scenes and the flow
+
+| Scene | Draws |
+|---|---|
+| `BootScene` | Loads fighters, alternates, stages, combat art, menu art and audio, then starts the logo |
+| `LogoScene` | The Chain Shift intro (any button skips it) |
+| `HomeScene` | A random fighter's breathing portrait, the title, and PLAY VERSUS CPU / PLAY ONLINE / OPTIONS. Online is selected first when the build has a server address; without one it is greyed out |
+| `OptionsScene` | CRT SCREEN, PIXEL PERFECT, HAPTICS, SOUND, MUSIC, SFX, BACK |
+| `LobbyScene` | The Online menu, Create Room (shows a 4-letter code) and Join Room (code entry); hands the connected session to character select |
+| `CharacterSelectScene` | The three-portrait lineup with live stats, Confirm and Back. Online, both players lock in before the match starts |
+| `FightScene` | The stage, fighters, HUD, countdown, coins, banners and effects, driven by `FightDirector` |
+| `ResultScene` | The victory splash (the winner's portrait, YOU WIN or the opponent's win) with Rematch and Main menu, plus online notices |
+| `TransitionScene` | Screen wipes and the versus panels (`VersusView`), which slam together over the old screen and open onto the fight |
+
+`SceneFlow` (`scenes/flow.ts`) is still the one place screens change: `toLogo`, `toHome`, `toOptions`, `toLobby`, `toCharacterSelect`, `toFight`, `toResult`. It owns the session's lifetime, gates input during transitions, picks each screen's music (the fight's theme comes from its stage) and returns online players to the main menu after a match or a disconnect.
+
+### Rules and characters
+
+- `CHARACTER_HEALTH` and `CHARACTER_DAMAGE` in `packages/core/src/characters.ts`: Taiko 100 health and 25 / 25 / 25 damage (rock / paper / scissors), Riot 80 and 15 / 15 / 35, Anchor 120 and 50 / 5 / 5.
+- `rulesForFighters(rules, fighters)` binds `healthBySide`, `damageBySide` and `autoPickBySide` (Anchor's timeout pick is always Rock). `LocalSession` and the server's `MatchRoom` both use it, so local and online matches play the same rules.
+- Phase timings (`packages/core/src/config.ts`): round intro 2800 ms (ROUND, then FIGHT, then a short clear pause), picking 3000 ms, reveal 1800 ms, round over 2200 ms. Two rounds win the match.
+- The stage comes from `session.stageSeed()` (it changes every rematch, and online both players get the same one), or from `?stage=<id>`.
+
+### Online
+
+- `PROTOCOL_VERSION` is 4. Older clients are refused, so the browser build and the Worker must be deployed together.
+- The room seats host and guest, runs character confirmation, freezes both identities, waits for both clients' `ready`, then runs the referee. Picks stay secret until the reveal.
+- `OnlineSession` keeps a persistent `endedReason`. `watchSessionEnd` checks it on focus, visibility and every frame, so a notice missed while a phone was suspended still appears, and the player returns to the main menu. Stale connections are detected and the check also runs on focus.
+
+### Development tools
+
+- **Effects Studio** (`dev/effectsPanel.ts`, F4): CRT controls and presets plus one-shot screen effects, saved per device.
+- **Round review** (`?roundReview&beat=N`): 19 scripted beats of a round on the real fight views.
+- **Menu review** (`?menuReview=…`): opens a single screen directly.
+- **Legacy tuning panel** (`?legacyTuning`): the Tweakpane panel described in section 8.
+
+### Tests
+
+193 unit tests in 31 files (Vitest: rules, referee, characters, protocol, sessions, the server room, stages, audio, palettes, choreography, haptics, session-end handling) and the Playwright suites in `apps/game/e2e/` (`smoke`, `characterSelect`, `effects`, `onlineReturn`). The browser tests play full CPU matches and rematches, mirror matches and phone touch input, check menus, music and effects persistence, and script online exits and disconnects.
 
 ## Historical architecture reference
 
-_Status: describes the code as it is in v0.11.0 (2026-10-11), the last build before the 1.0 release. The core, the cabinet game, online play (section 10), audio, the dev tuning panel and the polish passes are built. Anything not built yet is marked **(planned)**. Change this document when the code or a decision changes._
+_Historical: describes the code as it was in v0.11.0 (2026-10-11). See [Current architecture](#current-architecture-v2-revamp-30-october-2026) for what has changed since. Kept as a design reference; when the code changes, update the current section above._
 
 How the RPS Rivals code is organised so that it stays readable as it grows: from a local game against a random CPU, to online play, to an Android app. It builds on the decisions in [`PROJECT_CONTEXT.md`](../../PROJECT_CONTEXT.md) (Phaser 3, TypeScript, Vite, Vitest, arcade cabinet layout, pixel perfect, polish as a core goal). Where online matches could be hosted for free is compared in [`ONLINE-OPTIONS.md`](ONLINE-OPTIONS.md).
 
