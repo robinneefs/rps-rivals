@@ -63,7 +63,7 @@ async function untilScene(page: Page, key: string, maxMs = 5000): Promise<void> 
   }
   for (let t = 0; t < maxMs && !(await scenes(page)).includes(key); t += 50) await run(page, 50);
   expect(await scenes(page)).toContain(key);
-  await run(page, 300);
+  await run(page, 600); // let the complete CRT wipe release its input guard
 }
 
 /** Follow the new cosmetic selection step, without skipping it in the game. */
@@ -77,6 +77,9 @@ async function untilFight(page: Page): Promise<void> {
     await run(page, 50);
   }
   await untilScene(page, 'Fight');
+  for (let t = 0; t < 6000 && (await phase(page)) !== 'roundIntro'; t += 50) await run(page, 50);
+  expect(await scenes(page)).not.toContain('Result');
+  expect(await phase(page)).toBe('roundIntro');
 }
 
 test('boots to the logo, the home menu, and plays an exchange against the CPU', async ({ page }) => {
@@ -85,7 +88,7 @@ test('boots to the logo, the home menu, and plays an exchange against the CPU', 
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
 
   await pausedClock(page);
-  await page.goto('http://localhost:5174/');
+  await page.goto('http://127.0.0.1:5174/');
   await untilScene(page, 'Logo'); // wait for the larger artwork preload, rather than a fixed delay
 
   await untilScene(page, 'Home'); // the logo leaves on its own (about 2.7s)
@@ -118,7 +121,7 @@ test('native Taiko and Riot assets load and a complete CPU match can be replayed
     if (response.ok()) assets.add(new URL(response.url()).pathname);
   });
   await pausedClock(page);
-  await page.goto('http://localhost:5174/');
+  await page.goto('http://127.0.0.1:5174/');
   await untilScene(page, 'Home');
   expect(assets.has('/assets/taiko.png')).toBe(true);
   expect(assets.has('/assets/taiko.json')).toBe(true);
@@ -126,10 +129,11 @@ test('native Taiko and Riot assets load and a complete CPU match can be replayed
   expect(assets.has('/assets/riot.json')).toBe(true);
   expect(assets.has('/assets/stages/rooftop-v2-192.png')).toBe(true);
   expect(assets.has('/assets/stages/rooftop-clouds-576.png')).toBe(true);
+  await page.keyboard.press('ArrowUp'); // CPU, from the default Online selection
   await page.keyboard.press('Enter');
   await untilFight(page);
   await run(page, 1800);
-  await page.keyboard.press('Backquote'); // hide the development tuning panel for the art capture
+  await page.keyboard.press('F4'); // hide the development tuning panel for the art capture
   await page.screenshot({ path: testInfo.outputPath('riot-in-game.png') });
   // Auto-picks exercise ties, hits, round transitions and the KO animation without changing rules.
   await untilScene(page, 'Result', 180_000);
@@ -149,7 +153,7 @@ test('layered home art loads, options wrap correctly, and returning home restore
     if (r.ok()) assets.add(new URL(r.url()).pathname);
   });
   await pausedClock(page);
-  await page.goto('http://localhost:5174/');
+  await page.goto('http://127.0.0.1:5174/');
   await untilScene(page, 'Home');
   for (const name of [
     'background-sheet.png',
@@ -161,11 +165,11 @@ test('layered home art loads, options wrap correctly, and returning home restore
   ])
     expect(assets.has(`/assets/menus/action/${name}`)).toBe(true);
   await run(page, 1800); // let the staggered entrance settle before the art capture
-  await page.keyboard.press('Backquote');
+  await page.keyboard.press('F4');
   await page.screenshot({ path: testInfo.outputPath('action-home.png') });
-  // Up wraps from the CPU choice to Options; returning must discard the old subscription/lock.
+  // Down selects Options from Online; returning must discard the old subscription/lock.
   for (let i = 0; i < 2; i++) {
-    await page.keyboard.press('ArrowUp');
+    await page.keyboard.press('ArrowDown');
     await page.keyboard.press('Enter');
     await untilScene(page, 'Options');
     await page.keyboard.press('Escape');
@@ -175,12 +179,13 @@ test('layered home art loads, options wrap correctly, and returning home restore
     await run(page, 300);
     expect(await scenes(page)).toContain('Home');
   }
+  await page.keyboard.press('ArrowUp');
   await page.keyboard.press('Enter');
   await untilFight(page);
   expect(errors).toEqual([]);
 });
 
-test('home entrance gives six light phone ticks, and skip/reduced-motion/vibration-off suppress them', async ({
+test('home entrance and skip remain silent on phones with reduced motion or haptics disabled', async ({
   browser,
 }) => {
   for (const mode of ['normal', 'skip', 'reduced', 'off'] as const) {
@@ -206,7 +211,7 @@ test('home entrance gives six light phone ticks, and skip/reduced-motion/vibrati
       if (off) localStorage.setItem('rps-fighter.settings', JSON.stringify({ vibration: false }));
     }, mode === 'off');
     await pausedClock(page);
-    await page.goto('http://localhost:5174/');
+    await page.goto('http://127.0.0.1:5174/');
     await expect
       .poll(
         async () => {
@@ -220,25 +225,26 @@ test('home entrance gives six light phone ticks, and skip/reduced-motion/vibrati
     await page.keyboard.press('Digit1');
     await untilScene(page, 'Home');
     if (mode === 'skip') {
+      await page.keyboard.press('ArrowUp');
       await page.keyboard.press('Enter');
       await untilFight(page);
     }
     await run(page, 1800);
     const buzzes = await page.evaluate(() => window.__homeBuzzes);
-    expect(buzzes).toHaveLength(mode === 'normal' ? 6 : 0);
-    if (mode === 'normal') expect(buzzes.every((p) => p.length === 1 && p[0] === 12)).toBe(true);
+    // Home's current entrance is visual only; it must not vibrate the phone.
+    expect(buzzes).toEqual([]);
     await ctx.close();
   }
 });
 
 test('the build shows the version from package.json', async ({ page }) => {
-  await page.goto('http://localhost:5174/');
+  await page.goto('http://127.0.0.1:5174/');
   expect(await page.evaluate(() => window.__rps.version)).toBe(pkg.version);
 });
 
 test('the logo can be skipped with any button', async ({ page }) => {
   await pausedClock(page);
-  await page.goto('http://localhost:5174/');
+  await page.goto('http://127.0.0.1:5174/');
   await untilScene(page, 'Logo');
   await page.keyboard.press('Digit1');
   await untilScene(page, 'Home');
@@ -247,7 +253,7 @@ test('the logo can be skipped with any button', async ({ page }) => {
 test('buttons mashed while the game is still loading never freeze it', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto('http://localhost:5174/', { waitUntil: 'commit' });
+  await page.goto('http://127.0.0.1:5174/', { waitUntil: 'commit' });
   for (let i = 0; i < 40; i++) {
     await page.keyboard.press('Digit1');
     await page.waitForTimeout(50);
@@ -268,10 +274,10 @@ test('the cabinet fits an upright phone and its buttons work by touch', async ({
   });
   const page = await ctx.newPage();
   await pausedClock(page);
-  await page.goto('http://localhost:5174/');
+  await page.goto('http://127.0.0.1:5174/');
   await untilScene(page, 'Logo');
 
-  await page.keyboard.press('Backquote'); // development controls must not intercept monitor/cabinet taps
+  await page.keyboard.press('F4'); // development controls must not intercept monitor/cabinet taps
   // the whole screen and control panel are on the page
   const screen = await page.locator('#game').boundingBox();
   const rock = await page.locator('[data-button="rock"]').boundingBox();
@@ -279,7 +285,7 @@ test('the cabinet fits an upright phone and its buttons work by touch', async ({
   expect(screen!.x).toBeGreaterThanOrEqual(0);
   expect(screen!.x + screen!.width).toBeLessThanOrEqual(390);
   expect(rock!.y + rock!.height).toBeLessThanOrEqual(664 + 1);
-  const canvas = page.locator('#game canvas');
+  const canvas = page.locator('#game canvas').first();
   await expect(canvas).toHaveAttribute('width', '192');
   await expect(canvas).toHaveAttribute('height', '240');
   expect(await canvas.evaluate((el) => getComputedStyle(el).imageRendering)).toBe('pixelated');
@@ -296,6 +302,7 @@ test('the cabinet fits an upright phone and its buttons work by touch', async ({
   await untilScene(page, 'Options');
   await page.keyboard.press('Escape');
   await untilScene(page, 'Home');
+  await page.keyboard.press('ArrowUp'); // select CPU after returning Home
   await page.touchscreen.tap(rock!.x + rock!.width / 2, rock!.y + rock!.height / 2);
   await untilFight(page);
   await ctx.close();
@@ -305,27 +312,30 @@ test('music: the menu loop on home and the fight loop in a match', async ({ page
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await pausedClock(page);
-  await page.goto('http://localhost:5174/');
+  await page.goto('http://127.0.0.1:5174/');
   await untilScene(page, 'Logo');
   await page.keyboard.press('Digit1'); // skip the logo (also lets the browser play sound)
   await untilScene(page, 'Home');
   await run(page, 300);
   expect(await page.evaluate(() => window.__rps.music())).toBe('menu');
 
+  await page.keyboard.press('ArrowUp'); // CPU
   await page.keyboard.press('Enter'); // START GAME
   await untilFight(page);
   await run(page, 300);
-  expect(await page.evaluate(() => window.__rps.music())).toBe('fight');
+  expect(['fight', 'storm', 'harbor', 'courtyard', 'foundry']).toContain(
+    await page.evaluate(() => window.__rps.music()),
+  );
   expect(errors).toEqual([]);
 });
 
 test('ONLINE opens the lobby, and BACK returns home', async ({ page }) => {
   await pausedClock(page);
-  await page.goto('http://localhost:5174/');
+  await page.goto('http://127.0.0.1:5174/');
   await untilScene(page, 'Logo');
   await page.keyboard.press('Digit1'); // skip the logo
   await untilScene(page, 'Home');
-  await page.keyboard.press('ArrowDown'); // ONLINE (enabled in dev builds: local server address)
+  // Online is the default selection. (enabled in dev builds: local server address)
   await page.keyboard.press('Enter');
   await untilScene(page, 'Lobby');
   await page.keyboard.press('Escape');
@@ -336,11 +346,11 @@ test('JOIN ROOM takes letters by keyboard layout, and its code box is a real tex
   page,
 }) => {
   await pausedClock(page);
-  await page.goto('http://localhost:5174/');
+  await page.goto('http://127.0.0.1:5174/');
   await untilScene(page, 'Logo');
   await page.keyboard.press('Digit1');
   await untilScene(page, 'Home');
-  await page.keyboard.press('ArrowDown'); // ONLINE
+  // Online is the default selection.
   await page.keyboard.press('Enter');
   await untilScene(page, 'Lobby');
   await page.keyboard.press('ArrowDown'); // JOIN ROOM
@@ -371,11 +381,11 @@ test('JOIN ROOM takes letters by keyboard layout, and its code box is a real tex
 
 test('NEW ROOM is cancelled by any cabinet button, back to the lobby menu', async ({ page }) => {
   await pausedClock(page);
-  await page.goto('http://localhost:5174/');
+  await page.goto('http://127.0.0.1:5174/');
   await untilScene(page, 'Logo');
   await page.keyboard.press('Digit1');
   await untilScene(page, 'Home');
-  await page.keyboard.press('ArrowDown'); // ONLINE
+  // Online is the default selection.
   await page.keyboard.press('Enter');
   await untilScene(page, 'Lobby');
   await page.keyboard.press('Enter'); // CREATE ROOM

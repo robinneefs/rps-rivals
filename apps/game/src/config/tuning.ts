@@ -189,9 +189,9 @@ export const tuning = {
    * duty cycle, and texturePitch sets spacing in display pixels, above the game pixel raster.
    */
   crt: {
-    glow: 1.63,
+    glow: 1.8,
     /** Midtone lift after the scanline/mask loss; keeps black/white endpoints intact. */
-    gamma: 1,
+    gamma: 0.78,
     vignette: 0.61,
     cornerRadius: 0.06,
     roll: 0.15,
@@ -202,7 +202,7 @@ export const tuning = {
     scanlineAlpha: 0.2,
     phosphorMask: 0,
     /** Impact effects (on even with the CRT look off): colour split on a K.O., row warp on big hits. */
-    koSplitPx: 3,
+    koSplitPx: 6,
     koSplitMs: 900,
     bigHitWarpPx: 2,
     bigHitWarpMs: 260,

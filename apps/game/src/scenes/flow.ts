@@ -18,7 +18,6 @@ const SCENE_MUSIC: Record<string, MusicKey | null> = {
   [SceneKey.home]: 'menu',
   [SceneKey.options]: 'menu',
   [SceneKey.characterSelect]: 'menu',
-  [SceneKey.howTo]: 'menu',
   [SceneKey.lobby]: 'menu',
   // FightScene selects the theme from its actual seeded/overridden stage.
 };
@@ -43,7 +42,7 @@ export interface ResultData extends FightData {
 
 /**
  * The one place that changes screens: Logo -> Home -> Fight -> Result -> (Retry -> Fight | Home),
- * Home <-> Options, Home <-> How to play, and Home -> Lobby -> Fight for online matches.
+ * Home <-> Options, and Home -> Lobby -> Fight for online matches.
  * Scenes never start each other by key. Owns the current match session's lifetime.
  */
 export class SceneFlow {
@@ -77,10 +76,6 @@ export class SceneFlow {
 
   toOptions(): void {
     this.wipe(() => this.show(SceneKey.options));
-  }
-
-  toHowTo(): void {
-    this.wipe(() => this.show(SceneKey.howTo));
   }
 
   /** Online: create or join a room. The lobby hands its connected session to toFight. */

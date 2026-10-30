@@ -9,7 +9,7 @@ Before the final release of the new game version, review and address every outst
 ## Follow-ups
 
 - Current continuation: [29 October round-loop handoff](../checkpoints/2026-10-29-round-loop-handoff.md). User is reviewing actual-game previews point by point. HUD/intro/prompt/coins have been iterated; later combat beats and final acceptance remain open.
-- [ ] Finish selected v6 pictogram hand integration into production asset loading and agree later reveal/badge treatment. The current embossed hand coin textures are dev-review-only. v7/v8 were rejected in favour of v6; preserve all studies.
+- [x] Approved v6 hand pictograms integrated into normal gameplay on 30 October. Combat pacing/readability approved in the subsequent polish review; source studies preserved.
 - [x] Anchor always auto-picks Rock on timeout in shared local/online referee logic; manual choices stay valid and other fighters retain random timeout picks. Updated server code is not deployed yet.
 
 - [x] Alternate colours accepted: three masked combat atlases and three reference-generated alternate rest portraits installed, with final Taiko headband/wrist speck cleanup. Reviewed in actual game scenes. The subsequent CRT shader control panel is also complete.
@@ -24,4 +24,4 @@ Before the final release of the new game version, review and address every outst
 
 ## Marquee downscale trial
 
-The cabinet now uses `marquee-v4-1024.webp`: a 1024-pixel-wide Lanczos3 downscale of the existing 1466 × 322 marquee, encoded losslessly to avoid adding compression artifacts. The original remains available. Review the result at normal display size and on high-DPI displays before deciding whether further artwork cleanup is needed.
+Historical trial, superseded by approved marquee-v7.png (733 × 161) on 30 October. The cabinet previously used `marquee-v4-1024.webp`: a 1024-pixel-wide Lanczos3 downscale of the existing 1466 × 322 marquee, encoded losslessly to avoid adding compression artifacts. The original remains available. Review the result at normal display size and on high-DPI displays before deciding whether further artwork cleanup is needed.

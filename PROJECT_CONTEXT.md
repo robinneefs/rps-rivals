@@ -1,5 +1,18 @@
 # RPS Rivals: Project Context
 
+## Polish review decisions — 30 October 2026
+
+- User accepted combat pacing, exchange readability, and phone controls/layout in this chat. These are user-reported playtest results; no exhaustive device/stage matrix is implied.
+- Stronger K.O. colour split accepted: 6 native pixels, existing 900ms duration.
+- New marquee v7 accepted: Riot faces inward, Anchor has her tied-back dreadlock ponytail. Installed export is 733 × 161, cropped and resized proportionally. Sources/earlier studies are preserved under art/cabinet/marquee-v5 through v7.
+- Brighter CRT accepted: gamma 0.78, glow 1.8, original vignette 0.61. Screen-opening hairline masked; user approved the result.
+- How to Play removed by request; existing in-match guidance retained.
+- Keep the current random CPU and existing balance for this release. Additional single-player/CPU options may be explored later if the game gains traction.
+- User reported sound and background/resume behaviour looks good on 30 October; accepted for this polish review.
+- User deferred installable web app support to a future update; this release targets browser play.
+- User wants online playtesting LAST. It remains pending against this final candidate; earlier online results do not count as this final check.
+- Technical verification complete: 186 unit tests, all 16 browser checks (installed Chrome), lint, typecheck, formatting and production build pass. Browser checks cover CPU/rematch/mirrors, emulated phone touch, menus, music and effects persistence; they do not replace the pending two-player online playtest. Existing 1.66 MB minified / 403 KB gzip main-script advisory remains. Generated art studies and asset metadata are excluded from source-format checking; maintained code is formatted. User subsequently authorized committing and pushing all changes to main for weekend staging playtests. Production branch/version remain unchanged; main push triggers staging browser/server workflows.
+
 ## Current state — approved combat UI integrated (2026-10-30)
 
 - User approved the reviewed combat visuals and requested integration into normal gameplay, followed by committing all pending changes and pushing to main. This supersedes the historical 29 October handoff below.
@@ -62,7 +75,7 @@
 ## Courtyard distant smoke trial (2026-10-28)
 
 - User requested subtle smoke suggesting fires in the distant mountain buildings. Added two small cool-grey native-pixel plumes anchored at distant roof clusters (140,96 and123,107), slow8s rise/drift, maximum20% opacity, behind the foreground/lanterns/fighters. Existing scene clock/lifecycle; live reduced motion clears smoke immediately. Trial awaits visual feedback.
--176 tests, typecheck/lint passed; actual courtyard browser check confirmed10 moving puffs, zero reduced-motion puffs and no page errors. Existing courtyard preview URL unchanged.
+  -176 tests, typecheck/lint passed; actual courtyard browser check confirmed10 moving puffs, zero reduced-motion puffs and no page errors. Existing courtyard preview URL unchanged.
 
 ## Harbor water and frequent birds (2026-10-28)
 
@@ -170,13 +183,13 @@
 
 - Supersedes the earlier equal-HP rotating damage pass. Exact user values (HP/ROCK/PAPER/SCISSORS): Taiko100/25/25/25; Riot80/15/15/35; Anchor120/50/5/5. Taiko all-rounder, Riot fragile scissors specialist, Anchor rock tank. Shared phase/animation timings unchanged; no actual speed mechanic requested/added.
 - Authoritative characterHealth plus match-bound healthBySide now complement characterDamage/damageBySide. Initial health, each new round, rematches, online pre-phase snapshots, selection and per-side HUD maximums use actual character health. Protocol4 carries the new health rules; future client/server rollout must match. No package version bump or deployment.
--128 unit tests passed, including individual HP resets and CPU/server damage/rematches; all-workspace typecheck/full lint/build and3 Chrome selection/phone/full-match-rematch checks passed. Running5184 selection captures/state verified all exact values in `art/menus/character-values-v2/`. Alternate palette work remains deferred/discussion only.
+  -128 unit tests passed, including individual HP resets and CPU/server damage/rematches; all-workspace typecheck/full lint/build and3 Chrome selection/phone/full-match-rematch checks passed. Running5184 selection captures/state verified all exact values in `art/menus/character-values-v2/`. Alternate palette work remains deferred/discussion only.
 
 ## Distinct character damage implemented (2026-10-28)
 
 - User requested unique character values, followed by discussion of one alternate palette each. First tuning pass installed ROCK/PAPER/SCISSORS: Taiko15/10/20, Riot10/20/15, Anchor20/15/10; all HP50. Equal damage sums/health are a starting point, not a playtested balance claim.
 - Shared `CHARACTER_DAMAGE`, `characterStats`, `rulesForFighters` in core; RulesConfig carries authoritative characterDamage and match-bound damageBySide. CPU/server bind selected identities; pure exchange uses winning side's move damage. Selection reads the same authoritative roster values. Rematches retain profiles. Protocol3 prevents old shared-stat clients joining new rooms; package versions unchanged. Future client/server rollout must match; no deployment performed here.
--127 unit tests/17files passed, including all character/side/move combinations, CPU damage, real client-session/server damage and rematch. All-workspace typecheck/full lint/build and3 Chrome selection/phone/full-match-rematch checks passed. New core coverage `packages/core/test/characters.test.ts`; Anchor selection expected values updated.
+  -127 unit tests/17files passed, including all character/side/move combinations, CPU damage, real client-session/server damage and rematch. All-workspace typecheck/full lint/build and3 Chrome selection/phone/full-match-rematch checks passed. New core coverage `packages/core/test/characters.test.ts`; Anchor selection expected values updated.
 - Alternate palettes remain discussion only; no artwork changes in this pass.
 
 ## Victory splash integrated (2026-10-28)
@@ -441,24 +454,24 @@ This is the single source of truth for the project. **Any Claude working on this
 
 Same layout here and in the repository (the archive stays out of the repo):
 
-| Folder | What's in it |
-|---|---|
-| `PROJECT_CONTEXT.md` | This file |
-| `README.md` | Repository front page |
-| `docs/idea/` | Original idea brief |
-| `docs/design/` | Interactive design document (saved HTML) |
-| `docs/architecture/` | Architecture document (`ARCHITECTURE.md`, matched to the real code in v0.5.4), online hosting options (`ONLINE-OPTIONS.md`) and the diagrams (`diagrams/*.svg`) |
-| `docs/brand/` | Studio logo masters: Chain Shift white (the user's original) and purple |
-| `docs/tuning/` | Tuning panel guide (`TUNING-PANEL.md`): how to use the dev panel and how it is set up |
-| `docs/screenshots/` | Screenshots of the current build, browser and phone (recapture with `node sources/screenshots/capture.mjs`) |
-| `docs/mockups/redesign/` | Redesign mock-ups from the user (added v0.4.2, 2026-10-11), for the upcoming redesign: `mockups-game-1.png` (six cabinet screens: home, fighter select, fight, strike wins, K.O., online match), `mockups-game-2.png`, `mockups-characters-1.png` (one fighter in nine pixel-art styles), `mockups-characters-2.png` |
-| `docs/mockups/v2/` | v2 look references: `0-vibe-fight.webp` (cabinet and look), `7-key-art-poster.webp` (game poster, the target colour and energy), `8-characters-taiko-anchor-riot.webp` (the three fighters), and `VISUAL-DIRECTION.md` (the look and the fighters, read first for art) |
-| `docs/mockups/cabinet/` | Arcade cabinet mock-ups drawn before the build |
-| `docs/mockups/landscape-superseded/` | Old landscape mock-ups |
-| `docs/art-direction/` | Art direction samples (sizes, styles, body shapes) |
-| `sources/` | Code that draws the mock-ups, samples and diagrams (`landscape-mockup/`, `cabinet-mockup/`, `art-direction/`, `architecture/`) builds the interactive design document (`design-doc/`) and captures game screenshots (`screenshots/`) |
-| `config/` | Repo only: shared TypeScript settings (`tsconfig.base.json`) and the unit test setup (`vitest.config.ts`), moved out of the root in v0.4.1. Tool configs that editors and tools only look for in the root stay there: `package.json`, `package-lock.json`, `eslint.config.js`, `.gitignore`, `.prettierignore`. Prettier settings live in `package.json`. |
-| `archive/old-draft/` | Discarded first draft (not in the repo) |
+| Folder                               | What's in it                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PROJECT_CONTEXT.md`                 | This file                                                                                                                                                                                                                                                                                                                                                 |
+| `README.md`                          | Repository front page                                                                                                                                                                                                                                                                                                                                     |
+| `docs/idea/`                         | Original idea brief                                                                                                                                                                                                                                                                                                                                       |
+| `docs/design/`                       | Interactive design document (saved HTML)                                                                                                                                                                                                                                                                                                                  |
+| `docs/architecture/`                 | Architecture document (`ARCHITECTURE.md`, matched to the real code in v0.5.4), online hosting options (`ONLINE-OPTIONS.md`) and the diagrams (`diagrams/*.svg`)                                                                                                                                                                                           |
+| `docs/brand/`                        | Studio logo masters: Chain Shift white (the user's original) and purple                                                                                                                                                                                                                                                                                   |
+| `docs/tuning/`                       | Tuning panel guide (`TUNING-PANEL.md`): how to use the dev panel and how it is set up                                                                                                                                                                                                                                                                     |
+| `docs/screenshots/`                  | Screenshots of the current build, browser and phone (recapture with `node sources/screenshots/capture.mjs`)                                                                                                                                                                                                                                               |
+| `docs/mockups/redesign/`             | Redesign mock-ups from the user (added v0.4.2, 2026-10-11), for the upcoming redesign: `mockups-game-1.png` (six cabinet screens: home, fighter select, fight, strike wins, K.O., online match), `mockups-game-2.png`, `mockups-characters-1.png` (one fighter in nine pixel-art styles), `mockups-characters-2.png`                                      |
+| `docs/mockups/v2/`                   | v2 look references: `0-vibe-fight.webp` (cabinet and look), `7-key-art-poster.webp` (game poster, the target colour and energy), `8-characters-taiko-anchor-riot.webp` (the three fighters), and `VISUAL-DIRECTION.md` (the look and the fighters, read first for art)                                                                                    |
+| `docs/mockups/cabinet/`              | Arcade cabinet mock-ups drawn before the build                                                                                                                                                                                                                                                                                                            |
+| `docs/mockups/landscape-superseded/` | Old landscape mock-ups                                                                                                                                                                                                                                                                                                                                    |
+| `docs/art-direction/`                | Art direction samples (sizes, styles, body shapes)                                                                                                                                                                                                                                                                                                        |
+| `sources/`                           | Code that draws the mock-ups, samples and diagrams (`landscape-mockup/`, `cabinet-mockup/`, `art-direction/`, `architecture/`) builds the interactive design document (`design-doc/`) and captures game screenshots (`screenshots/`)                                                                                                                      |
+| `config/`                            | Repo only: shared TypeScript settings (`tsconfig.base.json`) and the unit test setup (`vitest.config.ts`), moved out of the root in v0.4.1. Tool configs that editors and tools only look for in the root stay there: `package.json`, `package-lock.json`, `eslint.config.js`, `.gitignore`, `.prettierignore`. Prettier settings live in `package.json`. |
+| `archive/old-draft/`                 | Discarded first draft (not in the repo)                                                                                                                                                                                                                                                                                                                   |
 
 New art samples go in `docs/art-direction/` (their source in `sources/art-direction/`); new mock-ups in `docs/mockups/`.
 
@@ -555,18 +568,18 @@ On `codex/edits`, a single Taiko idle-art experiment is available in dev builds 
 
 ## Code (updated 2026-10-11, v0.11.0)
 
-| Where | What |
-|---|---|
-| `packages/core` | `@rps/core`: rules (`resolveExchange`, `applyExchange`, rounds) and the `Referee` phase machine with injected clock + seeded RNG. Rules config and phase timings in `src/config.ts` (pick 3000, reveal 1800, round intro 1600, round over 2200 ms; start health 50). |
-| `apps/game/src/session` | `MatchSession`, `LocalSession`, `RandomCpu` (think delay 0.4 to 1.6s), `createSession(setup)` |
-| `apps/game/src/scenes` | Boot, Cabinet, Logo, Home, HowTo, Options, Lobby, Fight, Result, Transition (CRT off/on) + `flow.ts` (`SceneFlow`) |
-| `apps/game/src/{views,fight,fx,menus,input,platform}` | Dumb views, `FightDirector`, shake/flash, menus as data, `InputRouter`, `PixelScaler` (two scaling modes), `SettingsStore` (`platform/settings.ts`, localStorage) |
-| `apps/game/src/config/tuning.ts` | Every feel value |
-| `packages/core/src/online/protocol.ts` | Online messages shared by game and server, `PROTOCOL_VERSION`, room codes (4 consonants, no vowels so no words) (v0.6.0) |
-| `apps/server` | `@rps/server`: Cloudflare Worker + one Durable Object (`RoomObject`) per room code; `MatchRoom.ts` seats two players and runs the `Referee`. Local: `npm run dev:server` (port 8787). Deployed by `.github/workflows/deploy-server.yml` on main (needs secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`). Guide: `apps/server/README.md` (v0.6.0) |
-| `apps/game/src/session/OnlineSession.ts`, `socket.ts`; `scenes/LobbyScene.ts`; `config/online.ts` | Online client: real sides on both screens since v0.9.1 (host = P1 on the left, guest = P2 on the right; HUD tags "P1 YOU" / "P2 RIVAL"), opponent named RIVAL; lobby CREATE ROOM / JOIN ROOM; server address (dev: localhost:8787; release: the Worker's address, null until known = ONLINE greyed out) (v0.6.0) |
-| `apps/game/src/dev/` | Dev tuning panel (v0.5.0): Tweakpane over `tuning.ts` (live) plus the core rules and phase timings (next match), with Restart match, Copy changes, Reset all; edits kept in localStorage; backquote hides it. Only in `npm run dev`. Guide: `docs/tuning/TUNING-PANEL.md`. |
-| `apps/game/public/assets/logo.png` | Studio logo (Chain Shift as purple pixel art, 192x84 native): the master reduced to 94 blocks wide, each block 2x2 native pixels like the title's scaled font, violet #A35BFF fill with a light top edge, darker bottom edge, drop shadow in `palette.shadow` and a 1 px `palette.ink` outline. Built from the white master `docs/brand/logo-chain-shift-white.png` by `python3 tools/make-logo.py` (needs Pillow), which also writes the full-size `docs/brand/logo-chain-shift-purple.png` |
+| Where                                                                                             | What                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/core`                                                                                   | `@rps/core`: rules (`resolveExchange`, `applyExchange`, rounds) and the `Referee` phase machine with injected clock + seeded RNG. Rules config and phase timings in `src/config.ts` (pick 3000, reveal 1800, round intro 1600, round over 2200 ms; start health 50).                                                                                                                                                                                                                         |
+| `apps/game/src/session`                                                                           | `MatchSession`, `LocalSession`, `RandomCpu` (think delay 0.4 to 1.6s), `createSession(setup)`                                                                                                                                                                                                                                                                                                                                                                                                |
+| `apps/game/src/scenes`                                                                            | Boot, Cabinet, Logo, Home, HowTo, Options, Lobby, Fight, Result, Transition (CRT off/on) + `flow.ts` (`SceneFlow`)                                                                                                                                                                                                                                                                                                                                                                           |
+| `apps/game/src/{views,fight,fx,menus,input,platform}`                                             | Dumb views, `FightDirector`, shake/flash, menus as data, `InputRouter`, `PixelScaler` (two scaling modes), `SettingsStore` (`platform/settings.ts`, localStorage)                                                                                                                                                                                                                                                                                                                            |
+| `apps/game/src/config/tuning.ts`                                                                  | Every feel value                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `packages/core/src/online/protocol.ts`                                                            | Online messages shared by game and server, `PROTOCOL_VERSION`, room codes (4 consonants, no vowels so no words) (v0.6.0)                                                                                                                                                                                                                                                                                                                                                                     |
+| `apps/server`                                                                                     | `@rps/server`: Cloudflare Worker + one Durable Object (`RoomObject`) per room code; `MatchRoom.ts` seats two players and runs the `Referee`. Local: `npm run dev:server` (port 8787). Deployed by `.github/workflows/deploy-server.yml` on main (needs secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`). Guide: `apps/server/README.md` (v0.6.0)                                                                                                                                     |
+| `apps/game/src/session/OnlineSession.ts`, `socket.ts`; `scenes/LobbyScene.ts`; `config/online.ts` | Online client: real sides on both screens since v0.9.1 (host = P1 on the left, guest = P2 on the right; HUD tags "P1 YOU" / "P2 RIVAL"), opponent named RIVAL; lobby CREATE ROOM / JOIN ROOM; server address (dev: localhost:8787; release: the Worker's address, null until known = ONLINE greyed out) (v0.6.0)                                                                                                                                                                             |
+| `apps/game/src/dev/`                                                                              | Dev tuning panel (v0.5.0): Tweakpane over `tuning.ts` (live) plus the core rules and phase timings (next match), with Restart match, Copy changes, Reset all; edits kept in localStorage; backquote hides it. Only in `npm run dev`. Guide: `docs/tuning/TUNING-PANEL.md`.                                                                                                                                                                                                                   |
+| `apps/game/public/assets/logo.png`                                                                | Studio logo (Chain Shift as purple pixel art, 192x84 native): the master reduced to 94 blocks wide, each block 2x2 native pixels like the title's scaled font, violet #A35BFF fill with a light top edge, darker bottom edge, drop shadow in `palette.shadow` and a 1 px `palette.ink` outline. Built from the white master `docs/brand/logo-chain-shift-white.png` by `python3 tools/make-logo.py` (needs Pillow), which also writes the full-size `docs/brand/logo-chain-shift-purple.png` |
 
 Changelog: `CHANGELOG.md` at the repo root.
 
@@ -582,8 +595,8 @@ A browser fighting game built on rock paper scissors. Two pixel-art fighters sta
 
 ## Core rules
 
-| Winning move    | Beats  | Damage to loser |
-|-----------------|--------|-----------------|
+| Winning move               | Beats    | Damage to loser |
+| -------------------------- | -------- | --------------- |
 | Scissors (was Throw)       | Paper    | 20              |
 | Rock (was Attack)          | Scissors | 15              |
 | Paper (counter, was Block) | Rock     | 10              |
@@ -627,10 +640,10 @@ Online: the server runs the timer and the random fallback pick.
 
 The whole game is drawn as an upright arcade machine. This gives a vertical layout that works the same in a desktop browser and on a phone held upright.
 
-| Part | What it shows / does |
-|---|---|
-| Monitor (top ~2/3) | The fight: both fighters, health bars, round pips, timer, and the move coins/icons that show each player's pick on reveal. |
-| Control panel (bottom ~1/3) | Three physical arcade buttons: Attack, Throw, Block. Click/tap them or press keys 1/2/3. They press down visibly when used. |
+| Part                           | What it shows / does                                                                                                                                                                        |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Monitor (top ~2/3)             | The fight: both fighters, health bars, round pips, timer, and the move coins/icons that show each player's pick on reveal.                                                                  |
+| Control panel (bottom ~1/3)    | Three physical arcade buttons: Attack, Throw, Block. Click/tap them or press keys 1/2/3. They press down visibly when used.                                                                 |
 | Joystick (left of the buttons) | No effect in a fight (just for fun); in menus it moves the cursor. Tilts in 8 directions with the arrow keys (two keys = diagonal) or by click-and-drag; springs back to center on release. |
 
 - **Browser:** the cabinet stands centered and is scaled to fit the window height; the space around it is a dark arcade-room backdrop.
@@ -643,13 +656,13 @@ The whole game is drawn as an upright arcade machine. This gives a vertical layo
 
 The user asked for menu infrastructure now, so multiplayer menus can be added later without restructuring. Flow: **Boot → Logo intro → Home → Fight → Result → (Retry → Fight | Main menu → Home)**. Diagram: `docs/architecture/diagrams/7-screen-flow.svg`; details in section 6 of the architecture doc.
 
-| Screen | What it shows / does |
-|---|---|
-| Logo intro | The **Chain Shift** studio logo in purple (since v0.4.0; replaced the "YOUR STUDIO" placeholder) fades in, holds, fades out (about 0.5s / 1.5s / 0.5s, tunable). Any button or tap skips it. The image is `assets/logo.png`. Fades step through a few palette levels (pixel perfect, no smooth alpha). |
-| Home (main menu) | Game title, both fighters idling, and a menu: **START GAME (VS CPU)**; **ONLINE** shown greyed out with "SOON" as the slot for multiplayer; **OPTIONS**. More buttons (online lobby, how to play) are added as new menu items. |
-| Options (added 2026-10-10) | **SCALING**: FILL HEIGHT (default since v0.3.0) or PIXEL PERFECT; confirm or stick left/right flips it and it applies at once; **BACK** (or Esc) returns home. Two lines under the menu explain the current mode. Saved in localStorage. |
-| Fight | The match vs the CPU, as before. |
-| Result | Shown over the last fight frame: "YOU WIN!" or "CPU WINS" (online: "RIVAL WINS"), the round score (e.g. 2-1), and a menu: **RETRY** (default, new match with the same setup) and **MAIN MENU**. |
+| Screen                     | What it shows / does                                                                                                                                                                                                                                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Logo intro                 | The **Chain Shift** studio logo in purple (since v0.4.0; replaced the "YOUR STUDIO" placeholder) fades in, holds, fades out (about 0.5s / 1.5s / 0.5s, tunable). Any button or tap skips it. The image is `assets/logo.png`. Fades step through a few palette levels (pixel perfect, no smooth alpha). |
+| Home (main menu)           | Game title, both fighters idling, and a menu: **START GAME (VS CPU)**; **ONLINE** shown greyed out with "SOON" as the slot for multiplayer; **OPTIONS**. More buttons (online lobby, how to play) are added as new menu items.                                                                         |
+| Options (added 2026-10-10) | **SCALING**: FILL HEIGHT (default since v0.3.0) or PIXEL PERFECT; confirm or stick left/right flips it and it applies at once; **BACK** (or Esc) returns home. Two lines under the menu explain the current mode. Saved in localStorage.                                                               |
+| Fight                      | The match vs the CPU, as before.                                                                                                                                                                                                                                                                       |
+| Result                     | Shown over the last fight frame: "YOU WIN!" or "CPU WINS" (online: "RIVAL WINS"), the round score (e.g. 2-1), and a menu: **RETRY** (default, new match with the same setup) and **MAIN MENU**.                                                                                                        |
 
 - Menu controls: joystick or arrow keys move the cursor; any of the three cabinet buttons, Enter or Space confirms; items can also be tapped/clicked on the monitor; Esc / Android back goes back. (Default picked by Claude: gives the joystick a use in menus; easy to change.)
 - Structure: menus are data (`menus/homeMenu.ts`, `menus/resultMenu.ts`) drawn by one reusable `MenuView`; one `SceneFlow` handles all screen changes and transitions; a `MatchSetup` (`{ mode: 'cpu' }` now, `{ mode: 'online', roomCode }` later) is passed Home → Fight → Result so Retry replays the same kind of match (online: both players must agree to the rematch).
@@ -676,6 +689,7 @@ Engine: Phaser with `pixelArt: true` / `roundPixels: true` and integer zoom. The
 ## Polish and game feel (core goal, 2026-10-10)
 
 Very important to the user: the final product must look and feel polished. Besides the art style this means game feel ("juice"):
+
 - Screen shake that feels good (short, punchy, scaled to damage; whole pixels).
 - Visual effects: hit flash, sparks, impact frames, dust, brief hit-pause on big hits.
 - Dynamic, lively animations (anticipation, overshoot, follow-through; idle never static).
@@ -696,22 +710,24 @@ When: a dedicated tuning pass near the end, before release, at the latest before
 
 ## Technology (decided)
 
-| Part | Choice |
-|---|---|
-| Engine | Phaser 3 (chosen over Godot) |
-| Language | TypeScript |
-| Build | Vite |
-| Tests | Vitest |
-| Online (later) | Server-authoritative match room running `@rps/core`'s Referee. Host: **Cloudflare Workers + a Durable Object per room** (user's decision 2026-10-11, free plan; see `docs/architecture/ONLINE-OPTIONS.md`). Replaces the original Node + Colyseus plan |
-| Android (later) | Capacitor wrapping the web build |
+| Part            | Choice                                                                                                                                                                                                                                                 |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Engine          | Phaser 3 (chosen over Godot)                                                                                                                                                                                                                           |
+| Language        | TypeScript                                                                                                                                                                                                                                             |
+| Build           | Vite                                                                                                                                                                                                                                                   |
+| Tests           | Vitest                                                                                                                                                                                                                                                 |
+| Online (later)  | Server-authoritative match room running `@rps/core`'s Referee. Host: **Cloudflare Workers + a Durable Object per room** (user's decision 2026-10-11, free plan; see `docs/architecture/ONLINE-OPTIONS.md`). Replaces the original Node + Colyseus plan |
+| Android (later) | Capacitor wrapping the web build                                                                                                                                                                                                                       |
 
 Architecture rules:
+
 - **Shared rules module** in plain TypeScript: no Phaser, no timers, no network. Both moves in, result out; also tracks health, rounds, match.
 - Scenes only display what the rules module returns; they never decide results.
 - Moves arrive through a **move source**: now local input + random CPU; later the server.
 - Online: only the server knows both picks before the reveal (anti-cheat).
 
 **Architecture (proposed 2026-10-10, see `docs/architecture/ARCHITECTURE.md`):**
+
 - npm workspaces monorepo: `packages/core` (rules + referee, zero dependencies), `apps/game` (Phaser client), later `apps/server` (Colyseus).
 - Four layers, dependencies only point down: Platform, Presentation (scenes, director, views, fx, audio, input), Session, Core. Import rules enforced by ESLint.
 - Core = pure rules functions + a `Referee` phase machine (RoundIntro, Picking, Reveal, RoundOver, MatchOver) with injected clock and seeded RNG; the same referee runs in the Colyseus room later.
@@ -836,6 +852,7 @@ Architecture rules:
 - 2026-10-25: New marquee art (ChatGPT, Taiko, Anchor and Riot with the flame title, `art/source/marquee.webp`). The marquee box was shorter than the body's empty panel, so the body's own yellow stripe showed under the art; it is now the measured window, 101, 43, 739 x 180 cabinet units (1478 x 360 file px, 4.1 : 1). Marquee art must be generated at that shape or it gets cropped. A CSS shadow layer over it (seam, top-bezel shadow, edge shading, vignette; strengths in `tuning.marquee`) makes it sit in the cabinet. The PixelLab branch was merged into main with it as v2.2.0.
 
 ## Menu polish and cloud scrolling checkpoint (2026-10-28)
+
 - All three main-menu portraits now breathe from their rest image with torso/head/hand follow-through. Riot no longer cycles generated breathing frames. Reduced motion holds the still pose.
 - Main menu uses angled plates, comfortable equal text padding, shared purple/lavender/gold panel colors, unchanged text hover colors, and defaults to Online when enabled. Victory-style portrait/title/paired-row fades replace the bouncy entrance; studio logo retains its prior animation.
 - Fixed rooftop cloud panning to measure the original source panorama rather than TileSprite's viewport-sized internal texture. Slow 1px/200ms back-and-forth movement pauses at both ends; regression covers the distinction.

@@ -10,7 +10,8 @@ Every build that goes online gets a new version number (in `apps/game/package.js
 - Raised damage numbers use larger menu lettering with a gold gradient and a short downward fade. Results identify YOU, CPU or RIVAL instead of the fighter's name.
 - Anchor always auto-picks Rock on timeout; manual picks and other fighters' random fallbacks are preserved. The shared server rules are included.
 - Confirmed fresh-install defaults: CRT on, pixel perfect off, haptics on, sound on. Saved player preferences remain respected.
-- Validation: 186 unit tests, lint, typecheck, production build and focused CPU-match browser smoke pass. The full 16-test browser suite has 12 failures involving older navigation/timing assumptions and missing base URL configuration; repository-wide formatting also reports existing source/generated-study issues. These wider checks are not green.
+- Polish review: installed the approved 733 × 161 marquee with inward-facing Riot and tied-back Anchor hair; retained natural proportions. Increased K.O. colour split, brightened CRT midtones/glow while retaining edge shading, concealed the screen-opening hairline and removed the unused How to Play screen. Current random CPU retained by user decision.
+- Validation: 186 unit tests, all 16 browser checks using installed Chrome, lint, typecheck, formatting and production build pass. Updated stale navigation/rendering expectations and isolated random fixtures. Generated art studies/exported metadata excluded from source formatting. Final two-player online playtest remains pending; the existing bundle-size advisory remains.
 
 ## 2.2.0 (2026-10-25)
 

@@ -132,6 +132,13 @@ export class CabinetView {
     Object.assign(this.screen.style, { background: '#000', overflow: 'hidden' });
     this.screen.id = 'game';
     img(this.root, BODY.src, { ...box(0, 0, BODY.width, BODY.height), pointerEvents: 'none' });
+    // Hide the hairline colour fringe baked into the cabinet's keyed screen opening.
+    el('div', this.root, {
+      ...box(SCREEN.x - 2, SCREEN.y - 2, SCREEN.width + 4, SCREEN.height + 4),
+      boxShadow: 'inset 0 0 0 3px #000',
+      pointerEvents: 'none',
+      zIndex: '2',
+    });
     img(
       this.root,
       MARQUEE_RAIL.src,
