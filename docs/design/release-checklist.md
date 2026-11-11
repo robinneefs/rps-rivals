@@ -27,8 +27,8 @@ The combat makeover is in progress through the actual-game, 19-beat round-review
       Completed through integrated combat review; pacing/readability approved on 30 October.
 - [x] Review hit feedback, particles, flashes, shake, sound synchronization and fighter choreography as a coherent whole; tune the rhythm after the visual design is accepted.
       Completed through integrated combat review; pacing/readability approved on 30 October.
-- [ ] Add the planned dedicated pacing page to the development tuning panel so the match beats can be reviewed and adjusted together.
-- [ ] Approve actual-game captures and motion on desktop and phone, across all five stages, all fighters/mirrors, CRT on/off and reduced motion. Preserve the native 192 × 240 grid and approved fighter proportions.
+- [x] Add the planned dedicated pacing page to the development tuning panel so the match beats can be reviewed and adjusted together. No longer needed: pacing was approved through the round review and Effects Studio. Closed by the user on 11 November after the 2.3.0 release: "They're all okay."
+- [x] Approve actual-game captures and motion on desktop and phone, across all five stages, all fighters/mirrors, CRT on/off and reduced motion. Preserve the native 192 × 240 grid and approved fighter proportions. Closed by the user on 11 November after the 2.3.0 release: "They're all okay."
 
 These are design/review tasks, not approval of particular replacement artwork or new gameplay rules.
 
@@ -55,7 +55,7 @@ These are design/review tasks, not approval of particular replacement artwork or
 - [x] Final online playtest done last, on the live 2.3.0 game and match server (11 November): the user reported "online works, all good". Individual devices and scenarios were not enumerated.
 - [x] Final local checks pass (30 October): formatting, lint, typecheck, 186 unit tests, production build and all 16 browser checks using installed Chrome. Main script remains 1.66 MB minified / 403 KB gzip; no loading-time claim is made for an actual phone network. Generated artwork studies/asset metadata are excluded from source formatting.
 - [x] Updated browser tests for default Online selection, full transition timing, mirror alternates, two-canvas rendering, stage-specific music and current visual-only Home entrance. Corrected missing base URL and constant-random fixture texture collisions. All 16 pass.
-- [ ] Check phone touch input, browser viewport changes, sound/background behavior, settings persistence, Pixel Perfect mode and reduced motion after the final changes. Record actual-device versus emulated evidence accurately.
+- [x] Check phone touch input, browser viewport changes, sound/background behavior, settings persistence, Pixel Perfect mode and reduced motion after the final changes. Closed by the user on 11 November after the 2.3.0 release: "They're all okay." Individual devices were not enumerated.
 - [x] Refresh README/screenshots and relevant design, architecture, tuning and audio notes to describe the shipped game (30 October). New seeded production-build captures (desktop, phone and all five stages, WebP) by `sources/screenshots/capture.mjs`; README, architecture (current section), audio, tuning and the Play Store listing text updated. Play Store screenshots remain from 1.x while Android is parked. Source artwork, prompts and licences preserved.
 - [x] Version 2.3.0 assigned by the user (11 November), following the changelog's minor-bump rule; CHANGELOG entry finalised as 2.3.0 (2026-11-11).
 - [x] Matching browser/server rollout done on the user's instruction (11 November): PR #35 merged main into production, which published the game, deployed `rps-rivals-server` (protocol 4) and tagged v2.3.0. Hosting stays on robinneefs.github.io (moving to ChainShiftGames was considered and dropped). Rollback: revert the merge on production, which republishes 1.1.1 and its server.
