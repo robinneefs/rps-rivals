@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RPS Rivals — versus motion study</title>
+<style>
+@font-face{font-family:Native;src:url('../../fonts/m6x11/m6x11.ttf')}
+*{box-sizing:border-box}body{margin:0;background:#100d20;color:#fff2cb;font:16px system-ui;display:grid;place-content:center;min-height:100vh;padding:24px;gap:16px}main{display:flex;gap:32px;align-items:center;flex-wrap:wrap;justify-content:center}canvas{width:min(384px,85vw);height:auto;image-rendering:pixelated;box-shadow:0 0 0 6px #382267,0 20px 70px #0008}aside{max-width:290px}h1{font-size:24px}p{line-height:1.5;color:#c7bcd9}button,select,input{accent-color:#ffd35c}button,select{background:#382267;border:1px solid #8460b3;color:#fff2cb;padding:10px;margin:4px 0;font:inherit}label{display:block;margin:12px 0}input[type=range]{width:100%}small{color:#a99bbb}
+</style>
+<main><canvas width="192" height="240" aria-label="Animated versus panels revealing a rooftop fight"></canvas><aside>
+<small>RPS RIVALS / MOTION STUDY 01</small><h1>Meet in the middle.</h1><p>Two panels collide, hold the matchup, then pull apart to reveal the arena.</p>
+<label>P1 <select id="left"><option>taiko</option><option>riot</option><option>anchor</option></select></label>
+<label>P2 <select id="right"><option>riot</option><option>taiko</option><option>anchor</option></select></label>
+<button id="replay">Replay transition</button> <button id="hold">Hold matchup</button>
+<label>Scrub the animation <input id="scrub" type="range" min="0" max="2800" value="900"></label>
+<label><input id="sound" type="checkbox"> Impact sound</label>
+<p><small>Existing portraits and rooftop assets. Proposed timing and sound. This isolated mockup does not change selection or matches. Reduced motion uses a gentle fade.</small></p>
+</aside></main>
+<script type="module">
+const canvas=document.querySelector('canvas'),c=canvas.getContext('2d');c.imageSmoothingEnabled=false;
+const asset='../../../apps/game/public/assets/',ids=['taiko','riot','anchor'],images={},atlases={};
+async function load(key,url){const im=new Image();im.src=url;await im.decode();images[key]=im;}
+await Promise.all(ids.flatMap(id=>[load(id,asset+`menus/action/${id}-sheet.png`),load(id+'Fight',asset+id+'.png'),fetch(asset+id+'.json').then(r=>r.json()).then(j=>atlases[id]=j)]).concat([load('stage',asset+'stages/rooftop-v2-192.png'),load('clouds',asset+'stages/rooftop-clouds-576.png'),document.fonts.load('16px Native')]));
+const left=document.querySelector('#left'),right=document.querySelector('#right'),scrub=document.querySelector('#scrub'),reduce=matchMedia('(prefers-reduced-motion: reduce)');
+let start=0,playing=false,position=900,sounded=false,audio;
+function text(s,x,y,color='#fff2cb',size=16){c.font=`${size}px Native`;c.textAlign='center';c.textBaseline='top';c.fillStyle='#19102f';c.fillText(s,x+1,y+1);c.fillStyle=color;c.fillText(s,x,y);}
+function fighter(id,x,flip){const frames=atlases[id].frames;const f=(frames.idle??frames['idle-0']??Object.values(frames)[0]).frame;c.save();c.translate(x,216);if(flip)c.scale(-1,1);c.drawImage(images[id+'Fight'],f.x,f.y,f.w,f.h,-80,-156,f.w,f.h);c.restore();}
+function stage(){c.fillStyle='#0066fe';c.fillRect(0,0,192,240);c.drawImage(images.clouds,96,0,192,64,0,52,192,64);c.drawImage(images.stage,0,0);fighter(left.value,49,false);fighter(right.value,143,true);}
+function panel(side,offset){c.save();c.translate(Math.round(offset),0);c.beginPath();if(side===0){c.moveTo(0,0);c.lineTo(116,0);c.lineTo(76,240);c.lineTo(0,240);}else{c.moveTo(116,0);c.lineTo(192,0);c.lineTo(192,240);c.lineTo(76,240);}c.closePath();c.clip();
+c.fillStyle=side===0?'#492448':'#243c69';c.fillRect(0,0,192,240);
+c.fillStyle=side===0?'#ff789d':'#69e7e8';for(let y=-60;y<280;y+=32){c.beginPath();c.moveTo(0,y);c.lineTo(192,y-50);c.lineTo(192,y-46);c.lineTo(0,y+4);c.fill();}
+// Reverse both portraits while keeping their faces registered beside the centre seam.
+c.save();if(side===0){c.translate(108,0);c.scale(-1,1);c.drawImage(images[left.value],0,0,192,240,-68,24,192,240);}else{c.drawImage(images[right.value],0,0,192,240,16,24,192,240);}c.restore();
+c.fillStyle='#19102f';c.fillRect(0,0,192,28);c.fillRect(0,186,192,54);
+text(side===0?'P1 / YOU':'P2 / RIVAL',side===0?49:149,8,side===0?'#ff789d':'#69e7e8');text((side===0?left:right).value.toUpperCase(),side===0?43:145,194,'#ffd35c');c.restore();}
+function impact(){if(!document.querySelector('#sound').checked)return;audio??=new AudioContext();audio.resume();const o=audio.createOscillator(),g=audio.createGain();o.type='triangle';o.frequency.setValueAtTime(160,audio.currentTime);o.frequency.exponentialRampToValueAtTime(35,audio.currentTime+.16);g.gain.setValueAtTime(.2,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.2);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+.21);}
+function draw(t){stage();if(t>=2200){text('ROUND 1',96,66,'#ffd35c',32);return;}let offset=t<350?192*Math.pow(1-t/350,3):t<1650?0:192*Math.pow(Math.min(1,(t-1650)/550),2);c.save();if(reduce.matches){offset=0;c.globalAlpha=t<350?t/350:t>1650?1-(t-1650)/550:1;}panel(0,-offset);panel(1,offset);
+if(t>=350&&t<1650){c.strokeStyle='#ffd35c';c.lineWidth=2;c.beginPath();c.moveTo(116,0);c.lineTo(76,240);c.stroke();c.fillStyle='#19102f';c.beginPath();c.moveTo(97,96);c.lineTo(125,122);c.lineTo(95,153);c.lineTo(67,126);c.closePath();c.fill();text('VS',96,111,'#ffd35c',32);text('CITY ROOFTOP',96,222,'#fff2cb');if(t<410&&!reduce.matches){c.fillStyle=`rgba(255,242,203,${.3*(1-(t-350)/60)})`;c.fillRect(0,0,192,240);}}
+c.restore();}
+function replay(){start=performance.now();playing=true;sounded=false;}
+document.querySelector('#replay').onclick=replay;document.querySelector('#hold').onclick=()=>{playing=false;position=900;};scrub.oninput=()=>{playing=false;position=+scrub.value;};left.onchange=right.onchange=()=>{playing=false;position=900;};
+function frame(now){if(playing){position=Math.min(2800,now-start);if(position>=350&&!sounded){impact();sounded=true;}if(position===2800)playing=false;}scrub.value=position;draw(position);requestAnimationFrame(frame);}window.versusMockup={seek:t=>{playing=false;position=t;},ready:true};requestAnimationFrame(frame);
+</script>
+</html>

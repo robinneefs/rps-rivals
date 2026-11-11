@@ -1,0 +1,8 @@
+<!doctype html><meta charset="utf-8"><title>Taiko & Anchor breathing review</title>
+<style>body{margin:24px;background:#181827;color:#eee;font:16px system-ui}main{display:flex;gap:32px;flex-wrap:wrap}canvas{width:384px;height:480px;image-rendering:pixelated;background:#343449}button{padding:8px 16px;margin:12px 0}p{max-width:780px}</style>
+<h1>Taiko & Anchor · breathing</h1><p>Riot timing: rest 2000ms → inhale 240ms → rest 160ms → exhale 260ms → rest 180ms. Native 192 × 240 frames, shown at 2×.</p>
+<button id="toggle">Pause</button> <span id="phase">rest</span><main><section><h2>Taiko</h2><canvas width="192" height="240" id="taiko"></canvas></section><section><h2>Anchor</h2><canvas width="192" height="240" id="anchor"></canvas></section></main>
+<script>const order=[0,1,0,2,0],durations=[2000,240,160,260,180],names=['rest','inhale','exhale'];let index=0,elapsed=0,last=performance.now(),paused=false;
+const images=['taiko','anchor'].map(id=>{const image=new Image();image.src='native/'+id+'-sheet.png';return{image,ctx:document.getElementById(id).getContext('2d')}});
+document.getElementById('toggle').onclick=()=>{paused=!paused;document.getElementById('toggle').textContent=paused?'Play':'Pause'};
+function draw(now){if(!paused){elapsed+=Math.min(now-last,100);while(elapsed>=durations[index]){elapsed-=durations[index];index=(index+1)%order.length}}last=now;for(const{image,ctx}of images){ctx.clearRect(0,0,192,240);if(image.complete&&image.naturalWidth)ctx.drawImage(image,order[index]*192,0,192,240,0,0,192,240)}document.getElementById('phase').textContent=names[order[index]];requestAnimationFrame(draw)}requestAnimationFrame(draw);</script>

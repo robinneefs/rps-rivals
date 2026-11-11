@@ -74,4 +74,11 @@ export const fighterColors = {
   },
 } as const;
 
+/**
+ * Each side's UI colour, taken from its fighter's top (lightened so text reads on the dark screen):
+ * name tags, health bar frames, round pips, the over-the-head tags and the verdict all use it, so a
+ * bar and its fighter read as one thing.
+ */
+export const sideColors = { p1: 0xff5a52, p2: 0x2fd6e6 } as const;
+
 export const css = (color: number): string => '#' + color.toString(16).padStart(6, '0');

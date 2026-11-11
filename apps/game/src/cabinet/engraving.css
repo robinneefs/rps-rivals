@@ -1,0 +1,38 @@
+@font-face {
+  font-family: 'Cabinet Scratch';
+  src: url('./fonts/RockSalt-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.cabinet-engraving {
+  position: absolute;
+  top: 1352px;
+  height: 34px;
+  width: 220px;
+  font:
+    400 18px/34px 'Cabinet Scratch',
+    cursive;
+  letter-spacing: 0.6px;
+  white-space: nowrap;
+  color: #9aabc1;
+  /* Dark incision with a small lit lower edge, following the cabinet's painted metal. */
+  text-shadow:
+    0 -0.7px 0 rgba(0, 0, 0, 0.85),
+    0 1px 0 rgba(179, 202, 217, 0.65);
+  pointer-events: none;
+  user-select: none;
+}
+
+.cabinet-engraving--signature {
+  left: 114px;
+  word-spacing: -6px;
+  transform: rotate(-2deg);
+}
+
+.cabinet-engraving--version {
+  right: 114px;
+  text-align: right;
+  transform: rotate(1deg);
+}

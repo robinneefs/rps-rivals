@@ -26,4 +26,4 @@ The app's version is the game's (`apps/game/package.json`). Google Play's versio
 
 ## Store listing art
 
-Everything for the Play Store page (icon, feature graphic, screenshots, descriptions, form answers) is in `play-store/` at the repository root. The icon and feature graphic are made from the game's art, like the launcher icons and splash screens, by `node tools/make-icons.mjs`.
+Everything for the Play Store page (icon, feature graphic, screenshots, descriptions, form answers) is in `play-store/` at the repository root. The icon and feature graphic are made from the game's art, like the launcher icons and splash screens, by `python tools/art/prepare-brand-icons.py --install`.

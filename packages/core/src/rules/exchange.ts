@@ -5,7 +5,8 @@ import type { ExchangeOutcome, MatchState, Picks, RuleEvent, RulesConfig, Side }
 export function resolveExchange(picks: Picks, cfg: RulesConfig): ExchangeOutcome {
   if (picks.p1 === picks.p2) return { kind: 'tie', picks };
   const winner = cfg.beats[picks.p1] === picks.p2 ? 'p1' : 'p2';
-  return { kind: 'win', picks, winner, loser: opponentOf(winner), damage: cfg.damage[picks[winner]] };
+  const damage = cfg.damageBySide?.[winner] ?? cfg.damage;
+  return { kind: 'win', picks, winner, loser: opponentOf(winner), damage: damage[picks[winner]] };
 }
 
 /**
@@ -47,7 +48,7 @@ export function applyExchange(
 export function createMatchState(cfg: RulesConfig): MatchState {
   return {
     round: 1,
-    health: { p1: cfg.startHealth, p2: cfg.startHealth },
+    health: { ...(cfg.healthBySide ?? { p1: cfg.startHealth, p2: cfg.startHealth }) },
     roundsWon: { p1: 0, p2: 0 },
     winner: null,
   };
@@ -62,7 +63,11 @@ export function isRoundOver(state: MatchState): boolean {
 export function startNextRound(state: MatchState, cfg: RulesConfig): MatchState {
   if (state.winner) throw new Error('The match is already over');
   if (!isRoundOver(state)) throw new Error('The round is not over yet');
-  return { ...state, round: state.round + 1, health: { p1: cfg.startHealth, p2: cfg.startHealth } };
+  return {
+    ...state,
+    round: state.round + 1,
+    health: { ...(cfg.healthBySide ?? { p1: cfg.startHealth, p2: cfg.startHealth }) },
+  };
 }
 
 /** True when the round about to start is the last one possible (both sides one win away). */

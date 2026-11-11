@@ -3,26 +3,27 @@
 // loaded under the same keys replace it without touching any view.
 export const Tex = {
   logo: 'logo',
-  marquee: 'marquee',
-  room: 'room',
-  cabinet: 'cabinet',
+  logoSheen: 'logo-sheen',
   /** The menus' backdrop and its drifting stripes (fight stages are in config/stages.ts). */
   menuBackdrop: 'menu-backdrop',
   menuStripes: 'menu-stripes',
   fighterP1: 'fighter-p1',
   fighterP2: 'fighter-p2',
+  fighterAnchor: 'fighter-anchor',
   badges: 'move-badges',
-  buttons: 'cabinet-buttons',
-  buttonRings: 'cabinet-button-rings',
-  joystickBall: 'joystick-ball',
+  /** Small move symbols over the fighters' heads while picking (your pick, the rival's "?"). */
+  pickChips: 'pick-chips',
   dither: 'dither',
   /** The K.O. banner's letters. */
   koLetters: 'ko-letters',
 } as const;
 
-/** Frames every fighter sheet provides (64 px tall fighters, facing right). */
+/** Frames every fighter sheet provides (160 x 160 cells, facing right). */
 export const FighterFrames = ['idle0', 'idle1', 'rock', 'paper', 'scissors', 'hurt', 'ko', 'win'] as const;
 export type FighterFrame = (typeof FighterFrames)[number];
+/** The real Taiko atlas also contains a kick; legacy placeholder sheets keep their original frames. */
+export type FighterPose = FighterFrame | 'kick';
+export type FighterAttack = 'punch' | 'kick';
 
 /** Pixel font sizes: 5x7 glyphs drawn at whole multiples (pixel-perfect rule 5); 5 to 7 are for the big timer. */
 export const Fonts = {

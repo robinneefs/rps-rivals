@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Full Throttle — menu music preview</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font: 16px/1.5 system-ui;
+      background: #140b25;
+      color: #fff6df;
+    }
+    body {
+      max-width: 760px;
+      margin: 7vh auto;
+      padding: 24px;
+    }
+    .tag {
+      color: #ffb54f;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    h1 {
+      font-size: clamp(36px, 7vw, 62px);
+      line-height: 1.05;
+      margin: 12px 0 20px;
+    }
+    .card {
+      background: #25133b;
+      border: 1px solid #59305d;
+      border-radius: 18px;
+      padding: 24px;
+      margin: 24px 0;
+    }
+    audio {
+      width: 100%;
+      margin-top: 12px;
+    }
+    p {
+      color: #cdbedb;
+    }
+    strong {
+      color: #fff6df;
+    }
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 24px 0 0;
+    }
+    button {
+      text-align: left;
+      background: #42204c;
+      color: #fff6df;
+      border: 1px solid #75465e;
+      padding: 14px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+    }
+    button:hover {
+      border-color: #ffc45f;
+    }
+    button span {
+      display: block;
+      color: #ffbd58;
+      font-weight: 700;
+    }
+    @media (max-width: 480px) {
+      .timeline {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+  <div class="tag">RPS Rivals · Original soundtrack experiment 02</div>
+  <h1>Full Throttle</h1>
+  <p>
+    <strong>176 BPM · E minor · 43.64 seconds · Stereo loop</strong><br />
+    Twin driven chip guitars, palm-muted riffs, power chords, punchy bass and drums, an anthem hook, and a
+    fast lead break.
+  </p>
+  <div class="card">
+    <strong>New menu track</strong>
+    <audio id="new" controls loop preload="auto" src="menu-rock-v1.wav"></audio>
+    <div class="timeline">
+      <button data-time="0"><span>0:00</span>Guitar riff</button>
+      <button data-time="10.9090909"><span>0:11</span>Anthem hook</button>
+      <button data-time="21.8181818"><span>0:22</span>Lead break</button>
+      <button data-time="32.7272727"><span>0:33</span>Full-band return</button>
+    </div>
+  </div>
+  <div class="card">
+    <strong>Ready to Rival · saved first idea</strong>
+    <audio id="original" controls loop preload="metadata" src="../menu-riff-v1/menu-riff-v1.wav"></audio>
+  </div>
+  <p>
+    Preview only. The game's current music and approved visuals are unchanged. Both players loop; playing one
+    pauses the other.
+  </p>
+  <script>
+    const fresh = document.querySelector('#new');
+    const original = document.querySelector('#original');
+    fresh.volume = original.volume = 0.7;
+    fresh.addEventListener('play', () => original.pause());
+    original.addEventListener('play', () => fresh.pause());
+    document.querySelectorAll('[data-time]').forEach((button) =>
+      button.addEventListener('click', () => {
+        fresh.currentTime = Number(button.dataset.time);
+        fresh.play();
+      }),
+    );
+  </script>
+</html>

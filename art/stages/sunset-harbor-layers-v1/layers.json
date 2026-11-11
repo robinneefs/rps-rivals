@@ -1,0 +1,93 @@
+{
+  "width": 192,
+  "height": 240,
+  "order": [
+    "sky-gradient",
+    "distant-harbor",
+    "water-base",
+    "water-reflections",
+    "boat",
+    "pennant",
+    "rope-span",
+    "dock-foreground"
+  ],
+  "paletteLimitPerLayer": 40,
+  "sampling": "nearest",
+  "dither": 0,
+  "boat": {
+    "x": 126,
+    "y": 113,
+    "width": 66,
+    "height": 62,
+    "bobPixels": 1
+  },
+  "flag": {
+    "followsBoat": true
+  },
+  "rope": {
+    "anchors": [
+      [76, 165],
+      [117, 165]
+    ],
+    "note": "Pin endpoints; move center at most one pixel."
+  },
+  "standingLine": 220,
+  "checks": [
+    {
+      "name": "sky-gradient",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 46080,
+      "binaryAlpha": true
+    },
+    {
+      "name": "distant-harbor",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 5075,
+      "binaryAlpha": true
+    },
+    {
+      "name": "water-base",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 20544,
+      "binaryAlpha": true
+    },
+    {
+      "name": "water-reflections",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 757,
+      "binaryAlpha": true
+    },
+    {
+      "name": "boat",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 2102,
+      "binaryAlpha": true
+    },
+    {
+      "name": "pennant",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 61,
+      "binaryAlpha": true
+    },
+    {
+      "name": "rope-span",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 109,
+      "binaryAlpha": true
+    },
+    {
+      "name": "dock-foreground",
+      "width": 192,
+      "height": 240,
+      "visiblePixels": 13701,
+      "binaryAlpha": true
+    }
+  ]
+}

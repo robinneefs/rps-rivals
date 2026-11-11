@@ -1,0 +1,37 @@
+[
+  {
+    "selector": "[data-button=\"rock\"]",
+    "samples": 25,
+    "cursors": [
+      "pointer"
+    ]
+  },
+  {
+    "selector": "[data-button=\"paper\"]",
+    "samples": 25,
+    "cursors": [
+      "pointer"
+    ]
+  },
+  {
+    "selector": "[data-button=\"scissors\"]",
+    "samples": 25,
+    "cursors": [
+      "pointer"
+    ]
+  },
+  {
+    "selector": "[data-joystick]",
+    "samples": 25,
+    "cursors": [
+      "grab"
+    ]
+  },
+  {
+    "selector": "Home canvas menu",
+    "samples": 30,
+    "cursors": [
+      "pointer"
+    ]
+  }
+]

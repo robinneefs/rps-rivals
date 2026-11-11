@@ -1,17 +1,16 @@
 import Phaser from 'phaser';
-import { Tex } from '../assets/keys';
-import { MONITOR } from '../config/layout';
-import { palette } from '../config/palette';
-import { tuning } from '../config/tuning';
+import { OnlineSession } from '../session/OnlineSession';
+import { rematchNotice, showDisconnect } from '../views/OnlineNotice';
 import { resultMenu } from '../menus/resultMenu';
 import { MenuView } from '../views/MenuView';
-import { PixelText } from '../views/PixelText';
 import { getContext } from './context';
 import type { ResultData } from './flow';
 import { SceneKey } from './keys';
 import { useMonitorCamera } from './monitor';
+import { watchSessionEnd } from './watchSessionEnd';
+import { VictoryView } from '../views/VictoryView';
 
-/** Over the last fight frame: who won, the round score, and REMATCH / MAIN MENU. */
+/** Winner portrait splash with the existing local/online rematch and exit actions. */
 export class ResultScene extends Phaser.Scene {
   private result!: ResultData;
 
@@ -25,36 +24,18 @@ export class ResultScene extends Phaser.Scene {
 
   create(): void {
     const { flow, input, audio } = getContext(this);
-    const { session, setup, winner, state } = this.result;
+    const { session, setup, winner } = this.result;
     useMonitorCamera(this);
-    const cx = MONITOR.width / 2;
+
     const won = winner === session.me;
     audio.play(won ? 'winJingle' : 'loseJingle');
 
-    // dithered darkening (a checkerboard of ink pixels), not a smooth alpha overlay
-    this.add.tileSprite(0, 0, MONITOR.width, 156, Tex.dither).setOrigin(0);
-    new PixelText(this, cx, 26, won ? 'YOU WIN!' : `${session.opponentName} WINS`, {
-      size: 3,
-      color: won ? palette.gold : palette.pink,
-      align: 'center',
-      outline: palette.ink,
-      shadow: won ? 0xb3165f : palette.shadow,
-    });
-    // left player's rounds first, so online both players see the same score
-    new PixelText(this, cx, 58, `${state.roundsWon.p1} - ${state.roundsWon.p2}`, {
-      size: 2,
-      color: palette.text,
-      align: 'center',
-      shadow: palette.ink,
-    });
-    new PixelText(this, cx, 76, 'ROUNDS', { color: palette.cyan, align: 'center' });
-
-    // online: who asked for a rematch, or why the match can't go on (blank for a CPU match)
-    const note = new PixelText(this, cx, 142, '', {
-      color: palette.lilac,
-      align: 'center',
-      shadow: palette.ink,
-    });
+    // Identify the winning player consistently, including mirrors.
+    const mirror = session.fighters.p1 === session.fighters.p2;
+    const winnerLabel = won ? 'YOU WIN!' : `${session.opponentName} WINS`;
+    const victory = new VictoryView(this, session.fighters[winner], winnerLabel, mirror && winner === 'p2');
+    // Status remains visible while the online rematch handshake is pending.
+    const notice = rematchNotice(this);
 
     let leaving = false;
     let asked = false;
@@ -64,8 +45,20 @@ export class ResultScene extends Phaser.Scene {
         retry: () => {
           if (leaving || asked) return;
           asked = true;
-          note.setText('WAITING FOR RIVAL');
+          if (setup.mode === 'online') notice(true);
           session.requestRematch(); // online: waits for the opponent; locally accepted at once
+        },
+        characterSelect: () => {
+          if (leaving || asked) return;
+          if (session instanceof OnlineSession) {
+            asked = true;
+            notice(true, true);
+            session.requestCharacterSelect();
+          } else {
+            leaving = true;
+            menu.lock();
+            flow.toCharacterSelect(setup);
+          }
         },
         mainMenu: () => {
           if (leaving) return;
@@ -74,29 +67,36 @@ export class ResultScene extends Phaser.Scene {
           flow.toHome();
         },
       }),
-      96,
+      victory.menuY - 24,
       input,
       audio,
-      112,
     );
-    const ended = (text: string) => {
+    const ended = (rivalLeft: boolean) => {
       if (leaving) return;
       leaving = true;
       menu.lock();
-      note.setText(text).setColor(palette.pink);
-      this.time.delayedCall(tuning.online.endedHoldMs, () => flow.toHome());
+      showDisconnect(this, rivalLeft, () => flow.toHome());
     };
     const offs = [
       session.on('rematchAccepted', () => {
+        if (leaving) return;
         leaving = true;
         menu.lock();
         flow.toFight(setup, session);
       }),
-      session.on('rematchRequested', ({ side }) => {
-        if (side !== session.me) note.setText('RIVAL WANTS A REMATCH').setColor(palette.gold);
+      session.on('characterSelectAccepted', () => {
+        if (leaving || !(session instanceof OnlineSession)) return;
+        leaving = true;
+        menu.lock();
+        flow.toCharacterSelect(setup, session);
       }),
-      session.on('opponentLeft', () => ended('RIVAL LEFT')),
-      session.on('disconnected', () => ended('CONNECTION LOST')),
+      session.on('characterSelectRequested', ({ side }) => {
+        if (!leaving && side !== session.me) notice(asked, true);
+      }),
+      session.on('rematchRequested', ({ side }) => {
+        if (!leaving && !asked && side !== session.me) notice(false);
+      }),
+      watchSessionEnd(this, session, ended),
       input.on('action', (a) => {
         if (a.type === 'back' && this.scene.isActive() && !leaving) {
           audio.play('menuBack');
@@ -106,6 +106,8 @@ export class ResultScene extends Phaser.Scene {
         }
       }),
     ];
+    if (!session.endedReason && session.rivalRequestedRematch) notice(false);
+    if (!session.endedReason && session.rivalRequestedCharacterSelect) notice(false, true);
     this.events.once('shutdown', () => offs.forEach((off) => off()));
   }
 }

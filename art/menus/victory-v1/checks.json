@@ -1,0 +1,45 @@
+{
+  "checks": [
+    {
+      "name": "desktop",
+      "width": 600,
+      "height": 1000,
+      "crt": true,
+      "pixelPerfect": false,
+      "reducedMotion": "no-preference",
+      "rematch": true,
+      "mainMenu": true
+    },
+    {
+      "name": "desktop-crt-off",
+      "width": 600,
+      "height": 1000,
+      "crt": false,
+      "pixelPerfect": false,
+      "reducedMotion": "reduce",
+      "rematch": true,
+      "mainMenu": true
+    },
+    {
+      "name": "phone",
+      "width": 390,
+      "height": 664,
+      "crt": true,
+      "pixelPerfect": false,
+      "reducedMotion": "reduce",
+      "rematch": true,
+      "mainMenu": true
+    },
+    {
+      "name": "phone-pixel-perfect",
+      "width": 390,
+      "height": 664,
+      "crt": true,
+      "pixelPerfect": true,
+      "reducedMotion": "reduce",
+      "rematch": true,
+      "mainMenu": true
+    }
+  ],
+  "errors": []
+}

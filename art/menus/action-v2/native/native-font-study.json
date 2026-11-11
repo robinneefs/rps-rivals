@@ -1,0 +1,142 @@
+[
+  {
+    "id": "tamzen-bold",
+    "name": "Tamzen Bold \u00b7 native 10\u00d720",
+    "method": "BDF pixels verbatim",
+    "metrics": [
+      {
+        "label": "PLAY VERSUS CPU",
+        "inkWidth": 137,
+        "inkHeight": 10,
+        "sourceScale": 1,
+        "partialAlpha": 0
+      },
+      {
+        "label": "PLAY ONLINE",
+        "inkWidth": 102,
+        "inkHeight": 10,
+        "sourceScale": 1,
+        "partialAlpha": 0
+      },
+      {
+        "label": "OPTIONS",
+        "inkWidth": 67,
+        "inkHeight": 10,
+        "sourceScale": 1,
+        "partialAlpha": 0
+      }
+    ]
+  },
+  {
+    "id": "tamzen",
+    "name": "Tamzen Regular \u00b7 native 10\u00d720",
+    "method": "BDF pixels verbatim",
+    "metrics": [
+      {
+        "label": "PLAY VERSUS CPU",
+        "inkWidth": 137,
+        "inkHeight": 10,
+        "sourceScale": 1,
+        "partialAlpha": 0
+      },
+      {
+        "label": "PLAY ONLINE",
+        "inkWidth": 102,
+        "inkHeight": 10,
+        "sourceScale": 1,
+        "partialAlpha": 0
+      },
+      {
+        "label": "OPTIONS",
+        "inkWidth": 67,
+        "inkHeight": 10,
+        "sourceScale": 1,
+        "partialAlpha": 0
+      }
+    ]
+  },
+  {
+    "id": "spleen",
+    "name": "Spleen \u00b7 native 12\u00d724",
+    "method": "BDF pixels verbatim",
+    "metrics": [
+      {
+        "label": "PLAY VERSUS CPU",
+        "inkWidth": 166,
+        "inkHeight": 15,
+        "sourceScale": 1,
+        "partialAlpha": 0
+      },
+      {
+        "label": "PLAY ONLINE",
+        "inkWidth": 124,
+        "inkHeight": 15,
+        "sourceScale": 1,
+        "partialAlpha": 0
+      },
+      {
+        "label": "OPTIONS",
+        "inkWidth": 82,
+        "inkHeight": 15,
+        "sourceScale": 1,
+        "partialAlpha": 0
+      }
+    ]
+  },
+  {
+    "id": "spleen16",
+    "name": "Spleen \u00b7 native 8\u00d716",
+    "method": "BDF pixels verbatim",
+    "metrics": [
+      {
+        "label": "PLAY VERSUS CPU",
+        "inkWidth": 111,
+        "inkHeight": 10,
+        "sourceScale": 1,
+        "partialAlpha": 0
+      },
+      {
+        "label": "PLAY ONLINE",
+        "inkWidth": 83,
+        "inkHeight": 10,
+        "sourceScale": 1,
+        "partialAlpha": 0
+      },
+      {
+        "label": "OPTIONS",
+        "inkWidth": 55,
+        "inkHeight": 10,
+        "sourceScale": 1,
+        "partialAlpha": 0
+      }
+    ]
+  },
+  {
+    "id": "m6x11",
+    "name": "m6x11 \u00b7 native 16px",
+    "method": "author-specified16px;verified binary source mask",
+    "metrics": [
+      {
+        "label": "PLAY VERSUS CPU",
+        "inkWidth": 100,
+        "inkHeight": 11,
+        "sourceScale": 1,
+        "partialAlpha": 0
+      },
+      {
+        "label": "PLAY ONLINE",
+        "inkWidth": 74,
+        "inkHeight": 11,
+        "sourceScale": 1,
+        "partialAlpha": 0
+      },
+      {
+        "label": "OPTIONS",
+        "inkWidth": 48,
+        "inkHeight": 11,
+        "sourceScale": 1,
+        "partialAlpha": 0
+      }
+    ]
+  }
+]

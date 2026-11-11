@@ -1,29 +1,102 @@
 import type { PixelBuffer } from '../assets/placeholders/PixelBuffer';
-import { paintCastle } from '../assets/placeholders/stages/castle';
-import { paintField } from '../assets/placeholders/stages/field';
-import { paintStreet } from '../assets/placeholders/stages/street';
+import type { MusicKey } from '../audio/sounds';
 
-/**
- * The fight stages. Each match is fought on one of these, picked at random (see stageFor).
- * To add a stage: write a painter in assets/placeholders/stages/ and add a line here.
- * To remove one: delete its line. Real art can replace a placeholder by loading an image
- * under the stage's texture key (stageTexture) in BootScene.
- */
+export const HARBOR_LAYERS = [
+  'sky-gradient',
+  'distant-harbor',
+  'water-base',
+  'water-reflections',
+  'boat',
+  'pennant',
+  'rope-span',
+  'dock-foreground',
+] as const;
+export const harborTexture = (layer: (typeof HARBOR_LAYERS)[number]): string => `harbor-${layer}`;
+export const COURTYARD_LAYERS = [
+  'sky-gradient',
+  'scenery-clean',
+  'stone-floor',
+  'lantern-left',
+  'lantern-right',
+  'lantern-far-right',
+  'glow-left',
+  'glow-right',
+  'glow-far-right',
+] as const;
+export const courtyardTexture = (layer: (typeof COURTYARD_LAYERS)[number]): string => `courtyard-${layer}`;
+
+/** Stages authored at the native 192 x 240 resolution. */
 export interface StageDef {
   /** Short and unique; also used in the texture key and the ?stage= test link. */
   id: string;
   name: string;
-  /** Paints the 216x216 placeholder backdrop. The fighters stand at STAGE.floorY. */
-  paint: () => PixelBuffer;
+  /** Stage-specific soundtrack; stages without one retain the original fight theme. */
+  music?: MusicKey;
+  /** The picture, loaded at boot. The fighters stand at STAGE.floorY. */
+  image?: string;
+  /** Solid sky behind the transparent city layer. Keep the health-bar area clear for the HUD. */
+  sky?: number;
+  /** Cloud panorama pans back and forth behind the city, resting briefly at each end. */
+  clouds?: { image: string; y: number; height: number; stepMs: number; pauseMs?: number };
+  /** Separate native grass sheets; effects never alter match state or combat randomness. */
+  storm?: { clouds: string; field: string; foreground: string; frames: number; frameMs: number };
+  /** Directory of aligned 192 × 240 harbor layers. */
+  harbor?: string;
+  /** Directory of aligned courtyard scenery, lanterns, glows and petals. */
+  courtyard?: string;
+  foundry?: string;
+  /** Or a placeholder painted in code. */
+  paint?: () => PixelBuffer;
 }
 
 export const STAGES: readonly StageDef[] = [
-  { id: 'street', name: 'Night Street', paint: paintStreet },
-  { id: 'field', name: 'Sunny Field', paint: paintField },
-  { id: 'castle', name: 'Castle Roof', paint: paintCastle },
+  {
+    id: 'rooftop',
+    name: 'City Rooftop',
+    image: 'assets/stages/rooftop-v2-192.png',
+    sky: 0x0066fe,
+    clouds: { image: 'assets/stages/rooftop-clouds-576.png', y: 52, height: 64, stepMs: 200, pauseMs: 600 },
+  },
+  {
+    id: 'storm-field',
+    name: 'Storm Field',
+    music: 'storm',
+    image: 'assets/stages/storm-field-192.png',
+    sky: 0x020925,
+    storm: {
+      clouds: 'assets/stages/storm-clouds.png',
+      field: 'assets/stages/storm-field.png',
+      foreground: 'assets/stages/storm-foreground.png',
+      frames: 12,
+      frameMs: 120,
+    },
+  },
+  {
+    id: 'sunset-harbor',
+    name: 'Sunset Harbor',
+    music: 'harbor',
+    image: 'assets/stages/harbor/sky-gradient.png',
+    harbor: 'assets/stages/harbor/',
+  },
+  {
+    id: 'lantern-courtyard',
+    name: 'Lantern Courtyard',
+    music: 'courtyard',
+    image: 'assets/stages/courtyard/sky-gradient.png',
+    courtyard: 'assets/stages/courtyard/',
+  },
+  {
+    id: 'foundry-floor',
+    name: 'Foundry Floor',
+    music: 'foundry',
+    image: 'assets/stages/foundry/background.png',
+    foundry: 'assets/stages/foundry/',
+  },
 ];
-
 export const stageTexture = (id: string): string => `stage-${id}`;
+export const stageCloudTexture = (id: string): string => `stage-${id}-clouds`;
+export const stageFieldTexture = (id: string): string => `stage-${id}-field`;
+export const stageForegroundTexture = (id: string): string => `stage-${id}-foreground`;
 
 /**
  * The stage for a match. `seed` comes from the session (both online players get the same one);

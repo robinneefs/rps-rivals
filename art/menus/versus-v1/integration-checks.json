@@ -1,0 +1,7 @@
+{
+  "checks": [
+    "Desktop: selection, closed-panel idle gate, arena reveal, complete CPU match, rematch.",
+    "Phone/reduced motion: selection, closed-panel idle gate, arena reveal, complete CPU match, rematch."
+  ],
+  "errors": []
+}

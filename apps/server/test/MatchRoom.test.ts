@@ -1,4 +1,4 @@
-import { defaultRules, defaultTimings, PROTOCOL_VERSION, seededRng, type ServerMessage } from '@rps/core';
+import { defaultTimings, PROTOCOL_VERSION, seededRng, type ServerMessage } from '@rps/core';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { FakeClock } from '../../../packages/core/test/fakeClock';
 import { CloseCode, defaultRoomTimeouts, MatchRoom, type Connection } from '../src/MatchRoom';
@@ -44,9 +44,24 @@ describe('MatchRoom', () => {
   };
   const startMatch = () => {
     seatBoth();
+    send(room, a, { type: 'character', character: 'taiko', confirmed: true });
+    send(room, b, { type: 'character', character: 'riot', confirmed: true });
     send(room, a, { type: 'ready' });
     send(room, b, { type: 'ready' });
   };
+
+  it('notifies the rival when a silent phone stops sending heartbeats', () => {
+    seatBoth();
+    send(room, a, { type: 'ping' });
+    send(room, b, { type: 'ping' });
+    expect(a.last).toEqual({ type: 'pong' });
+    clock.advance(10000);
+    send(room, a, { type: 'ping' });
+    clock.advance(10000);
+    expect(a.last).toEqual({ type: 'opponentLeft' });
+    expect(b.closed?.code).toBe(CloseCode.timeout);
+    expect(room.isEmpty).toBe(true);
+  });
 
   it('seats the creator as p1 and the joiner as p2, then tells both', () => {
     seatBoth();
@@ -90,13 +105,14 @@ describe('MatchRoom', () => {
 
   it('starts only when both players are ready, and sends time left instead of clock times', () => {
     seatBoth();
+    send(room, a, { type: 'character', character: 'taiko', confirmed: true });
+    send(room, b, { type: 'character', character: 'riot', confirmed: true });
     send(room, a, { type: 'ready' });
     expect(a.of('phase')).toHaveLength(0);
     send(room, b, { type: 'ready' });
     const [phase] = a.of('phase');
     expect(phase).toMatchObject({ phase: 'roundIntro', msLeft: defaultTimings.roundIntroMs, round: 1 });
-    const full = defaultRules.startHealth;
-    expect(phase?.state.health).toEqual({ p1: full, p2: full });
+    expect(phase?.state.health).toEqual({ p1: 100, p2: 80 });
     expect(b.of('phase')).toEqual(a.of('phase'));
   });
 
@@ -112,7 +128,7 @@ describe('MatchRoom', () => {
     clock.advance(defaultTimings.pickMs);
     const [reveal] = b.of('reveal');
     expect(reveal?.picks).toEqual({ p1: 'scissors', p2: 'paper' });
-    expect(reveal?.outcome).toMatchObject({ kind: 'win', winner: 'p1', damage: 20 });
+    expect(reveal?.outcome).toMatchObject({ kind: 'win', winner: 'p1', damage: 25 });
     expect(reveal?.autoPicked).toEqual({ p1: false, p2: false });
   });
 
@@ -130,6 +146,40 @@ describe('MatchRoom', () => {
     send(room, a, { type: 'ready' });
     send(room, b, { type: 'ready' });
     expect(a.of('phase').slice(phasesBefore)[0]).toMatchObject({ phase: 'roundIntro', round: 1 });
+  });
+
+  it.each([
+    ['characterSelect', 'rematch'],
+    ['rematch', 'characterSelect'],
+    ['characterSelect', 'characterSelect'],
+  ])('returns both to selection for %s plus %s and starts with new fighters', (first, second) => {
+    startMatch();
+    for (let i = 0; i < 2000 && a.of('matchOver').length === 0; i++) clock.advance(1000);
+    send(room, a, { type: first });
+    expect(b.last).toEqual({
+      type: first === 'rematch' ? 'rematchRequested' : 'characterSelectRequested',
+      side: 'p1',
+    });
+    expect(a.of('characterSelectAccepted')).toHaveLength(0);
+    send(room, b, { type: second });
+    expect(a.last).toEqual({ type: 'characterSelectAccepted' });
+    expect(b.last).toEqual(a.last);
+    expect(a.of('selection').at(-1)?.confirmed).toEqual({ p1: false, p2: false });
+    send(room, a, { type: 'character', character: 'riot', confirmed: true });
+    send(room, b, { type: 'character', character: 'taiko', confirmed: true });
+    send(room, a, { type: 'ready' });
+    send(room, b, { type: 'ready' });
+    expect(a.of('phase').at(-1)?.state.health).toEqual({ p1: 80, p2: 100 });
+  });
+
+  it('quit ends the room while character select is pending', () => {
+    startMatch();
+    for (let i = 0; i < 2000 && a.of('matchOver').length === 0; i++) clock.advance(1000);
+    send(room, a, { type: 'characterSelect' });
+    room.leave(b);
+    expect(a.last).toEqual({ type: 'opponentLeft' });
+    expect(a.of('characterSelectAccepted')).toHaveLength(0);
+    expect(room.isEmpty).toBe(true);
   });
 
   it('ignores a rematch request while the match is still running', () => {

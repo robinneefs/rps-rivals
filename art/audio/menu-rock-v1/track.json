@@ -1,0 +1,41 @@
+{
+  "title": "Full Throttle",
+  "bpm": 176,
+  "key": "E minor / power-chord rock",
+  "bars": 32,
+  "sampleRate": 44100,
+  "channels": 2,
+  "durationSeconds": 43.636371882086166,
+  "peakDbFS": -1.1103466040620245,
+  "rmsDbFS": -15.324555291966355,
+  "seamSampleDelta": [
+    0.0022936835885047913,
+    0.002839144319295883
+  ],
+  "sections": [
+    {
+      "at": 0,
+      "label": "Guitar riff"
+    },
+    {
+      "at": 10.909090909090908,
+      "label": "Anthem hook"
+    },
+    {
+      "at": 21.818181818181817,
+      "label": "Lead break"
+    },
+    {
+      "at": 32.72727272727273,
+      "label": "Full-band return"
+    }
+  ],
+  "originalComposition": true,
+  "externalSamples": false,
+  "installedInGame": false,
+  "sources": [
+    "tools/audio/make-menu-rock.mjs",
+    "tools/audio/synth.mjs",
+    "tools/audio/music-mix.mjs"
+  ]
+}

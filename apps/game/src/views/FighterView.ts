@@ -1,38 +1,57 @@
 import type { Side } from '@rps/core';
 import type Phaser from 'phaser';
-import { Tex, type FighterFrame } from '../assets/keys';
-import { FIGHTER_FRAME } from '../assets/placeholders/fighters';
+import { Tex, type FighterAttack, type FighterPose } from '../assets/keys';
 import { tuning } from '../config/tuning';
 import { snap } from '../util/snap';
+import { FIGHTER_GEOMETRY } from '../config/fighterGeometry';
+import { MONITOR } from '../config/layout';
+import { FIGHTER_FOOTPRINTS } from '../config/fighterFootprints';
 
 /** One fighter on the stage. Dumb: it shows the pose it is told to, and breathes while idle. */
 export class FighterView {
   readonly sprite: Phaser.GameObjects.Sprite;
-  private readonly shadow: Phaser.GameObjects.Rectangle;
+  private readonly shadow: Phaser.GameObjects.Ellipse;
+  private readonly footprints: Record<string, { left: number; width: number }>;
   private idle = true;
   private breath = 0;
+  private frame: FighterPose = 'idle0';
+  private offset = 0;
+  private readonly geometry: (typeof FIGHTER_GEOMETRY)[string];
 
   constructor(
     scene: Phaser.Scene,
     readonly side: Side,
     private readonly homeX: number,
     floorY: number,
+    texture: string = side === 'p1' ? Tex.fighterP1 : Tex.fighterP2,
   ) {
-    this.shadow = scene.add.rectangle(homeX, floorY, 30, 3, 0x050014).setOrigin(0.5, 0.5);
-    this.sprite = scene.add.sprite(homeX, floorY + 1, side === 'p1' ? Tex.fighterP1 : Tex.fighterP2, 'idle0');
-    // feet on the floor; p2 is the same art mirrored (flipping keeps the pixel grid)
-    const footX = side === 'p1' ? FIGHTER_FRAME.footX : FIGHTER_FRAME.width - 1 - FIGHTER_FRAME.footX;
-    this.sprite.setDisplayOrigin(footX, FIGHTER_FRAME.height).setFlipX(side === 'p2');
+    this.footprints = FIGHTER_FOOTPRINTS[texture.replace(/-alternate$/, '')] ?? {};
+    this.geometry = FIGHTER_GEOMETRY[texture.replace(/-alternate$/, '')] ?? {
+      originX: 64,
+      originY: 124,
+      shadowWidth: 40,
+      kickOffset: 27,
+      bounds: {},
+    };
+    this.shadow = scene.add
+      .ellipse(homeX, floorY, this.geometry.shadowWidth, 8, 0x000000, 0.5)
+      .setOrigin(0.5, 0.5)
+      .setName(`shadow-${side}`);
+    this.sprite = scene.add.sprite(homeX, floorY + 1, texture, 'idle0');
+    this.sprite.setName(`fighter-${side}`);
+    // Shared foot origin; right-facing source art is mirrored for p2 on the pixel grid.
+    this.sprite.setDisplayOrigin(this.geometry.originX, this.geometry.originY).setFlipX(side === 'p2');
     const timer = scene.time.addEvent({
       delay: tuning.idle.breatheEveryMs,
       loop: true,
       startAt: side === 'p2' ? tuning.idle.breatheEveryMs / 2 : 0,
       callback: () => {
         this.breath ^= 1;
-        if (this.idle) this.sprite.setFrame(this.breath ? 'idle1' : 'idle0');
+        if (this.idle) this.pose(this.breath ? 'idle1' : 'idle0');
       },
     });
     scene.events.once('shutdown', () => timer.remove());
+    this.place();
   }
 
   /** Facing direction: +1 looks right (p1), -1 looks left (p2). */
@@ -40,9 +59,19 @@ export class FighterView {
     return this.side === 'p1' ? 1 : -1;
   }
 
-  pose(frame: FighterFrame): void {
+  pose(frame: FighterPose): void {
+    this.frame = frame;
     this.idle = frame === 'idle0' || frame === 'idle1';
-    this.sprite.setFrame(frame);
+    this.sprite.setFrame(frame).setDisplayOrigin(this.geometry.originX, this.geometry.originY);
+    this.place();
+  }
+
+  attack(kind: FighterAttack): void {
+    this.pose(kind === 'punch' ? 'rock' : 'kick');
+  }
+
+  block(): void {
+    this.pose('paper');
   }
 
   toIdle(): void {
@@ -52,7 +81,36 @@ export class FighterView {
 
   /** Steps toward (+) or away from (-) the opponent by whole pixels. */
   setOffset(px: number): void {
-    this.sprite.x = snap(this.homeX + px * this.facing);
-    this.shadow.x = this.sprite.x;
+    this.offset = px;
+    this.place();
+  }
+
+  private place(): void {
+    let x = snap(this.homeX + this.offset * this.facing);
+    const bounds = this.geometry.bounds[this.frame];
+    if (bounds) {
+      // Keep the complete native silhouette in the monitor, including mirrored KO/hurt/kick.
+      const left =
+        this.side === 'p1'
+          ? bounds.left - this.geometry.originX
+          : this.geometry.originX - bounds.left - bounds.width;
+      x = Math.max(-left, Math.min(MONITOR.width - left - bounds.width, x));
+    }
+    this.sprite.x = x;
+    this.placeShadow();
+  }
+
+  private placeShadow(): void {
+    this.shadow.setVisible(this.frame !== 'ko');
+    const footprint = this.footprints[this.frame];
+    if (this.frame !== 'kick' && footprint) {
+      const center = footprint.left + footprint.width / 2 - this.geometry.originX;
+      this.shadow.x = snap(this.sprite.x + center * this.facing);
+      this.shadow.setSize(footprint.width, 8);
+      return;
+    }
+    // The kick's planted foot sits behind the common pose anchor.
+    this.shadow.x = this.sprite.x - (this.frame === 'kick' ? this.geometry.kickOffset * this.facing : 0);
+    this.shadow.setSize(this.frame === 'kick' ? 20 : this.geometry.shadowWidth, 8);
   }
 }

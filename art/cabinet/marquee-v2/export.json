@@ -1,0 +1,24 @@
+{
+  "source": [
+    1983,
+    793
+  ],
+  "removePadding": {
+    "top": 150,
+    "height": 492
+  },
+  "output": "apps/game/public/assets/cabinet/marquee-v3.webp",
+  "pixels": [
+    1442,
+    358
+  ],
+  "cabinetWindow": {
+    "x": 110,
+    "y": 49,
+    "width": 721,
+    "height": 157
+  },
+  "fit": "contain",
+  "verticalInset": 4,
+  "position": "center"
+}

@@ -1,0 +1,188 @@
+{
+  "frames": {
+    "ul": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 560,
+        "h": 560
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 560,
+        "h": 560
+      },
+      "sourceSize": {
+        "w": 560,
+        "h": 560
+      }
+    },
+    "u": {
+      "frame": {
+        "x": 560,
+        "y": 0,
+        "w": 560,
+        "h": 560
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 560,
+        "h": 560
+      },
+      "sourceSize": {
+        "w": 560,
+        "h": 560
+      }
+    },
+    "ur": {
+      "frame": {
+        "x": 1120,
+        "y": 0,
+        "w": 560,
+        "h": 560
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 560,
+        "h": 560
+      },
+      "sourceSize": {
+        "w": 560,
+        "h": 560
+      }
+    },
+    "l": {
+      "frame": {
+        "x": 0,
+        "y": 560,
+        "w": 560,
+        "h": 560
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 560,
+        "h": 560
+      },
+      "sourceSize": {
+        "w": 560,
+        "h": 560
+      }
+    },
+    "c": {
+      "frame": {
+        "x": 560,
+        "y": 560,
+        "w": 560,
+        "h": 560
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 560,
+        "h": 560
+      },
+      "sourceSize": {
+        "w": 560,
+        "h": 560
+      }
+    },
+    "r": {
+      "frame": {
+        "x": 1120,
+        "y": 560,
+        "w": 560,
+        "h": 560
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 560,
+        "h": 560
+      },
+      "sourceSize": {
+        "w": 560,
+        "h": 560
+      }
+    },
+    "dl": {
+      "frame": {
+        "x": 0,
+        "y": 1120,
+        "w": 560,
+        "h": 560
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 560,
+        "h": 560
+      },
+      "sourceSize": {
+        "w": 560,
+        "h": 560
+      }
+    },
+    "d": {
+      "frame": {
+        "x": 560,
+        "y": 1120,
+        "w": 560,
+        "h": 560
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 560,
+        "h": 560
+      },
+      "sourceSize": {
+        "w": 560,
+        "h": 560
+      }
+    },
+    "dr": {
+      "frame": {
+        "x": 1120,
+        "y": 1120,
+        "w": 560,
+        "h": 560
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 560,
+        "h": 560
+      },
+      "sourceSize": {
+        "w": 560,
+        "h": 560
+      }
+    }
+  },
+  "meta": {
+    "image": "joystick-sheet.webp",
+    "scale": "1"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "source": "docs\\brand\\logo-chain-shift-white.png",
+  "sourceBounds": [
+    70,
+    77,
+    1018,
+    485
+  ],
+  "nativeSize": [
+    168,
+    75
+  ],
+  "screen": [
+    192,
+    240
+  ],
+  "horizontalMargin": 12,
+  "method": "native BOX coverage, binary alpha threshold112, 1px gradient/bevel; no enlarged pixel blocks",
+  "sheenFrames": 24
+}

@@ -6,3 +6,7 @@ package-lock.json
 *.md
 .wrangler/
 apps/android/android/
+
+# Generated artwork studies and exported atlas metadata are preserved as produced.
+art/
+apps/game/public/assets/

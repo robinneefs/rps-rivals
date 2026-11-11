@@ -1,5 +1,7 @@
 import {
   defaultRules,
+  characterStats,
+  initialCharacterSelection,
   Emitter,
   PROTOCOL_VERSION,
   type ClientMessage,
@@ -11,6 +13,7 @@ import {
   type ServerMessage,
   type Side,
   type Unsubscribe,
+  type PlayableCharacterId,
 } from '@rps/core';
 import type { MatchSession, MatchView, SessionEvents } from './MatchSession';
 import type { OpenSocket, Socket } from './socket';
@@ -34,6 +37,14 @@ export interface OnlineOptions {
  * the left, the guest is p2 on the right. Also reports the lobby steps: joined, refused, left.
  */
 export class OnlineSession implements MatchSession {
+  selection = initialCharacterSelection();
+  get fighters() {
+    return this.selection.fighters;
+  }
+
+  selectCharacter(character: PlayableCharacterId, confirmed: boolean): void {
+    this.send({ type: 'character', character, confirmed });
+  }
   readonly opponentName = 'RIVAL';
   rules: RulesConfig = structuredClone(defaultRules);
   private readonly events = new Emitter<SessionEvents>();
@@ -45,8 +56,11 @@ export class OnlineSession implements MatchSession {
   private state: MatchState | null = null;
   private myPick: Move | null = null;
   private ended = false;
+  endedReason: 'refused' | 'opponentLeft' | 'disconnected' | null = null;
   /** Matches started in this room before the current one (rematches both players count alike). */
   private rematches = 0;
+  rivalRequestedRematch = false;
+  rivalRequestedCharacterSelect = false;
 
   constructor(private readonly opts: OnlineOptions) {
     this.socket = opts.openSocket(`${opts.serverUrl}/room/${opts.roomCode}`, {
@@ -76,6 +90,10 @@ export class OnlineSession implements MatchSession {
     this.send({ type: 'pick', move });
   }
 
+  requestCharacterSelect(): void {
+    this.send({ type: 'characterSelect' });
+  }
+
   requestRematch(): void {
     this.send({ type: 'rematch' });
   }
@@ -95,7 +113,10 @@ export class OnlineSession implements MatchSession {
       phase: this.phase,
       state: this.state ?? {
         round: 1,
-        health: { p1: this.rules.startHealth, p2: this.rules.startHealth },
+        health: {
+          p1: characterStats(this.fighters.p1, this.rules).hp,
+          p2: characterStats(this.fighters.p2, this.rules).hp,
+        },
         roundsWon: { p1: 0, p2: 0 },
         winner: null,
       },
@@ -127,6 +148,10 @@ export class OnlineSession implements MatchSession {
     }
     const seated = this.side !== null;
     switch (msg.type) {
+      case 'selection':
+        this.selection = { fighters: { ...msg.fighters }, confirmed: { ...msg.confirmed } };
+        this.events.emit('selection', this.selection);
+        break;
       case 'welcome':
         this.side = msg.side;
         this.rules = msg.rules;
@@ -170,9 +195,28 @@ export class OnlineSession implements MatchSession {
         this.events.emit('matchOver', { winner: msg.winner, state: this.state });
         break;
       case 'rematchRequested':
-        if (seated) this.events.emit('rematchRequested', { side: msg.side });
+        if (seated) {
+          if (msg.side !== this.me) this.rivalRequestedRematch = true;
+          this.events.emit('rematchRequested', { side: msg.side });
+        }
+        break;
+      case 'characterSelectRequested':
+        if (seated) {
+          if (msg.side !== this.me) this.rivalRequestedCharacterSelect = true;
+          this.events.emit('characterSelectRequested', { side: msg.side });
+        }
+        break;
+      case 'characterSelectAccepted':
+        this.rivalRequestedRematch = this.rivalRequestedCharacterSelect = false;
+        this.rematches++;
+        this.phase = 'idle';
+        this.state = null;
+        this.myPick = null;
+        this.endsAt = null;
+        this.events.emit('characterSelectAccepted', {});
         break;
       case 'rematchAccepted':
+        this.rivalRequestedRematch = false;
         this.rematches++;
         this.events.emit('rematchAccepted', {});
         break;
@@ -186,6 +230,7 @@ export class OnlineSession implements MatchSession {
   ): void {
     if (this.ended) return;
     this.ended = true;
+    this.endedReason = event;
     this.events.emit(event, payload);
     this.socket.close();
   }

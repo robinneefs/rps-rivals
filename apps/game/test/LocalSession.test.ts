@@ -4,6 +4,7 @@ import { FakeClock } from '../../../packages/core/test/fakeClock';
 import { RandomCpu } from '../src/session/cpu/RandomCpu';
 import { LocalSession } from '../src/session/LocalSession';
 import type { SessionEvents } from '../src/session/MatchSession';
+import { stageFor, STAGES } from '../src/config/stages';
 
 const timings: PhaseTimings = { roundIntroMs: 1000, pickMs: 5000, revealMs: 2000, roundOverMs: 3000 };
 
@@ -26,6 +27,65 @@ function setup(seed = 3) {
 }
 
 describe('LocalSession', () => {
+  it('auto-picks Rock for the local Anchor when the player lets the timer expire', () => {
+    const clock = new FakeClock();
+    const session = new LocalSession(
+      defaultRules,
+      timings,
+      clock,
+      seededRng(7),
+      {
+        onPickingStarted: (_context, submit) => submit('scissors'),
+        cancel: () => {},
+      },
+      { p1: 'anchor', p2: 'riot' },
+    );
+    const reveals: SessionEvents['reveal'][] = [];
+    session.on('reveal', (event) => reveals.push(event));
+    session.ready();
+    clock.advance(timings.roundIntroMs + timings.pickMs);
+    expect(reveals[0]).toMatchObject({
+      picks: { p1: 'rock', p2: 'scissors' },
+      autoPicked: { p1: true, p2: false },
+      outcome: { kind: 'win', winner: 'p1', damage: 50 },
+    });
+    session.dispose();
+  });
+  it('cycles through every stage on rematch without consecutive repeats', () => {
+    const { session } = setup();
+    const stages = [stageFor(session.stageSeed()).id];
+    for (let i = 0; i < STAGES.length * 3; i++) {
+      session.requestRematch();
+      stages.push(stageFor(session.stageSeed()).id);
+      expect(stages.at(-1)).not.toBe(stages.at(-2));
+    }
+    expect(new Set(stages.slice(0, STAGES.length)).size).toBe(STAGES.length);
+    session.dispose();
+  });
+  it('applies selected character damage to both the player and CPU', () => {
+    const clock = new FakeClock();
+    const session = new LocalSession(
+      defaultRules,
+      timings,
+      clock,
+      seededRng(7),
+      {
+        onPickingStarted: (_context, submit) => submit('rock'),
+        cancel: () => {},
+      },
+      { p1: 'riot', p2: 'anchor' },
+    );
+    session.ready();
+    clock.advance(timings.roundIntroMs);
+    session.submitPick('paper');
+    clock.advance(timings.pickMs);
+    expect(session.snapshot().state.health).toEqual({ p1: 80, p2: 105 });
+    clock.advance(timings.revealMs);
+    session.submitPick('scissors');
+    clock.advance(timings.pickMs);
+    expect(session.snapshot().state.health).toEqual({ p1: 30, p2: 105 });
+    session.dispose();
+  });
   it('starts on ready() and reports the time left in the phase', () => {
     const { clock, session } = setup();
     expect(session.snapshot().phase).toBe('idle');

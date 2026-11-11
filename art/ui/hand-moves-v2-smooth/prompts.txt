@@ -1,0 +1,8 @@
+Image 1 is the HAND EDIT TARGET. Image 2 is the CHARACTER STYLE REFERENCE ONLY. Redraw the hand from image 1 in the exact smooth, radically simple flat-shape illustration language of Taiko in image 2. This is smooth high-resolution sprite source artwork, NOT pre-pixelated artwork. Clean smooth continuous contours, bold restrained dark navy outer outline, much thinner sparse internal lines, each material ONE flat base colour plus ONE broad angular shadow plane, NO gradients, NO texture, NO highlights, NO tiny crease details, NO dithering, NO visible pixel blocks or stair-stepped edges. Same warm peach skin as Taiko, compact wrist, short simple colored cuff. Preserve the hand gesture and cuff color from image 1, simplify strongly. ONE complete centered isolated hand, same front three-quarter view, transparent background and generous margin, no circle, no text, no extra hands, no character sheet. Intended to be reduced later to approximately32 native game pixels inside a50-pixel circle. Broad silhouette and clear digit separation.
+
+Rock: Closed fist, curled fingers and thumb across them. Red cuff.
+Paper: Open palm with exactly five fingers including thumb. Gold yellow cuff.
+Scissors: Two-finger V, index and middle extended, other fingers folded under thumb. Cyan cuff.
+
+Edit targets: ../hand-moves-v1/{rock,paper,scissors}-generated.png
+Style reference: ../../fighters/taiko-v2/source/generated.png

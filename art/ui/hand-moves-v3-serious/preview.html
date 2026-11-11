@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><title>Hand moves · native-size study</title>
+  <style>
+    body {
+      margin: 0;
+      background: #10111c;
+      color: #eee9ff;
+      font: 16px/1.5 system-ui;
+      padding: 36px;
+    }
+    h1 {
+      margin: 0;
+    }
+    p {
+      color: #aaa6bd;
+    }
+    .grid {
+      display: flex;
+      gap: 36px;
+      flex-wrap: wrap;
+      margin: 30px 0;
+    }
+    article {
+      background: #1c1b2b;
+      border: 1px solid #39334d;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+    canvas {
+      image-rendering: pixelated;
+      display: block;
+      margin: 16px auto;
+    }
+    .big {
+      width: 208px;
+      height: 208px;
+    }
+    h2 {
+      font-size: 17px;
+    }
+    small {
+      color: #aaa6bd;
+    }
+  </style>
+  <h1>Hand moves · serious study</h1>
+  <p>
+    Restrained martial-arts hand art in the current 50-pixel circles. Small: actual game pixels. Large: 4×
+    nearest-neighbour preview.<br />Hands are shown within a 32 × 32 pixel footprint. These are review
+    candidates.
+  </p>
+  <div class="grid"></div>
+  <script type="module">
+    for (const [name, color] of [
+      ['rock', '#ff3b6b'],
+      ['paper', '#ffb321'],
+      ['scissors', '#3ff0ff'],
+    ]) {
+      const article = document.createElement('article');
+      article.innerHTML = `<h2>${name.toUpperCase()}</h2><canvas width="52" height="52"></canvas><small>Native size</small><canvas class="big" width="52" height="52"></canvas>`;
+      document.querySelector('.grid').append(article);
+      const img = new Image();
+      img.src = `${name}-generated.png`;
+      await img.decode();
+      const scratch = document.createElement('canvas');
+      scratch.width = img.width;
+      scratch.height = img.height;
+      const sc = scratch.getContext('2d');
+      sc.drawImage(img, 0, 0);
+      const { data } = sc.getImageData(0, 0, img.width, img.height);
+      let minX = img.width,
+        minY = img.height,
+        maxX = 0,
+        maxY = 0;
+      for (let y = 0; y < img.height; y++)
+        for (let x = 0; x < img.width; x++)
+          if (data[(y * img.width + x) * 4 + 3] > 128) {
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+          }
+      const sw = maxX - minX + 1,
+        sh = maxY - minY + 1,
+        scale = 32 / Math.max(sw, sh),
+        w = Math.round(sw * scale),
+        h = Math.round(sh * scale);
+      for (const canvas of article.querySelectorAll('canvas')) {
+        const c = canvas.getContext('2d');
+        c.imageSmoothingEnabled = false;
+        for (const [r, fill] of [
+          [25, '#100c1c'],
+          [23, color],
+          [21, '#191526'],
+        ]) {
+          c.fillStyle = fill;
+          for (let y = -r; y <= r; y++) {
+            const half = Math.floor(Math.sqrt(r * r - y * y));
+            c.fillRect(26 - half, 26 + y, half * 2 + 1, 1);
+          }
+        }
+        c.drawImage(img, minX, minY, sw, sh, Math.round((52 - w) / 2), Math.round((52 - h) / 2), w, h);
+      }
+    }
+  </script>
+</html>

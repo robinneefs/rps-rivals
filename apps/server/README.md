@@ -5,7 +5,7 @@ Online matches run here: a Cloudflare Worker with one [Durable Object](https://d
 | File | What it does |
 |---|---|
 | `src/index.ts` | The Worker (routes `/room/CODE` to that room's Durable Object) and `RoomObject` (holds the two WebSockets) |
-| `src/MatchRoom.ts` | The room itself: seats, ready, picks, rematch, leaving, idle timeouts. No Cloudflare code, so tests drive it with a fake clock |
+| `src/MatchRoom.ts` | The room itself: seats, fighter selection and lock-in, per-fighter rules, ready, picks, rematch, leaving, idle timeouts. No Cloudflare code, so tests drive it with a fake clock |
 | `test/MatchRoom.test.ts` | Room tests (run with the rest by `npm test` at the repo root) |
 | `wrangler.jsonc` | Cloudflare settings: the Worker's name (`rps-rivals-server`) and the Durable Object class |
 | `../../packages/core/src/online/protocol.ts` | The messages between game and room, shared by both |
@@ -33,7 +33,9 @@ There are two Workers, one per copy of the game:
 - `CLOUDFLARE_API_TOKEN`: a Cloudflare API token from the "Edit Cloudflare Workers" template
 - `CLOUDFLARE_ACCOUNT_ID`: the Cloudflare account ID
 
-Without them the workflow skips the deploy with a warning. The game finds its server through the repository **variable** (not secret) `CLOUDFLARE_WORKERS_SUBDOMAIN`, set to your workers.dev subdomain: the publish workflow (`.github/workflows/pages.yml`) builds production against `wss://rps-rivals-server.<subdomain>.workers.dev` and staging against `wss://rps-rivals-server-staging.<subdomain>.workers.dev`. Until it is set, published builds show ONLINE greyed out.
+Without them the workflow skips the deploy with a warning.
+
+**Release the game and the Worker together.** The protocol is versioned (`PROTOCOL_VERSION`, now 4: versions 2 to 4 added fighter selection and per-fighter damage and health), and a room refuses clients on another version. Merging to `production` publishes both, but the live game will not find a match until both deploys have finished. The game finds its server through the repository **variable** (not secret) `CLOUDFLARE_WORKERS_SUBDOMAIN`, set to your workers.dev subdomain: the publish workflow (`.github/workflows/pages.yml`) builds production against `wss://rps-rivals-server.<subdomain>.workers.dev` and staging against `wss://rps-rivals-server-staging.<subdomain>.workers.dev`. Until it is set, published builds show ONLINE greyed out.
 
 ## Free plan limits
 

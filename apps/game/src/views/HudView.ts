@@ -1,110 +1,158 @@
 import type { Side } from '@rps/core';
 import type Phaser from 'phaser';
-import { GLYPH } from '../assets/glyphs';
-import type { FontSize } from '../assets/keys';
 import { MONITOR } from '../config/layout';
-import { palette } from '../config/palette';
+import { moveColors, palette, sideColors } from '../config/palette';
 import { tuning } from '../config/tuning';
-import { lighten } from '../assets/placeholders/icons';
-import { shade } from '../assets/placeholders/PixelBuffer';
-import { frameRect } from '../util/gfx';
 import { PixelText } from './PixelText';
-
-const BAR = { y: 6, w: 88, h: 12, inset: 6 } as const;
-const PIP = { y: 23, size: 5, gap: 3 } as const;
-/** Where the timer's first second is centred; later seconds drift down from here. */
-const TIMER = { x: MONITOR.width / 2, y: 15 } as const;
-const MAX_FONT = 7;
+import { MenuText } from './MenuStyle';
+import { MENU_TYPOGRAPHY } from '../config/menuTypography';
 
 interface BarState {
-  shown: number; // what the bar shows now (animates toward the target)
-  trail: number; // white trail that follows behind after a short delay
+  shown: number;
+  trail: number;
   max: number;
 }
-
-/** Health bars, round pips, timer, names, "READY" markers and the pick prompt. Shows what it's told. */
 const SIDES = ['p1', 'p2'] as const;
+/** Whole-number enlargement of the menu font for the countdown digit. */
+const TIMER_SCALE = 2;
+/** Ink size of the menu font's digit glyphs, in font pixels. */
+const TIMER_DIGIT_INK = { width: 6, height: 11 } as const;
 
+/** Classic life bars with compact name ribbons; the stage stays visible between HUD elements. */
 export class HudView {
   private readonly gfx: Phaser.GameObjects.Graphics;
-  /** The timer: one text per font size inside a box that moves, shakes and tilts as a whole. */
-  private readonly timerBox: Phaser.GameObjects.Container;
-  private readonly timerTexts = new Map<FontSize, PixelText>();
-  private readonly timerSlam: PixelText;
-  private startSecs = 0;
-  private lastSecs = 0;
-  private timerSize: FontSize = 4;
-  private popUntil = 0;
-  private boxY: number = TIMER.y;
-  private slamHide: Phaser.Time.TimerEvent | null = null;
-  private readonly prompt: PixelText;
-  private readonly ready: Record<Side, PixelText>;
   private readonly bars: Record<Side, BarState>;
+  /** The countdown digit: a one-pixel ink outline (8 copies) under the coloured face, last. */
+  private readonly timer: Phaser.GameObjects.Container;
+  private readonly timerLayers: Phaser.GameObjects.BitmapText[] = [];
+  private readonly prompt: Phaser.GameObjects.Container;
+  private readonly arrows: Phaser.GameObjects.Container;
+  private readonly triangles: Phaser.GameObjects.Graphics[] = [];
+  private waveStartedAt = 0;
+  private readonly ready: Record<Side, PixelText>;
+  private readonly timerFace: Phaser.GameObjects.Graphics;
+  private timerMs: number | null = null;
+  private timerSecond = -1;
+  private readonly timerBeat = { kick: 0 };
+  private readonly flashUntil: Record<Side, number> = { p1: 0, p2: 0 };
   private roundsWon: Record<Side, number> = { p1: 0, p2: 0 };
   private roundsToWin = 2;
-  /** Flips every lowPulseMs: a bar at low health glows brighter and its frame turns red. */
   private pulse = false;
+  private slamHide: Phaser.Time.TimerEvent | null = null;
 
   constructor(
     private readonly scene: Phaser.Scene,
     names: Record<Side, string>,
-    maxHealth: number,
+    maxHealth: number | Record<Side, number>,
+    characters: Record<Side, string> = { p1: 'TAIKO', p2: 'RIOT' },
   ) {
+    const health = typeof maxHealth === 'number' ? { p1: maxHealth, p2: maxHealth } : maxHealth;
     this.bars = {
-      p1: { shown: maxHealth, trail: maxHealth, max: maxHealth },
-      p2: { shown: maxHealth, trail: maxHealth, max: maxHealth },
+      p1: { shown: health.p1, trail: health.p1, max: health.p1 },
+      p2: { shown: health.p2, trail: health.p2, max: health.p2 },
     };
     this.gfx = scene.add.graphics();
+    const style = { outline: palette.ink, edgePx: 1 } as const;
+    this.ready = {} as Record<Side, PixelText>;
+    for (const side of SIDES) {
+      const x = side === 'p1' ? 6 : 186;
+      const align = side === 'p1' ? 'left' : 'right';
+      new PixelText(scene, x, 7, characters[side], {
+        ...style,
+        align,
+        color: palette.text,
+        shadow: 0x6b4525,
+      });
+      const playerX = side === 'p1' ? 4 : 188;
+      // A coloured extrusion gives the small player labels an arcade-lettering lift.
+      new PixelText(scene, playerX + 1, 34, names[side], {
+        align,
+        color: sideColors[side],
+        outline: 0x08080e,
+        edgePx: 1,
+      });
+      this.ready[side] = new PixelText(scene, playerX, 32, names[side], {
+        ...style,
+        align,
+        color: side === 'p1' ? 0xffd5ca : 0xc4faff,
+        outline: 0x101018,
+        shadow: 0x08080e,
+      });
+    }
+    this.timerFace = scene.add.graphics();
+    // The menu font at 2x: its 6 x 11 digits become 22 px, filling the 30 px dial on whole pixels.
+    // The outline stays one native pixel, so the digit reads crisp rather than chunky.
+    this.timer = scene.add.container(0, 0).setVisible(false);
+    for (const [dx, dy] of [
+      [-1, -1],
+      [0, -1],
+      [1, -1],
+      [-1, 0],
+      [1, 0],
+      [-1, 1],
+      [0, 1],
+      [1, 1],
+      [0, 0],
+    ]) {
+      const layer = scene.add
+        .bitmapText(dx!, dy!, MENU_TYPOGRAPHY.fontKey, '', MENU_TYPOGRAPHY.size)
+        .setScale(TIMER_SCALE)
+        .setTint(0x100d1c);
+      this.timer.add(layer);
+      this.timerLayers.push(layer);
+    }
+    this.prompt = scene.add.container(MONITOR.width / 2, 56).setVisible(false);
+    // Match the round title's native menu font, gold face and one-pixel outline.
+    for (const [dx, dy, color] of [
+      [1, 2, palette.shadow],
+      [-1, 0, palette.ink],
+      [1, 0, palette.ink],
+      [0, -1, palette.ink],
+      [0, 1, palette.ink],
+      [0, 0, palette.gold],
+    ]) {
+      const label = new MenuText(scene, dx!, dy!, 'PICK YOUR MOVE', color!);
+      this.prompt.add(label.image);
+    }
+    this.arrows = scene.add.container(0, 0).setVisible(false);
+    (['rock', 'paper', 'scissors'] as const).forEach((move, i) => {
+      const x = MONITOR.width / 2 + (i - 1) * 32;
+      const graphic = scene.add.graphics();
+      this.arrows.add(graphic);
+      this.triangles.push(graphic);
+      const triangle = (dx: number, dy: number, color: number) => {
+        graphic.fillStyle(color, 1);
+        for (let row = 0; row < 6; row++) graphic.fillRect(x - 5 + row + dx, 76 + row + dy, 11 - row * 2, 1);
+      };
+      for (let dy = -1; dy <= 1; dy++)
+        for (let dx = -1; dx <= 1; dx++) if (dx || dy) triangle(dx, dy, palette.ink);
+      triangle(0, 0, moveColors[move].main);
+    });
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const wave = () => {
+      if (!this.arrows.visible) return;
+      const t = tuning.hud;
+      const elapsed = Math.max(0, scene.game.loop.time - this.waveStartedAt);
+      this.prompt.setAlpha(
+        reducedMotion.matches || elapsed % t.pickPromptFlickerMs < t.pickPromptFlickerMs * 0.75 ? 1 : 0,
+      );
+      this.triangles.forEach((triangle, i) => {
+        const phase = (elapsed - i * t.pickBounceStaggerMs + t.pickBounceCycleMs) % t.pickBounceCycleMs;
+        const height = phase < t.pickBounceMs ? Math.sin((phase / t.pickBounceMs) * Math.PI) : 0;
+        triangle.setY(reducedMotion.matches ? 0 : -Math.round(height * t.pickBouncePx));
+      });
+    };
+    // Keep this cosmetic cue looping even when the review harness holds the match frame.
+    scene.game.events.on('step', wave);
+    scene.events.once('shutdown', () => scene.game.events.off('step', wave));
     scene.time.addEvent({
       delay: tuning.hud.lowPulseMs,
       loop: true,
       callback: () => {
         this.pulse = !this.pulse;
-        if (SIDES.some((s) => this.isLow(this.bars[s]))) this.draw();
+        if (SIDES.some((side) => this.isLow(this.bars[side]))) this.draw();
       },
     });
-    // the timer box sits on the timer's centre; each text is centred on the box, so the box can
-    // move, shake and tilt the digits around their middle
-    this.timerBox = scene.add.container(TIMER.x, TIMER.y);
-    const big = { align: 'center', outline: palette.ink, shadow: palette.shadow, edgePx: 2 } as const;
-    for (let size = 3; size <= MAX_FONT; size++) {
-      const s = size as FontSize;
-      const text = new PixelText(scene, 0, -(GLYPH.height * s) / 2, '', {
-        ...big,
-        size: s,
-        color: palette.text,
-      });
-      this.timerBox.add(text.setVisible(false));
-      this.timerTexts.set(s, text);
-    }
-    this.timerSlam = new PixelText(scene, 0, -(GLYPH.height * MAX_FONT) / 2, '0', {
-      ...big,
-      size: MAX_FONT,
-      color: palette.red,
-    });
-    this.timerBox.add(this.timerSlam.setVisible(false));
-    new PixelText(scene, BAR.inset, PIP.y, names.p1, { color: palette.text, shadow: palette.ink });
-    new PixelText(scene, MONITOR.width - BAR.inset, PIP.y, names.p2, {
-      color: palette.text,
-      align: 'right',
-      shadow: palette.ink,
-    });
-    this.ready = {
-      p1: new PixelText(scene, BAR.inset, PIP.y + 10, 'READY', {
-        color: palette.cyan,
-        shadow: palette.ink,
-      }).setVisible(false),
-      p2: new PixelText(scene, MONITOR.width - BAR.inset, PIP.y + 10, 'READY', {
-        color: palette.cyan,
-        align: 'right',
-        shadow: palette.ink,
-      }).setVisible(false),
-    };
-    this.prompt = new PixelText(scene, MONITOR.width / 2, 78, 'PICK YOUR MOVE', {
-      color: palette.text,
-      align: 'center',
-      shadow: palette.ink,
-    }).setVisible(false);
     this.draw();
   }
 
@@ -145,82 +193,122 @@ export class HudView {
     });
   }
 
-  /**
-   * Seconds left, or null to hide the timer. Called every frame while picking. Each new second is
-   * one font size bigger and a few pixels further down (towards the middle of the screen), and pops
-   * in one size bigger still. In the last seconds the timer turns gold, then red, and shakes and
-   * tilts from side to side.
-   */
   setTimer(msLeft: number | null): void {
-    const t = tuning.hud;
     if (msLeft === null) {
-      this.timerTexts.forEach((text) => text.setVisible(false));
-      this.timerBox.setRotation(0);
-      this.lastSecs = 0;
+      if (!this.slamHide) {
+        this.timer.setVisible(false);
+        this.timerMs = null;
+        this.timerSecond = -1;
+        this.timerFace.clear();
+        this.scene.tweens.killTweensOf(this.timerBeat);
+      }
       return;
     }
-    const now = this.scene.time.now;
-    const secs = Math.ceil(msLeft / 1000);
-    if (secs !== this.lastSecs) {
-      if (this.lastSecs === 0) this.startSecs = secs;
-      this.lastSecs = secs;
-      const step = Math.max(0, this.startSecs - secs);
-      this.timerSize = clampSize(t.timerBaseSize + step * t.timerGrowPerTick);
-      this.popUntil = now + t.timerPopMs;
-      this.timerTexts.forEach((text) => text.setText(String(secs)));
-      // glide to this second's spot
-      const target = TIMER.y + step * t.timerDriftPx;
-      this.scene.tweens.killTweensOf(this);
+    this.slamHide?.remove();
+    this.slamHide = null;
+    this.timerMs = Math.max(0, msLeft);
+    const second = Math.ceil(this.timerMs / 1000);
+    this.setTimerDigit(String(second));
+    if (second !== this.timerSecond) {
+      this.timerSecond = second;
+      this.scene.tweens.killTweensOf(this.timerBeat);
+      this.timerBeat.kick = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1;
       this.scene.tweens.add({
-        targets: this,
-        boxY: target,
-        duration: t.timerPopMs * 2,
+        targets: this.timerBeat,
+        kick: 0,
+        duration: second === 1 ? 260 : 200,
         ease: 'Back.easeOut',
+        onUpdate: () => this.drawTimer(),
       });
     }
-    const popping = now < this.popUntil;
-    const shown = popping ? clampSize(this.timerSize + 1) : this.timerSize;
-    const color =
-      msLeft <= t.timerRedMs ? palette.red : msLeft <= t.timerWarnMs ? palette.gold : palette.text;
-    this.timerTexts.forEach((text, size) =>
-      text.setVisible(size === shown).setColor(popping ? palette.white : color),
-    );
-    // whole-pixel jitter and a side-to-side tilt, stronger in the last second
-    const hard = msLeft <= 1000;
-    const amp = hard ? t.timerShakePx * 2 : msLeft <= t.timerRedMs ? t.timerShakePx : 0;
-    const step = Math.floor(now / Math.max(1, t.timerShakeEveryMs));
-    const jitter = (k: number) => (amp ? ((step * 7 + k * 13) % (amp * 2 + 1)) - amp : 0);
-    const tilt = amp ? (step % 2 ? 1 : -1) * t.timerTiltDeg * (hard ? 1.5 : 1) : 0;
-    this.timerBox.setPosition(TIMER.x + jitter(1), Math.round(this.boxY) + jitter(2)).setAngle(tilt);
+    this.drawTimer();
   }
 
-  /** Time ran out: a big red 0 slams down where the last second was and holds for a moment. */
+  private drawTimer(): void {
+    const g = this.timerFace.clear();
+    if (this.timerMs === null) return;
+    const x = MONITOR.width / 2;
+    const y = 18;
+    const kick = Math.max(0, this.timerBeat.kick);
+    const color = this.timerSecond <= 1 ? 0xff493b : this.timerSecond === 2 ? 0xffad39 : 0xffdf70;
+    // Fine continuous arcs replace the chunky square countdown segments.
+    g.fillStyle(0x100d1c, 0.94).fillCircle(x, y, 15);
+    g.lineStyle(1, 0x62536c, 0.8).strokeCircle(x, y, 15);
+    const remaining = Math.max(0, Math.min(1, this.timerMs / 3000));
+    if (remaining > 0) {
+      g.lineStyle(2.5, color, 1);
+      g.beginPath();
+      g.arc(x, y, 16, -Math.PI / 2, -Math.PI / 2 + remaining * Math.PI * 2, false);
+      g.strokePath();
+      const angle = -Math.PI / 2 + remaining * Math.PI * 2;
+      g.fillStyle(0xfff4d5).fillCircle(x + Math.cos(angle) * 16, y + Math.sin(angle) * 16, 1);
+    }
+    if (kick > 0) {
+      g.lineStyle(1, color, kick * 0.6).strokeCircle(x, y, 17 + (1 - kick) * 5);
+    }
+    // Every digit's ink is the same 6 x 11 box from the glyph's top-left (its 7 px advance adds a
+    // blank column), so centring that box centres any digit, on whole pixels.
+    this.timerLayers[this.timerLayers.length - 1]!.setTint(kick > 0.65 ? 0xffffff : color);
+    this.timer.setPosition(
+      x - (TIMER_DIGIT_INK.width * TIMER_SCALE) / 2,
+      y - Math.round((TIMER_DIGIT_INK.height * TIMER_SCALE) / 2) - Math.round(kick * 2),
+    );
+  }
+
+  private setTimerDigit(text: string): void {
+    for (const layer of this.timerLayers) layer.setText(text);
+    this.timer.setVisible(true);
+  }
+
   slamTimer(): void {
-    const t = tuning.hud;
     this.slamHide?.remove();
-    this.timerTexts.forEach((text) => text.setVisible(false));
-    this.timerBox.setAngle(0).setPosition(TIMER.x, Math.round(this.boxY));
-    const restY = -(GLYPH.height * MAX_FONT) / 2;
-    this.timerSlam.setVisible(true).setY(restY - t.timerSlamDropPx);
-    this.scene.tweens.add({
-      targets: this.timerSlam,
-      y: restY,
-      duration: t.timerSlamMs,
-      ease: 'Back.easeOut',
-      onUpdate: () => this.timerSlam.setY(Math.round(this.timerSlam.y)),
-    });
-    this.slamHide = this.scene.time.delayedCall(t.timerSlamMs + t.timerSlamHoldMs, () => {
-      this.timerSlam.setVisible(false);
-      this.boxY = TIMER.y;
+    this.scene.tweens.killTweensOf(this.timerBeat);
+    this.timerMs = 0;
+    this.timerSecond = 0;
+    this.timerBeat.kick = 0;
+    this.setTimerDigit('0');
+    this.drawTimer();
+    this.slamHide = this.scene.time.delayedCall(tuning.hud.timerSlamHoldMs, () => {
+      this.timer.setVisible(false);
+      this.timerMs = null;
+      this.timerFace.clear();
+      this.slamHide = null;
     });
   }
 
   setReady(side: Side, ready: boolean): void {
-    this.ready[side].setVisible(ready);
+    this.ready[side].setColor(ready ? palette.white : side === 'p1' ? 0xffd5ca : 0xc4faff);
+    this.draw();
   }
 
   showPrompt(on: boolean): void {
+    if (on && !this.arrows.visible) {
+      this.waveStartedAt = this.scene.game.loop.time;
+      this.prompt.setAlpha(1);
+      this.triangles.forEach((triangle) => triangle.setY(0));
+    }
     this.prompt.setVisible(on);
+    this.arrows.setVisible(on);
+  }
+
+  /** The bar of the side that was just hit flashes white a few times, so the eye goes to it. */
+  flashBar(side: Side): void {
+    const t = tuning.hud;
+    const ms = t.hitFlashes * t.hitFlashMs * 2;
+    this.flashUntil[side] = this.scene.time.now + ms;
+    this.scene.time.addEvent({
+      delay: t.hitFlashMs,
+      repeat: t.hitFlashes * 2,
+      callback: () => this.draw(),
+    });
+  }
+
+  /** On during the "on" half of each flash. */
+  private flashing(side: Side): boolean {
+    const now = this.scene.time.now;
+    const left = this.flashUntil[side] - now;
+    if (left <= 0) return false;
+    return Math.floor(left / tuning.hud.hitFlashMs) % 2 === 1;
   }
 
   private isLow(bar: BarState): boolean {
@@ -229,59 +317,49 @@ export class HudView {
 
   private draw(): void {
     const g = this.gfx.clear();
-    for (const side of ['p1', 'p2'] as const) {
+    // Pixel-stepped corners give the HUD softer forms without blurred edges.
+    const rounded = (x: number, y: number, w: number, h: number, color: number, alpha = 1) => {
+      g.fillStyle(color, alpha);
+      g.fillRect(x + 2, y, w - 4, h);
+      g.fillRect(x + 1, y + 1, w - 2, h - 2);
+      g.fillRect(x, y + 2, w, h - 4);
+    };
+    for (const side of SIDES) {
+      const rect = (px: number, y: number, w: number, h: number, color: number) =>
+        g.fillStyle(color).fillRect(side === 'p1' ? px - 4 : MONITOR.width - px - w + 4, y, w, h);
+      // Soft name capsules with a small player-colour inset.
+      const nameX = side === 'p1' ? 1 : 116;
+      rounded(nameX, 4, 75, 12, 0x25252d, 0.95);
+      rect(10, 4, 62, 1, 0x777782);
+      rect(6, 8, 2, 4, sideColors[side]);
+      const x = side === 'p1' ? 2 : 116;
       const bar = this.bars[side];
-      const x = side === 'p1' ? BAR.inset : MONITOR.width - BAR.inset - BAR.w;
-      const inner = BAR.w - 2;
-      const fillW = Math.round((inner * Math.max(0, bar.shown)) / bar.max);
-      const trailW = Math.round((inner * Math.max(0, bar.trail)) / bar.max);
-      const y = BAR.y + 1;
-      const h = BAR.h - 2;
-      g.fillStyle(palette.ink).fillRect(x - 1, BAR.y - 1, BAR.w + 2, BAR.h + 2);
-      g.fillStyle(palette.hpBack).fillRect(x + 1, y, inner, h);
-      g.fillStyle(shade(palette.hpBack, 0.6)).fillRect(x + 1, y, inner, 2); // the empty bar's inner shadow
+      const width = (health: number) => Math.round((70 * Math.max(0, Math.min(bar.max, health))) / bar.max);
+      const fill = width(bar.shown);
+      const trail = width(bar.trail);
+      const anchor = (w: number) => (side === 'p1' ? x + 2 : x + 72 - w);
+      rounded(x - 1, 16, 76, 12, 0x101426);
+      rounded(x, 17, 74, 10, 0x8b9db5);
+      rounded(x + 1, 18, 72, 8, 0x18263d);
+      if (trail > fill) g.fillStyle(palette.hpTrail).fillRect(anchor(trail), 19, trail, 6);
       const low = this.isLow(bar);
-      const color = low
-        ? this.pulse
-          ? lighten(palette.hpRed, 0.35)
-          : palette.hpRed
-        : bar.shown <= bar.max / 2
-          ? palette.hpYellow
-          : palette.hpGreen;
-      // p1's bar is anchored on the left edge, p2's on the right: both drain toward the outside
-      const anchor = (w: number) => (side === 'p1' ? x + 1 : x + 1 + inner - w);
-      if (trailW > fillW) g.fillStyle(palette.hpTrail).fillRect(anchor(trailW), y, trailW, h);
-      if (fillW > 0) {
-        // a rounded, lit tube: shine on top, the colour, then two darker bands underneath
-        const fx = anchor(fillW);
-        g.fillStyle(color).fillRect(fx, y, fillW, h);
-        g.fillStyle(lighten(color, 0.45)).fillRect(fx, y + 1, fillW, 2);
-        g.fillStyle(0xffffff).fillRect(fx, y + 1, fillW, 1);
-        g.fillStyle(shade(color, 0.78)).fillRect(fx, y + h - 3, fillW, 2);
-        g.fillStyle(shade(color, 0.55)).fillRect(fx, y + h - 1, fillW, 1);
-        // the leading edge glints
-        g.fillStyle(lighten(color, 0.7)).fillRect(side === 'p1' ? fx + fillW - 1 : fx, y + 1, 1, h - 2);
-      }
-      // segment notches every tenth of the bar, over fill and background alike
-      for (let i = 1; i < 10; i++) {
-        const nx = x + 1 + Math.round((inner * i) / 10);
-        g.fillStyle(palette.ink, 0.35).fillRect(nx, y + 3, 1, h - 5);
-      }
-      frameRect(g, x, BAR.y, BAR.w, BAR.h, low && this.pulse ? palette.red : palette.gold);
-      g.fillStyle(lighten(palette.gold, 0.5)).fillRect(x + 1, BAR.y, BAR.w - 2, 1); // frame highlight
-
-      // round pips next to the name, toward the centre
+      const colour = this.flashing(side)
+        ? palette.white
+        : low
+          ? this.pulse
+            ? 0xffa078
+            : palette.hpRed
+          : 0xffd04a;
+      g.fillStyle(colour).fillRect(anchor(fill), 19, fill, 6);
+      g.fillStyle(low ? 0xffbf9b : 0xfff3a0).fillRect(anchor(fill), 19, fill, 1);
+      g.fillStyle(low ? 0x9e3434 : 0xc67b1c).fillRect(anchor(fill), 24, fill, 1);
       for (let i = 0; i < this.roundsToWin; i++) {
-        const px =
-          side === 'p1'
-            ? BAR.inset + BAR.w - (i + 1) * (PIP.size + PIP.gap) + PIP.gap
-            : MONITOR.width - BAR.inset - BAR.w + i * (PIP.size + PIP.gap);
+        const px = side === 'p1' ? 71 - i * 9 : 121 + i * 9;
         const won = i < this.roundsWon[side];
-        g.fillStyle(palette.ink).fillRect(px - 1, PIP.y - 1, PIP.size + 2, PIP.size + 2);
-        g.fillStyle(won ? palette.gold : palette.hpBack).fillRect(px, PIP.y, PIP.size, PIP.size);
+        g.fillStyle(0x101426).fillRect(px - 3, 31, 7, 7);
+        g.fillStyle(won ? 0xffdc72 : 0x35536e).fillRect(px - 2, 32, 5, 5);
+        if (won) g.fillStyle(0xfff3bd).fillRect(px - 2, 32, 5, 1);
       }
     }
   }
 }
-
-const clampSize = (n: number): FontSize => Math.max(1, Math.min(MAX_FONT, Math.round(n))) as FontSize;

@@ -1,22 +1,25 @@
 export const SceneKey = {
   boot: 'Boot',
-  cabinet: 'Cabinet',
   logo: 'Logo',
   home: 'Home',
   options: 'Options',
-  howTo: 'HowTo',
+  characterSelect: 'CharacterSelect',
   lobby: 'Lobby',
   fight: 'Fight',
   result: 'Result',
   transition: 'Transition',
+  artPreview: 'ArtPreview',
+  sheetPreview: 'SheetPreview',
 } as const;
 
 /** Scenes drawn on the monitor (stopped and started by SceneFlow). */
 export const MONITOR_SCENES = [
+  SceneKey.artPreview,
+  SceneKey.sheetPreview,
   SceneKey.logo,
   SceneKey.home,
   SceneKey.options,
-  SceneKey.howTo,
+  SceneKey.characterSelect,
   SceneKey.lobby,
   SceneKey.fight,
   SceneKey.result,

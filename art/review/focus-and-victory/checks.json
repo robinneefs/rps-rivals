@@ -1,0 +1,12 @@
+{
+  "checks": [
+    "real WebAudio: no buffer starts while blurred and no queued burst on focus",
+    "victory title animates after entrance; live reduced motion settles to a still frame"
+  ],
+  "errors": [],
+  "audioStarts": {
+    "before": 2,
+    "during": 2,
+    "after": 2
+  }
+}

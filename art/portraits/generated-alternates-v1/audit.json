@@ -1,0 +1,80 @@
+[
+  {
+    "id": "taiko",
+    "source": "apps/game/public/assets/menus/action/taiko-sheet.png",
+    "sourceFrame": "rest",
+    "frame": {
+      "x": 0,
+      "y": 0,
+      "w": 192,
+      "h": 240
+    },
+    "sourceSha256": "c8ee24c4f151d044d35891ef3fe8ec8f760046ab7825aa5232d080be9ced37e4",
+    "originalMatchesInstalledRest": true,
+    "generatedDimensions": [
+      1122,
+      1402
+    ],
+    "nativeDimensions": [
+      192,
+      240
+    ],
+    "alphaThresholdForComparison": 128,
+    "silhouetteIoU": 0.9567793931731985,
+    "originalOnly": 671,
+    "generatedOnly": 423,
+    "fullyTransparentNativePixels": 20131
+  },
+  {
+    "id": "riot",
+    "source": "apps/game/public/assets/menus/action/riot-sheet.png",
+    "sourceFrame": "rest",
+    "frame": {
+      "x": 0,
+      "y": 0,
+      "w": 192,
+      "h": 240
+    },
+    "sourceSha256": "1275ae251b879312a16ad7b5f8334933d565a8f1888557f26f64bbd7f2b05cbf",
+    "originalMatchesInstalledRest": true,
+    "generatedDimensions": [
+      1122,
+      1402
+    ],
+    "nativeDimensions": [
+      192,
+      240
+    ],
+    "alphaThresholdForComparison": 128,
+    "silhouetteIoU": 0.9813891658358258,
+    "originalOnly": 168,
+    "generatedOnly": 280,
+    "fullyTransparentNativePixels": 21309
+  },
+  {
+    "id": "anchor",
+    "source": "apps/game/public/assets/menus/action/anchor-sheet.png",
+    "sourceFrame": "rest",
+    "frame": {
+      "x": 0,
+      "y": 0,
+      "w": 192,
+      "h": 240
+    },
+    "sourceSha256": "16101d0277793f7fc39ed056a9f67a5be8995cc988367db7ec28d904f888fcfe",
+    "originalMatchesInstalledRest": true,
+    "generatedDimensions": [
+      1122,
+      1402
+    ],
+    "nativeDimensions": [
+      192,
+      240
+    ],
+    "alphaThresholdForComparison": 128,
+    "silhouetteIoU": 0.9736286529130709,
+    "originalOnly": 402,
+    "generatedOnly": 310,
+    "fullyTransparentNativePixels": 18359
+  }
+]

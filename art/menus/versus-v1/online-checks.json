@@ -1,0 +1,7 @@
+{
+  "checks": [
+    "Actual local Worker and two browsers: Anchor versus Riot, delayed peer readiness keeps host panels closed, shared roundIntro opens both.",
+    "Peer disconnected during closed panels; match remains idle and disconnect notice replaces panels."
+  ],
+  "errors": []
+}

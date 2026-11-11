@@ -1,0 +1,9 @@
+Create a FOUR-FRAME home-screen idle animation sheet of ANCHOR ONLY from the reference's CENTER character. Isolate her, remove ALL environment, title, menu, other characters and text. Actual transparent background.
+EXACT TWO COLUMNS by TWO ROWS, four full-body separate figures, large clear gutters, no cell lines/floor/shadows/labels. Each complete figure same physical scale, same floor baseline and identical proportions and clothing, no clipping. Standing height80% cell height. Simple clean flat angular colour shapes, thick navy outlines, broad 2-tone shadows, NO painterly rendering, no microtexture; later reduced to about142px tall.
+Anchor is a powerful broad very muscular adult dark-skinned WOMAN: feminine face, warm confident smile, long black dreadlocks tied back with gold bands, teal sleeveless cropped vest with collar over black tank crop top, rust-orange cargo pants with dark brown knee patches, gold belt buckle, black combat boots, white hand wraps. Largest broadest character in roster. Standing relaxed with BOTH HANDS ON HIPS, elbows out, feet planted apart, face slightly toward RIGHT, proud posture. Not folded arms and not a boxing guard.
+ROW MAJOR:
+1 top-left resting idle, eyes open.
+2 top-right tiny chest breath in, shoulders about ONE native pixel higher at142px height, dreadlock tips gently shift, feet stationary.
+3 bottom-left same rest with brief blink, eyes closed; head position consistent.
+4 bottom-right gentle breath out shoulders about ONE pixel lower, tiny settling dreadlock tips. Same stance.
+Changes tiny enough for subtle slow idle, all figures visually same size and anatomy. No step, turn or extra props; four complete isolated Anchor figures, transparent2x2 sheet.

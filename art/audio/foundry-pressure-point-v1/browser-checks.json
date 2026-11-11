@@ -1,0 +1,39 @@
+{
+  "errors": [],
+  "results": [
+    {
+      "stage": "foundry-floor",
+      "music": "foundry"
+    },
+    {
+      "decoded": [
+        {
+          "ext": "ogg",
+          "duration": 49.23077083333333,
+          "channels": 2
+        },
+        {
+          "ext": "mp3",
+          "duration": 49.23077083333333,
+          "channels": 2
+        }
+      ]
+    },
+    {
+      "stage": "lantern-courtyard",
+      "music": "courtyard"
+    },
+    {
+      "stage": "sunset-harbor",
+      "music": "harbor"
+    },
+    {
+      "stage": "storm-field",
+      "music": "storm"
+    },
+    {
+      "stage": "rooftop",
+      "music": "fight"
+    }
+  ]
+}

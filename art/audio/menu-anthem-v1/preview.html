@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>One More Round — menu music preview</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font: 16px/1.5 system-ui;
+      background: #140b25;
+      color: #fff6df;
+    }
+    body {
+      max-width: 760px;
+      margin: 7vh auto;
+      padding: 24px;
+    }
+    .tag {
+      color: #ffb54f;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    h1 {
+      font-size: clamp(36px, 7vw, 62px);
+      line-height: 1.05;
+      margin: 12px 0 20px;
+    }
+    .card {
+      background: #25133b;
+      border: 1px solid #59305d;
+      border-radius: 18px;
+      padding: 24px;
+      margin: 24px 0;
+    }
+    audio {
+      width: 100%;
+      margin-top: 12px;
+    }
+    p {
+      color: #cdbedb;
+    }
+    strong {
+      color: #fff6df;
+    }
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 24px 0 0;
+    }
+    button {
+      text-align: left;
+      background: #42204c;
+      color: #fff6df;
+      border: 1px solid #75465e;
+      padding: 14px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+    }
+    button:hover {
+      border-color: #ffc45f;
+    }
+    button span {
+      display: block;
+      color: #ffbd58;
+      font-weight: 700;
+    }
+    @media (max-width: 480px) {
+      .timeline {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+  <div class="tag">RPS Rivals · Original soundtrack experiment 03</div>
+  <h1>One More Round</h1>
+  <p>
+    <strong>168 BPM · E minor · 45.71 seconds · Stereo loop</strong><br />
+    One four-bar anthem hook, four power chords, steady eighth-note guitars, and a straight rock backbeat. No
+    solo, no busy arpeggios.
+  </p>
+  <div class="card">
+    <strong>Approved menu theme</strong>
+    <audio id="new" controls loop preload="auto" src="menu-anthem-v1.wav"></audio>
+    <div class="timeline">
+      <button data-time="0"><span>0:00</span>Main hook</button>
+      <button data-time="11.4285714"><span>0:11</span>Hook doubled</button>
+      <button data-time="22.8571429"><span>0:23</span>Lighter return</button>
+      <button data-time="34.2857143"><span>0:34</span>Final hook</button>
+    </div>
+  </div>
+  <div class="card">
+    <strong>Full Throttle · previous rock idea</strong>
+    <audio id="original" controls loop preload="metadata" src="../menu-rock-v1/menu-rock-v1.wav"></audio>
+  </div>
+  <p>
+    Now installed as the menu theme. Previous tracks are preserved. Both players loop; playing one pauses the other.
+  </p>
+  <script>
+    const fresh = document.querySelector('#new');
+    const original = document.querySelector('#original');
+    fresh.volume = original.volume = 0.7;
+    fresh.addEventListener('play', () => original.pause());
+    original.addEventListener('play', () => fresh.pause());
+    document.querySelectorAll('[data-time]').forEach((button) =>
+      button.addEventListener('click', () => {
+        fresh.currentTime = Number(button.dataset.time);
+        fresh.play();
+      }),
+    );
+  </script>
+</html>

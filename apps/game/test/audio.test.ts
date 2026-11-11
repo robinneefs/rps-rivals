@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { busGain } from '../src/audio/AudioService';
 import { audioFiles, SFX, sfxFileKeys } from '../src/audio/sounds';
+import { stageFor } from '../src/config/stages';
 import {
   DEFAULT_SETTINGS,
   SettingsStore,
@@ -22,6 +23,29 @@ const memoryStore = (data: Record<string, string> = {}): KeyValueStore => ({
 });
 
 describe('sound files', () => {
+  it('loads a dedicated storm theme and retains the original rooftop theme', () => {
+    expect(stageFor(0, 'foundry-floor').music).toBe('foundry');
+    expect(audioFiles().find((file) => file.key === 'music.foundry')?.urls).toEqual([
+      'assets/audio/music/stage-pressure-point.ogg',
+      'assets/audio/music/stage-pressure-point.mp3',
+    ]);
+    expect(stageFor(0, 'lantern-courtyard').music).toBe('courtyard');
+    expect(audioFiles().find((file) => file.key === 'music.courtyard')?.urls).toEqual([
+      'assets/audio/music/stage-lantern-rush.ogg',
+      'assets/audio/music/stage-lantern-rush.mp3',
+    ]);
+    expect(stageFor(0, 'sunset-harbor').music).toBe('harbor');
+    expect(audioFiles().find((file) => file.key === 'music.harbor')?.urls).toEqual([
+      'assets/audio/music/stage-golden-hour.ogg',
+      'assets/audio/music/stage-golden-hour.mp3',
+    ]);
+    expect(stageFor(0, 'storm-field').music).toBe('storm');
+    expect(stageFor(0, 'rooftop').music ?? 'fight').toBe('fight');
+    expect(audioFiles().find((file) => file.key === 'music.storm')?.urls).toEqual([
+      'assets/audio/music/stage-under-the-storm.ogg',
+      'assets/audio/music/stage-under-the-storm.mp3',
+    ]);
+  });
   it('every sound the game loads exists (run tools/audio/make-audio.mjs after adding one)', () => {
     for (const { urls } of audioFiles()) for (const url of urls) expect(FILES.has(url), url).toBe(true);
   });

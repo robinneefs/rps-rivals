@@ -1,0 +1,119 @@
+{
+  "checks": [
+    "boat, flag, rope and native water ripple frames advance; distant birds appear; dock behind fighters",
+    "live reduced-motion toggle immediately freezes all effects and resumes correctly",
+    "rooftop shares the higher bird flyby and live reduced-motion hiding",
+    "all three stages load with real fighters; harbor scene re-entry starts a fresh clock"
+  ],
+  "errors": [],
+  "samples": [
+    {
+      "boatY": 1,
+      "flutter": -1,
+      "ropeY": 1,
+      "waterFrame": 6,
+      "birdsVisible": false,
+      "elapsed": 1600,
+      "reducedMotion": false
+    },
+    {
+      "boatY": 1,
+      "flutter": -1,
+      "ropeY": 1,
+      "waterFrame": 7,
+      "birdsVisible": false,
+      "elapsed": 1900,
+      "reducedMotion": false
+    },
+    {
+      "boatY": 1,
+      "flutter": -1,
+      "ropeY": 1,
+      "waterFrame": 9,
+      "birdsVisible": false,
+      "elapsed": 2300,
+      "reducedMotion": false
+    },
+    {
+      "boatY": 1,
+      "flutter": 0,
+      "ropeY": 0,
+      "waterFrame": 10,
+      "birdsVisible": false,
+      "elapsed": 2600,
+      "reducedMotion": false
+    },
+    {
+      "boatY": 0,
+      "flutter": 1,
+      "ropeY": 0,
+      "waterFrame": 0,
+      "birdsVisible": false,
+      "elapsed": 3000,
+      "reducedMotion": false
+    },
+    {
+      "boatY": 0,
+      "flutter": 1,
+      "ropeY": 0,
+      "waterFrame": 2,
+      "birdsVisible": false,
+      "elapsed": 3400,
+      "reducedMotion": false
+    },
+    {
+      "boatY": 0,
+      "flutter": 0,
+      "ropeY": -1,
+      "waterFrame": 3,
+      "birdsVisible": false,
+      "elapsed": 3700,
+      "reducedMotion": false
+    },
+    {
+      "boatY": 0,
+      "flutter": 0,
+      "ropeY": -1,
+      "waterFrame": 5,
+      "birdsVisible": false,
+      "elapsed": 4100,
+      "reducedMotion": false
+    },
+    {
+      "boatY": -1,
+      "flutter": -1,
+      "ropeY": -1,
+      "waterFrame": 6,
+      "birdsVisible": false,
+      "elapsed": 4400,
+      "reducedMotion": false
+    },
+    {
+      "boatY": -1,
+      "flutter": -1,
+      "ropeY": -1,
+      "waterFrame": 8,
+      "birdsVisible": false,
+      "elapsed": 4800,
+      "reducedMotion": false
+    },
+    {
+      "boatY": -1,
+      "flutter": 0,
+      "ropeY": -1,
+      "waterFrame": 9,
+      "birdsVisible": false,
+      "elapsed": 5200,
+      "reducedMotion": false
+    },
+    {
+      "boatY": -1,
+      "flutter": 1,
+      "ropeY": -1,
+      "waterFrame": 10,
+      "birdsVisible": false,
+      "elapsed": 5500,
+      "reducedMotion": false
+    }
+  ]
+}

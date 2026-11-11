@@ -1,0 +1,169 @@
+{
+  "source": "taiko.png",
+  "size": [
+    480,
+    480
+  ],
+  "palette": {
+    "1": [
+      [
+        20,
+        "25212a"
+      ],
+      [
+        65,
+        "655d59"
+      ],
+      [
+        105,
+        "a69b85"
+      ],
+      [
+        150,
+        "d0c5ab"
+      ],
+      [
+        195,
+        "eee4ce"
+      ],
+      [
+        240,
+        "fff5e1"
+      ],
+      [
+        255,
+        "fff9ed"
+      ]
+    ],
+    "2": [
+      [
+        35,
+        "300915"
+      ],
+      [
+        90,
+        "650c1b"
+      ],
+      [
+        145,
+        "a41025"
+      ],
+      [
+        200,
+        "d51b2e"
+      ],
+      [
+        235,
+        "ee2937"
+      ],
+      [
+        255,
+        "ff4245"
+      ]
+    ],
+    "3": [
+      [
+        35,
+        "300915"
+      ],
+      [
+        90,
+        "650c1b"
+      ],
+      [
+        145,
+        "a41025"
+      ],
+      [
+        200,
+        "d51b2e"
+      ],
+      [
+        235,
+        "ee2937"
+      ],
+      [
+        255,
+        "ff4245"
+      ]
+    ],
+    "4": [
+      [
+        20,
+        "080b12"
+      ],
+      [
+        90,
+        "10151d"
+      ],
+      [
+        160,
+        "1b232d"
+      ],
+      [
+        215,
+        "29333e"
+      ],
+      [
+        255,
+        "3a4652"
+      ]
+    ]
+  },
+  "frames": [
+    {
+      "name": "idle0",
+      "changed": 2029,
+      "outsideChanges": 0,
+      "alphaChanges": 0
+    },
+    {
+      "name": "idle1",
+      "changed": 2008,
+      "outsideChanges": 0,
+      "alphaChanges": 0
+    },
+    {
+      "name": "rock",
+      "changed": 2059,
+      "outsideChanges": 0,
+      "alphaChanges": 0
+    },
+    {
+      "name": "paper",
+      "changed": 1928,
+      "outsideChanges": 0,
+      "alphaChanges": 0
+    },
+    {
+      "name": "scissors",
+      "changed": 1892,
+      "outsideChanges": 0,
+      "alphaChanges": 0
+    },
+    {
+      "name": "hurt",
+      "changed": 2000,
+      "outsideChanges": 0,
+      "alphaChanges": 0
+    },
+    {
+      "name": "ko",
+      "changed": 779,
+      "outsideChanges": 0,
+      "alphaChanges": 0
+    },
+    {
+      "name": "win",
+      "changed": 2014,
+      "outsideChanges": 0,
+      "alphaChanges": 0
+    },
+    {
+      "name": "kick",
+      "changed": 1552,
+      "outsideChanges": 0,
+      "alphaChanges": 0
+    }
+  ]
+}

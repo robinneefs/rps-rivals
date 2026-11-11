@@ -1,0 +1,22 @@
+[
+  {
+    "character": "riot",
+    "framesReviewed": 9,
+    "pixelAuditPassed": true,
+    "imagesLoaded": true,
+    "frameSelectorsPassed": true,
+    "idlePlaybackPassed": true,
+    "nativeTogglePassed": true,
+    "pageErrors": []
+  },
+  {
+    "character": "anchor",
+    "framesReviewed": 9,
+    "pixelAuditPassed": true,
+    "imagesLoaded": true,
+    "frameSelectorsPassed": true,
+    "idlePlaybackPassed": true,
+    "nativeTogglePassed": true,
+    "pageErrors": []
+  }
+]

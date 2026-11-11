@@ -1,38 +1,72 @@
 // Every number that changes how the game *feels*. Changing these never changes who wins
 // (rules and phase timings live in packages/core/src/config.ts). A magic number in a view is a bug.
 export const tuning = {
+  versus: {
+    closeMs: 420,
+    holdMs: 2800,
+    openMs: 240,
+    impactMs: 260,
+    impactPx: 5,
+    cabinetPx: 4,
+    cabinetMs: 280,
+    sparkCount: 36,
+    sparkMs: 650,
+    crtJoltMs: 120,
+  },
   reveal: {
     /**
      * Move badges pop in beside the fighters (badgeOutPx out from them, at badgeY), wait, then fly
      * from flyAtMs to the middle and collide at impactAtMs. The winner slides to the centre; the
      * loser is knocked off screen in loserFlyMs, turning a quarter every loserSpinMs. A tie bounces
-     * both back by tieBouncePx. The verdict ("ROCK WINS") slams in at verdictY.
+     * both back by tieBouncePx.
      */
     badgePopMs: 200,
     badgePopFromPx: 10,
-    badgeOutPx: 48,
-    badgeY: 104,
-    clashY: 76,
+    badgeOutPx: 24,
+    badgeY: 102,
+    clashY: 96,
     flyAtMs: 300,
+    coinWindupMs: 180,
+    coinPullbackPx: 12,
+    coinTurnDegrees: 90,
+    coinWindupTiltDegrees: 18,
+    coinArcPx: 14,
+    coinTrailLifeMs: 340,
+    coinTrailFrequencyMs: 8,
+    coinImpactParticles: 140,
+    coinImpactLifeMs: 520,
+    coinShockwaveMs: 320,
     loserFlyMs: 480,
     loserSpinMs: 70,
     tieBouncePx: 14,
     tieBounceMs: 240,
     flashMs: 60,
-    verdictY: 38,
+    /**
+     * The verdict: the rule ("ROCK BEATS SCISSORS") at ruleY, then after hitLineDelayMs who hit
+     * ("YOU HIT!", "RIVAL HITS!") at verdictY, both in the winner's colour. A tie: "CLASH!" and
+     * "NO DAMAGE". While the badges fly each carries its owner's name, ownerGapPx above it.
+     */
+    ruleY: 52,
+    verdictY: 65,
+    hitLineDelayMs: 140,
+    ownerGapPx: 10,
     /** The damage number hops up damageHopPx, then falls damageFallPx over damageFallMs. */
+    damageAboveFloorPx: 130,
     damageHopPx: 4,
-    damageFallPx: 22,
+    damageFallPx: 6,
     damageFallMs: 620,
     /** Fighters swing into their move at this point of the reveal... */
-    strikeAtMs: 420,
+    strikeAtMs: 620,
     /** ...and the hit lands here (the badges collide here too). */
     impactAtMs: 620,
     /** Back to idle (the reveal phase itself is timed by the referee). */
     recoverAtMs: 1400,
     /** Badges, verdict and damage number are cleared away. */
     clearAtMs: 1550,
-    lungePx: 4,
+    /** Close the wider idle gap for contact, then step back on recovery. */
+    lungePx: 14,
+    guardStepPx: 12,
+    recoilPx: 2,
   },
   hitPause: { byDamage: { 10: 50, 15: 70, 20: 90 } as Record<number, number> },
   shake: { byDamage: { 10: 2, 15: 3, 20: 4 } as Record<number, number>, durationMs: 280, koPx: 5 },
@@ -66,14 +100,13 @@ export const tuning = {
     sizePx: 3,
   },
   dust: { count: 5, speedMin: 12, speedMax: 30, gravity: -20, lifeMs: 360, sizePx: 3 },
-  /**
-   * HUD. Timer: the first second is drawn at font size timerBaseSize, and each next second
-   * timerGrowPerTick sizes bigger and timerDriftPx lower (towards the middle). Gold from
-   * timerWarnMs (the ticks start there too), red, shaking and tilting by timerTiltDeg from
-   * timerRedMs (harder in the last second). Each new second pops one size up for timerPopMs.
-   * At 0 a red 0 drops timerSlamDropPx and slams down in timerSlamMs, then holds timerSlamHoldMs.
-   */
+  /** HUD health animation and fixed-size timer. Ticks start at timerWarnMs; red from timerRedMs. */
   hud: {
+    pickBouncePx: 3,
+    pickPromptFlickerMs: 1600,
+    pickBounceMs: 360,
+    pickBounceStaggerMs: 140,
+    pickBounceCycleMs: 900,
     drainMs: 600,
     trailDelayMs: 120,
     lowHealth: 15,
@@ -81,16 +114,10 @@ export const tuning = {
     lowPulseMs: 260,
     timerWarnMs: 3000,
     timerRedMs: 2000,
-    timerBaseSize: 4,
-    timerGrowPerTick: 1,
-    timerDriftPx: 9,
-    timerTiltDeg: 4,
-    timerPopMs: 90,
-    timerShakePx: 1,
-    timerShakeEveryMs: 40,
-    timerSlamDropPx: 10,
-    timerSlamMs: 160,
     timerSlamHoldMs: 450,
+    /** The hurt fighter's bar flashes white hitFlashes times, hitFlashMs per flash and per gap. */
+    hitFlashes: 3,
+    hitFlashMs: 60,
   },
   /**
    * Cabinet buttons. releaseMs: how long a quick tap stays down. Lock-in: the chosen button flashes
@@ -99,7 +126,6 @@ export const tuning = {
    */
   /** Buttons: press and lock-in timings; a glint sweeps them every shineGapMs (frames shineFrameMs apart). */
   buttons: {
-    pressDepthPx: 6,
     releaseMs: 80,
     lockFlashes: 2,
     lockFlashMs: 45,
@@ -108,15 +134,40 @@ export const tuning = {
     shineFrameMs: 50,
     shineStaggerMs: 110,
   },
-  /** Joystick: on release it springs back, overshoots by `wobble` of a full tilt, and settles (wobbleMs a step). */
-  joystick: { springBackMs: 90, tiltPx: { x: 9, y: 6 }, dragDeadzonePx: 6, wobble: 0.35, wobbleMs: 60 },
+  /**
+   * Joystick: a drag must go dragDeadzonePx (CSS pixels) before it tilts at all; within
+   * axisSnapDeg of straight up, down, left or right it stays on that axis (no accidental
+   * diagonals). Let go, it springs back after springBackMs, flicks the other way for wobbleMs,
+   * and settles.
+   */
+  joystick: { springBackMs: 90, dragDeadzonePx: 28, axisSnapDeg: 30, wobbleMs: 60 },
   idle: { breatheEveryMs: 420 },
-  intro: { fadeInMs: 500, holdMs: 1500, fadeOutMs: 500, fadeSteps: 4 },
+  intro: { delayMs: 180, popMs: 650, holdMs: 1400, sheenDelayMs: 160, sheenMs: 900 },
   /** Screen changes: the CRT closes to a line (closeMs), the line shrinks to a dot (lineMs), it stays off (offMs), then back on; a frame every stepMs. */
   transitions: { closeMs: 120, lineMs: 80, offMs: 60, stepMs: 20 },
   /** Menus; the backdrop's diagonal stripes move one pixel every stripeStepMs. */
   menu: { cursorBlinkMs: 400, repeatDelayMs: 300, stripeStepMs: 90 },
-  banner: { slamMs: 180, holdMs: 900 },
+  banner: { slamMs: 180, holdMs: 900, fightHoldMs: 650, afterFightMs: 350 },
+  /**
+   * Who is who. Before round 1 a "YOU VS RIVAL" card holds for vsCardMs, then "ROUND 1" slams in.
+   * A "YOU" / "RIVAL" tag with an arrow bobs over each fighter (by bobPx every bobMs) through the
+   * first tagRounds rounds; at the start of the next round it blinks out (blinkTimes, blinkMs each).
+   */
+  identity: {
+    circlePopMs: 280,
+    coinTickPx: 2,
+    coinTickMs: 180,
+    introFlickerMs: 60,
+    vsCardMs: 850,
+    vsSlideMs: 220,
+    tagRounds: 0,
+    bobPx: 1,
+    bobMs: 320,
+    blinkTimes: 3,
+    blinkMs: 110,
+  },
+  /** "PICK YOUR MOVE" and, for the first arrowTurns picks of a match, "▼ PRESS A BUTTON ▼" under it. */
+  prompt: { arrowTurns: 1 },
   /**
    * The whole cabinet rattles against the room: on a K.O., on a hit of bigHitDamage or more,
    * and once when the pick timer runs out. It moves to a new offset every shakeStepMs.
@@ -134,17 +185,24 @@ export const tuning = {
   /**
    * CRT screen (Options > CRT SCREEN): glow is how much bright colours bleed, vignette darkens the
    * edges, cornerRadius rounds the corners (fraction of the screen), roll is the slow bright band.
-   * Scanlines: a dark line scanlineThickness of each pixel row tall, at scanlineAlpha.
+   * Display-resolution texture: scanlineAlpha darkens rows, scanlineThickness controls their
+   * duty cycle, and texturePitch sets spacing in display pixels, above the game pixel raster.
    */
   crt: {
-    glow: 0.9,
-    vignette: 0.45,
+    glow: 1.8,
+    /** Midtone lift after the scanline/mask loss; keeps black/white endpoints intact. */
+    gamma: 0.78,
+    vignette: 0.61,
     cornerRadius: 0.06,
-    roll: 0.035,
+    roll: 0.15,
+    /** Small one-native-pixel channel fringe, separate from the strong K.O. split. */
+    colorFringe: 0.14,
+    texturePitch: 4,
     scanlineThickness: 0.35,
-    scanlineAlpha: 0.28,
+    scanlineAlpha: 0.2,
+    phosphorMask: 0,
     /** Impact effects (on even with the CRT look off): colour split on a K.O., row warp on big hits. */
-    koSplitPx: 3,
+    koSplitPx: 6,
     koSplitMs: 900,
     bigHitWarpPx: 2,
     bigHitWarpMs: 260,
@@ -160,8 +218,22 @@ export const tuning = {
     blackoutAlpha: 0.7,
     surgeAlpha: 0.1,
     surgeMs: 50,
+    /**
+     * The art sits recessed in the cabinet (cabinet units, read once at start): a dark seam round
+     * the edge, a shadow cast down by the top bezel, a softer one in from every side, and a
+     * vignette that darkens the corners.
+     */
+    seamPx: 1.5,
+    seamAlpha: 0.6,
+    topShadowPx: 12,
+    topShadowAlpha: 0.75,
+    bottomShadowPx: 12,
+    bottomShadowAlpha: 0.75,
+    edgeShadowPx: 14,
+    edgeShadowAlpha: 0.55,
+    vignetteAlpha: 0.35,
   },
   result: { delayAfterMatchMs: 400 },
   /** Online: how long "RIVAL LEFT" and other ending messages stay up before going home; lobby text blink. */
-  online: { endedHoldMs: 2500, waitBlinkMs: 500 },
+  online: { endedHoldMs: 3500, waitBlinkMs: 500 },
 } as const;

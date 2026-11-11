@@ -1,4 +1,6 @@
-"""Builds the studio logo assets from the white master in docs/brand/.
+"""Legacy chunky logo experiment; current intro uses tools/art/prepare-studio-logo.py.
+
+Builds the old studio logo assets from the white master in docs/brand/.
 
 Run with: python3 tools/make-logo.py   (needs Pillow: python3 -m pip install pillow)
 

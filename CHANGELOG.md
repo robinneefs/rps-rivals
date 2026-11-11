@@ -2,6 +2,70 @@
 
 Every build that goes online gets a new version number (in `apps/game/package.json`, shown small on the home screen) and an entry here. Version numbers follow semver: a new feature bumps the middle number (1.0.0 → 1.1.0), a fix-only build bumps the last (1.0.0 → 1.0.1). Each version that goes live is tagged `vX.Y.Z` with a GitHub release, made automatically from its entry here when it reaches the `production` branch.
 
+## 2.3.0 (2026-11-11)
+
+- New icon and link preview. The browser tab, home-screen, Android and Play Store icons are now the cabinet's glossy Rock button on a marquee-style burst, and links shared in chat apps show the RPS RIVALS title beside the versus screen and a K.O., with an updated description. The image has a new file name, so apps that cached the old preview pick up the new one.
+- The countdown digits use the menu font at 2x, matching the other pixel lettering.
+
+- Documentation refresh: new README, screenshots of every screen and all five stages from the production build (`sources/screenshots/capture.mjs`, now WebP), a current-architecture section, and updated audio, tuning and store-listing notes.
+
+- Online match exits and disconnect recovery return to the main menu; Play Online always starts at the Online menu. Removed stale room-screen callbacks that could interrupt disconnect handling, and reconcile ended sessions after phone background/resume or focus.
+
+- Centre countdown digits using rendered ink bounds rather than platform-dependent font padding, fixing mobile alignment while preserving the typeface and tick animation.
+
+- Integrated approved v6 embossed hand pictograms and generated K.O. lettering into normal gameplay. Preserved all studies and the 19-beat development review harness.
+- Revised the gold HUD, larger countdown dial, synchronized coin ticks, persistent countdown audio, picking prompt and local-player marker. Round openings now last 2.8 seconds with red-highlighted FIGHT lettering and a 350ms clear pause; picking still allows three full seconds.
+- Attack coins pull back, rotate inward and arc into an accelerating collision with intense trails, sparks and shockwaves. They return to their round shape at impact. Ties trigger a one-shot CRT burst; redundant attack text is removed.
+- Raised damage numbers use larger menu lettering with a gold gradient and a short downward fade. Results identify YOU, CPU or RIVAL instead of the fighter's name.
+- Anchor always auto-picks Rock on timeout; manual picks and other fighters' random fallbacks are preserved. The shared server rules are included.
+- Confirmed fresh-install defaults: CRT on, pixel perfect off, haptics on, sound on. Saved player preferences remain respected.
+- Polish review: installed the approved 733 × 161 marquee with inward-facing Riot and tied-back Anchor hair; retained natural proportions. Increased K.O. colour split, brightened CRT midtones/glow while retaining edge shading, concealed the screen-opening hairline and removed the unused How to Play screen. Current random CPU retained by user decision.
+- Validation: 186 unit tests, all 16 browser checks using installed Chrome, lint, typecheck, formatting and production build pass. Updated stale navigation/rendering expectations and isolated random fixtures. Generated art studies/exported metadata excluded from source formatting. Final two-player online playtest remains pending; the existing bundle-size advisory remains.
+
+## 2.2.0 (2026-10-25)
+
+- **New marquee.** Fresh marquee art with Taiko, Anchor and Riot beside the flame-lettered RPS RIVALS title. It now fills the whole marquee window: before, the art was a little too short, so a strip of the cabinet's empty marquee showed underneath it.
+- **The marquee sits in the cabinet.** A soft shadow under the top edge, shading round the sides and darker corners make it look set into the machine instead of pasted on top.
+
+## 2.1.0 (2026-10-24)
+
+- **New joystick.** A new red ball-top joystick, drawn in all 8 directions; the right-hand directions mirror the left ones, so both sides look the same. The stick is drawn in front of everything else on the cabinet, the screen and the buttons included.
+- **No accidental diagonals.** Dragging the joystick with a finger or the mouse needs a clear push before it moves, and a swipe that is mostly up, down, left or right stays exactly that. Only a clearly diagonal drag tilts it diagonally.
+
+## 2.0.0 (2026-10-24)
+
+The first build of the big overhaul: a new arcade cabinet, made for phones. (A work in progress on staging: the fighters, the other screens and the characters are still to come.)
+
+- **A new cabinet.** The pixel cabinet is replaced by a painted, glossy 90s cabinet: navy body with red, yellow and blue stripes, a flame-lettered RPS RIVALS marquee that still flickers, a red ball joystick, and big pink, yellow and cyan ROCK, PAPER and SCISSORS buttons. Behind it, a neon arcade room. Only the game on the screen is pixel art now.
+- **Fits your phone.** The cabinet fills the width of an upright phone, even with the browser's address and tool bars showing, keeps clear of the notch and home bar, and refits when the bars slide in or out. On a computer it stands in the middle of the arcade room.
+- **Big touch controls.** The buttons and joystick are much bigger, and each reacts to its whole part of the control panel, so a thumb that lands next to a button still presses it. The buttons press in, your pick glows and the others dim. Drag the joystick in any of 8 directions; it flicks back when you let go.
+- **A bigger, taller screen.** The game screen is now 288 x 360 pixels (was 216 x 216), drawn so every pixel stays sharp and the same size on any screen. The CRT scanlines and glow are still there.
+- **A new stage.** Fights take place on a sunny city rooftop. The old Night Street, Sunny Field and Castle Roof stages are gone for now (they were made for the old screen).
+- **SCALING is gone** from Options: the new cabinet always sizes itself.
+
+## 1.3.0 (2026-10-17)
+
+- **CPU is CPU again.** In a match against the computer it's called CPU everywhere again: the tags over the fighters, the VS card, "CPU HITS!", the HUD, "CPU WINS" and START GAME, VS CPU on the home menu. RIVAL is now only for online matches, and the ONLINE menu item now says VS RIVAL instead of VS FRIEND.
+- **Menus follow the mouse.** Hovering a menu item with the mouse now selects it, just like moving to it with the joystick, with the same blip. (On a phone a tap still just picks the item.)
+- **How to Play shows the circle.** The three moves are now drawn in a triangle with arrows going round: rock → scissors → paper → rock, each move beating the one its arrow points at. The cryptic "PAPER BEATS ROCK TOO" line is gone.
+- **Steadier sound.** The sound effects came out of the generator up to 7 dB apart (the whoosh and K.O. loud, the menu blips quiet), so the volume jumped from one sound to the next. Every effect now peaks at about the same level (the K.O. a touch louder). The effects sit closer to the music: they used to be about 14 dB above it and are now about 9. A limiter on the output stops overlapping sounds from clipping into a loud crackle.
+- **Even CRT scanlines.** The scanlines are now drawn at the screen's own resolution, one equally thick line under each pixel row, placed exactly where the browser draws that row. Before, at the default Fill height scaling, the lines came out uneven and drifted against the rows.
+
+## 1.2.0 (2026-10-17)
+
+New players often couldn't tell which fighter was theirs or what had just happened. The fight now spells it out:
+
+- **YOU VS RIVAL.** Before round 1, the two names slide in from their sides with a big VS between them, then ROUND 1 slams in.
+- **A tag over each fighter.** Through round 1 a bobbing **YOU** or **RIVAL** tag with an arrow points down at each fighter. At the start of round 2 the tags blink out.
+- **Each side has its own colour.** Your names, health bar frames and round boxes are now red for the left fighter (red shirt) and teal for the right one (teal top), so each bar matches its fighter.
+- **Your pick shows over your head.** While picking, your move appears over your fighter, and a **?** hangs over your rival's head (dim until they lock in, bright once they have). The pick stays hidden until the reveal.
+- **A bigger prompt.** PICK YOUR MOVE is bigger and sits under the fighters. For the first three picks of a match, **▼ PRESS A BUTTON ▼** points down at the buttons. The prompt goes away once you've picked.
+- **The reveal says who hit whom.** Each badge carries its owner's name (YOU / RIVAL) until the badges collide. Then the rule appears (**SCISSORS BEATS PAPER**), followed by **YOU HIT!** or **RIVAL HITS!**, both in the winner's colour. A tie shows **CLASH!** and **NO DAMAGE**.
+- **The hit lands on the right bar.** The damage number now pops off the loser's head in red, and the loser's health bar flashes white.
+- **The CPU is called RIVAL.** RIVAL now appears everywhere the game used to say CPU: the HUD, the result screen (RIVAL WINS) and the home menu (START GAME, VS RIVAL). Online works the same way, with P1 / P2 in front of each name on the HUD.
+- At low health the bar frame now flashes white instead of red (red is the left side's colour now).
+- All of it works the same online, from either seat. New tuning values (`identity`, `prompt`, the verdict and bar flash values under `reveal` and `hud`) are in the dev tuning panel.
+
 ## 1.1.1 (2026-10-13)
 
 - **Privacy policy page.** The game's site now has a privacy policy at `privacy.html` (needed for Google Play): no accounts, no ads, no analytics, settings stay on your device, and the online server only passes moves between the two players without saving anything.

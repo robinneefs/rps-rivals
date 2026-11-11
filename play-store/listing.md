@@ -21,11 +21,11 @@ You've played rock paper scissors a thousand times. You've never played it like 
 
 RPS Rivals turns the oldest hand game in the world into a pixel-art arcade fighter, straight off a '90s cabinet. Two fighters. Three buttons. Three seconds to choose. Pick ROCK, PAPER or SCISSORS, watch the moves clash in the middle of the screen, and see who hits the floor.
 
-★ EVERY MOVE HITS DIFFERENT
-This isn't the rock paper scissors you know. Scissors slices for 20 damage, Rock smashes for 15, Paper wraps for 10. The big hit is tempting... and that's exactly what your rival is counting on. Bluff, read, double-bluff, and land the K.O.
+★ PICK YOUR FIGHTER
+Taiko hits hard with every move. Riot is fragile, but Riot's Scissors slice for 35. Anchor soaks up 120 damage and her Rock smashes for 50, but her Paper and Scissors barely sting, and everyone knows it. Choose your style, then make your rival guess.
 
 ★ A MIND GAME IN EVERY ROUND
-Each fighter has 50 health and only the loser of an exchange gets hurt. Low on health? Suddenly a 10-damage Paper won't finish the job, and everyone knows it. Best of three rounds takes the match.
+Only the loser of an exchange gets hurt. The big hit is tempting... and that's exactly what your rival is counting on. Bluff, read, double-bluff, and land the K.O. Win two rounds to take the match.
 
 ★ PLAY A FRIEND ONLINE
 Start a room, share the 4-letter code, and settle it once and for all. No accounts, no sign-up, no waiting.
@@ -37,7 +37,7 @@ Warm up against the computer any time, even offline.
 Your phone buzzes with every screen shake: a soft tap on a clash, a solid thump on a big hit, a rumble on the K.O. Too much? Turn it off in Options.
 
 ★ PURE ARCADE STYLE
-Crunchy pixel art, three stages (Night Street, Sunny Field and Castle Roof), punchy sound effects, chiptune music and an optional CRT screen glow for that real arcade-tube feel.
+Crunchy pixel art on a glossy '90s cabinet, five animated stages (City Rooftop, Storm Field, Sunset Harbor, Lantern Courtyard and Foundry Floor), each with its own chiptune soundtrack, a versus screen that slams together before every fight, and a CRT screen glow for that real arcade-tube feel.
 
 ★ FREE AND FAIR
 No ads. No in-app purchases. No accounts. No data collected. Just you, your rival and three buttons.

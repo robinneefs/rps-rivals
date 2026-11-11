@@ -1,0 +1,99 @@
+{
+  "errors": [],
+  "results": [
+    {
+      "reduced": false,
+      "initial": {
+        "id": "storm-field",
+        "effects": {
+          "frame": 0,
+          "cloudOffset": 0,
+          "strikes": 0,
+          "lightning": false,
+          "reducedMotion": false
+        },
+        "layers": [
+          "storm-clouds",
+          "storm-lightning",
+          "storm-field",
+          "fighter-p1",
+          "fighter-p2",
+          "storm-foreground",
+          "storm-rain"
+        ]
+      },
+      "strike": {
+        "id": "storm-field",
+        "effects": {
+          "frame": 8,
+          "cloudOffset": 9,
+          "strikes": 1,
+          "lightning": true,
+          "reducedMotion": false
+        },
+        "layers": [
+          "storm-clouds",
+          "storm-lightning",
+          "storm-field",
+          "fighter-p1",
+          "fighter-p2",
+          "storm-foreground",
+          "storm-rain"
+        ]
+      }
+    },
+    {
+      "rematch": {
+        "id": "storm-field",
+        "effects": {
+          "frame": 0,
+          "cloudOffset": 0,
+          "strikes": 0,
+          "lightning": false,
+          "reducedMotion": false
+        },
+        "layers": [
+          "storm-clouds",
+          "storm-lightning",
+          "storm-field",
+          "fighter-p1",
+          "fighter-p2",
+          "storm-foreground",
+          "storm-rain"
+        ]
+      }
+    },
+    {
+      "reduced": true,
+      "state": {
+        "id": "storm-field",
+        "effects": {
+          "frame": 0,
+          "cloudOffset": 0,
+          "strikes": 0,
+          "lightning": false,
+          "reducedMotion": true
+        },
+        "layers": [
+          "storm-clouds",
+          "storm-lightning",
+          "storm-field",
+          "fighter-p1",
+          "fighter-p2",
+          "storm-foreground",
+          "storm-rain"
+        ]
+      }
+    },
+    {
+      "rooftop": {
+        "id": "rooftop",
+        "effects": null,
+        "layers": [
+          "fighter-p1",
+          "fighter-p2"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "errors": [],
+  "results": [
+    {
+      "stage": "sunset-harbor",
+      "music": "harbor"
+    },
+    {
+      "decoded": [
+        {
+          "ext": "ogg",
+          "duration": 53.333333333333336,
+          "channels": 2
+        },
+        {
+          "ext": "mp3",
+          "duration": 53.333333333333336,
+          "channels": 2
+        }
+      ]
+    },
+    {
+      "stage": "storm-field",
+      "music": "storm"
+    },
+    {
+      "stage": "rooftop",
+      "music": "fight"
+    }
+  ]
+}

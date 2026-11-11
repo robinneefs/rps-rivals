@@ -1,9 +1,20 @@
 import type Phaser from 'phaser';
 import { VOLUME_MAX, type Settings, type SettingsStore } from '../platform/settings';
-import { musicFileKey, SFX_GAIN, sfxFileKeys, type MusicKey, type SfxKey, type SfxPlayer } from './sounds';
+import {
+  musicFileKey,
+  SFX,
+  SFX_GAIN,
+  sfxFileKeys,
+  type MusicKey,
+  type SfxKey,
+  type SfxPlayer,
+} from './sounds';
 
-/** Loudness of each bus at full volume, so effects sit on top of the music. */
-const BUS = { music: 0.5, sfx: 0.85 } as const;
+/**
+ * Loudness of each bus at full volume, so effects sit on top of the music without jumping out of
+ * it (they were about 14 dB over it; now about 9).
+ */
+const BUS = { music: 0.7, sfx: 0.7 } as const;
 const FADE_IN_MS = 200;
 
 /** Gain for a volume step: a curve, so the low steps are still audible but get quiet fast. */
@@ -41,7 +52,16 @@ export class AudioService implements SfxPlayer {
     private readonly settings: SettingsStore,
   ) {
     game.events.on('step', (time: number) => this.step(time));
+    this.addLimiter();
     game.sound.on('unlocked', () => this.startWanted());
+    // WebAudio suspends its clock on blur. One-shots started while suspended
+    // would otherwise accumulate and all begin when the context resumes.
+    const discardEffects = () => {
+      for (const key of Object.keys(SFX) as SfxKey[])
+        for (const file of sfxFileKeys(key)) for (const sound of game.sound.getAll(file)) sound.destroy();
+    };
+    game.events.on('blur', discardEffects);
+    game.events.on('hidden', discardEffects);
     settings.onChange(() => this.applyVolumes());
   }
 
@@ -52,7 +72,15 @@ export class AudioService implements SfxPlayer {
 
   play(key: SfxKey, opts: { detune?: number; volume?: number } = {}): void {
     const gain = busGain(this.settings.value, 'sfx') * (SFX_GAIN[key] ?? 1) * (opts.volume ?? 1);
-    if (gain <= 0 || this.game.sound.locked) return;
+    const manager = this.game.sound as Partial<Phaser.Sound.WebAudioSoundManager>;
+    if (
+      gain <= 0 ||
+      this.game.sound.locked ||
+      manager.gameLostFocus ||
+      (typeof document !== 'undefined' && document.hidden) ||
+      (manager.context && manager.context.state !== 'running')
+    )
+      return;
     const files = sfxFileKeys(key);
     const file = files[Math.floor(Math.random() * files.length)];
     if (!file || !this.game.cache.audio.exists(file)) return;
@@ -73,6 +101,25 @@ export class AudioService implements SfxPlayer {
     }
     if (key === null) return;
     this.startAt = this.now + (opts.delayMs ?? 0);
+  }
+
+  /**
+   * A limiter on the way out: when several sounds land at once (a hit, the whoosh, the music)
+   * their sum would clip into a harsh, louder crackle. It only acts on those peaks.
+   */
+  private addLimiter(): void {
+    const manager = this.game.sound as Partial<Phaser.Sound.WebAudioSoundManager>;
+    const { context, masterVolumeNode: master } = manager;
+    if (!context || !master) return; // HTML5 audio or no audio: nothing to route
+    const limiter = context.createDynamicsCompressor();
+    limiter.threshold.value = -3;
+    limiter.knee.value = 2;
+    limiter.ratio.value = 20;
+    limiter.attack.value = 0.002;
+    limiter.release.value = 0.15;
+    master.disconnect();
+    master.connect(limiter);
+    limiter.connect(context.destination);
   }
 
   private startWanted(): void {

@@ -1,0 +1,8 @@
+{
+  "native": [192, 240],
+  "poses": ["idle0", "idle1", "rock", "paper", "scissors", "hurt", "ko", "win", "kick"],
+  "errors": [],
+  "failures": [],
+  "crt": true,
+  "reviewOnly": true
+}

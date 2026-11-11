@@ -1,5 +1,7 @@
 import {
   defaultRules,
+  rulesForFighters,
+  initialCharacterSelection,
   defaultTimings,
   opponentOf,
   parseClientMessage,
@@ -14,6 +16,7 @@ import {
   type RulesConfig,
   type ServerMessage,
   type Side,
+  type PlayableCharacterId,
 } from '@rps/core';
 
 /** One player's connection, whatever carries it (a WebSocket in the Durable Object, a fake in tests). */
@@ -26,7 +29,8 @@ interface Seat {
   conn: Connection;
   version: string;
   ready: boolean;
-  rematch: boolean;
+  rematch: false | 'rematch' | 'characterSelect';
+  heartbeat?: Cancel;
 }
 
 export interface RoomTimeouts {
@@ -50,6 +54,8 @@ export class MatchRoom {
   private readonly seats: Record<Side, Seat | null> = { p1: null, p2: null };
   private referee: Referee | null = null;
   private idle: Cancel | null = null;
+  private selection = initialCharacterSelection();
+  private selectionLocked = false;
 
   constructor(
     private readonly clock: Clock,
@@ -75,15 +81,29 @@ export class MatchRoom {
     }
     const seat = this.seats[side]!;
     switch (msg?.type) {
+      case 'ping':
+        seat.heartbeat?.();
+        seat.heartbeat = this.clock.schedule(20000, () => {
+          this.leave(conn);
+          conn.close(CloseCode.timeout, 'connection check timed out');
+        });
+        conn.send({ type: 'pong' });
+        break;
       case 'ready':
         seat.ready = true;
         this.startIfReady();
+        break;
+      case 'character':
+        this.chooseCharacter(side, msg.character, msg.confirmed);
         break;
       case 'pick':
         this.referee?.submitPick(side, msg.move);
         break;
       case 'rematch':
-        this.requestRematch(side);
+        this.requestRematch(side, 'rematch');
+        break;
+      case 'characterSelect':
+        this.requestRematch(side, 'characterSelect');
         break;
       // a repeated hello or garbage from a seated player is ignored
     }
@@ -93,6 +113,7 @@ export class MatchRoom {
   leave(conn: Connection): void {
     const side = this.sideOf(conn);
     if (!side) return;
+    this.seats[side]?.heartbeat?.();
     this.seats[side] = null;
     const other = this.seats[opponentOf(side)];
     if (other) {
@@ -117,6 +138,8 @@ export class MatchRoom {
     this.seats.p2 = { conn, version, ready: false, rematch: false };
     this.clearIdle();
     this.welcome('p2');
+    this.setIdle(this.timeouts.lobbyMs);
+    this.broadcast({ type: 'selection', ...this.selection });
     this.broadcast({ type: 'opponentJoined' });
   }
 
@@ -126,6 +149,7 @@ export class MatchRoom {
 
   private startIfReady(): void {
     if (!SIDES.every((s) => this.seats[s]?.ready)) return;
+    if (!SIDES.every((s) => this.selection.confirmed[s])) return;
     const phase = this.referee?.currentPhase ?? 'idle';
     if (phase !== 'idle' && phase !== 'matchOver') return;
     this.clearIdle();
@@ -133,18 +157,47 @@ export class MatchRoom {
     this.referee.start();
   }
 
-  private requestRematch(side: Side): void {
+  private chooseCharacter(side: Side, character: PlayableCharacterId, confirmed: boolean): void {
+    // Identities cannot change during a match or its rematch handshake.
+    if (this.referee || this.selectionLocked) return;
+    this.selection.fighters[side] = character;
+    this.selection.confirmed[side] = confirmed;
+    this.selectionLocked = SIDES.every((s) => this.selection.confirmed[s]);
+    // A readiness message sent before lock-in cannot bypass selection.
+    for (const s of SIDES) if (this.seats[s]) this.seats[s]!.ready = false;
+    this.broadcast({
+      type: 'selection',
+      fighters: { ...this.selection.fighters },
+      confirmed: { ...this.selection.confirmed },
+    });
+  }
+
+  private requestRematch(side: Side, choice: 'rematch' | 'characterSelect'): void {
     const seat = this.seats[side]!;
     if (this.referee?.currentPhase !== 'matchOver' || seat.rematch) return;
-    seat.rematch = true;
-    this.broadcast({ type: 'rematchRequested', side });
+    seat.rematch = choice;
+    this.broadcast({ type: choice === 'rematch' ? 'rematchRequested' : 'characterSelectRequested', side });
     if (!SIDES.every((s) => this.seats[s]?.rematch)) return;
+    const reselect = SIDES.some((s) => this.seats[s]?.rematch === 'characterSelect');
     for (const s of SIDES) Object.assign(this.seats[s]!, { rematch: false, ready: false });
-    this.broadcast({ type: 'rematchAccepted' });
+    if (reselect) {
+      this.referee?.dispose();
+      this.referee = null;
+      this.selection.confirmed = { p1: false, p2: false };
+      this.selectionLocked = false;
+      this.setIdle(this.timeouts.lobbyMs);
+      this.broadcast({ type: 'selection', ...this.selection });
+      this.broadcast({ type: 'characterSelectAccepted' });
+    } else this.broadcast({ type: 'rematchAccepted' });
   }
 
   private createReferee(): Referee {
-    const referee = new Referee(this.rules, this.timings, this.clock, this.rng);
+    const referee = new Referee(
+      rulesForFighters(this.rules, this.selection.fighters),
+      this.timings,
+      this.clock,
+      this.rng,
+    );
     referee.on('phase', (e) =>
       this.broadcast({
         type: 'phase',
@@ -183,7 +236,6 @@ export class MatchRoom {
     this.idle = this.clock.schedule(ms, () => {
       this.idle = null;
       for (const s of SIDES) this.seats[s]?.conn.close(CloseCode.timeout, 'timed out');
-      this.seats.p1 = this.seats.p2 = null;
       this.reset();
     });
   }
@@ -197,6 +249,11 @@ export class MatchRoom {
     this.clearIdle();
     this.referee?.dispose();
     this.referee = null;
-    for (const s of SIDES) this.seats[s] = null;
+    this.selection = initialCharacterSelection();
+    this.selectionLocked = false;
+    for (const s of SIDES) {
+      this.seats[s]?.heartbeat?.();
+      this.seats[s] = null;
+    }
   }
 }

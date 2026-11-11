@@ -1,57 +1,67 @@
+import type { CabinetView, ScreenSize } from '../cabinet/CabinetView';
 import { MONITOR } from '../config/layout';
 import { tuning } from '../config/tuning';
-import type { PixelScaler } from '../platform/PixelScaler';
-import type { CabinetShake } from './cabinetShake';
 
 /**
- * The CRT's scanlines: a see-through layer laid over the monitor in the page, at device
- * resolution, so each native pixel row gets a fine dark line under it (the canvas itself is at
- * native size, too coarse for that). Follows the window, the scaling mode and the cabinet shake.
+ * The CRT's scanlines: a see-through layer over the monitor, at device resolution, with a fine dark
+ * line under each monitor pixel row (the game canvas is too coarse for that), plus the soft dark
+ * edge round the glass. It lives in the cabinet's screen opening, so it moves and scales with it.
  */
 export class CrtOverlay {
-  private readonly el: HTMLDivElement;
+  private readonly lines: HTMLCanvasElement;
+  private readonly glass: HTMLDivElement;
+  private on = false;
 
-  constructor(
-    private readonly canvas: HTMLCanvasElement,
-    private readonly scaler: PixelScaler,
-    private readonly shake: CabinetShake,
-  ) {
-    this.el = document.createElement('div');
-    Object.assign(this.el.style, {
-      position: 'absolute',
-      pointerEvents: 'none',
-      zIndex: '1',
-      display: 'none',
-    } satisfies Partial<CSSStyleDeclaration>);
-    document.body.appendChild(this.el);
-    scaler.onChange(() => this.place());
-    shake.onMove(() => this.place());
-    window.addEventListener('scroll', () => this.place());
+  constructor(private readonly cabinet: CabinetView) {
+    this.lines = document.createElement('canvas');
+    this.glass = document.createElement('div');
+    for (const el of [this.lines, this.glass])
+      Object.assign(el.style, {
+        position: 'absolute',
+        inset: '0',
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        zIndex: '1',
+        display: 'none',
+      } satisfies Partial<CSSStyleDeclaration>);
+    cabinet.screen.append(this.lines, this.glass);
+    cabinet.onResize((s) => this.draw(s));
   }
 
   setVisible(on: boolean): void {
-    this.el.style.display = on ? 'block' : 'none';
-    if (on) this.place();
+    this.on = on;
+    for (const el of [this.lines, this.glass]) el.style.display = on ? 'block' : 'none';
+    if (on) this.draw(this.cabinet.screenSize);
   }
 
-  private place(): void {
-    if (this.el.style.display === 'none') return;
-    const l = this.scaler.layout;
-    const zoom = this.scaler.zoom;
-    const o = this.shake.offset;
-    const rect = this.canvas.getBoundingClientRect();
+  private draw(size: ScreenSize): void {
+    if (!this.on) return;
     const c = tuning.crt;
-    // one dark line per native pixel row, a fraction of the row thick
-    const row = zoom;
-    const line = Math.max(1, row * c.scanlineThickness);
-    Object.assign(this.el.style, {
-      left: `${rect.left + window.scrollX + (l.cabinetX + MONITOR.x + o.x) * zoom}px`,
-      top: `${rect.top + window.scrollY + (l.cabinetY + MONITOR.y + o.y) * zoom}px`,
-      width: `${MONITOR.width * zoom}px`,
-      height: `${MONITOR.height * zoom}px`,
-      borderRadius: `${MONITOR.width * zoom * c.cornerRadius * 0.6}px`,
-      background: `repeating-linear-gradient(to bottom, transparent 0, transparent ${row - line}px, rgba(0, 0, 0, ${c.scanlineAlpha}) ${row - line}px, rgba(0, 0, 0, ${c.scanlineAlpha}) ${row}px)`,
-      boxShadow: `inset 0 0 ${8 * zoom}px rgba(0, 0, 0, 0.35)`,
+    const w = Math.max(1, Math.round(size.deviceWidth));
+    const h = Math.max(1, Math.round(size.deviceHeight));
+    // the glass is in cabinet units (the screen opening's own size), so the radius scales with it
+    const radius = this.cabinet.screen.offsetWidth * c.cornerRadius * 0.6;
+    Object.assign(this.glass.style, {
+      borderRadius: `${radius}px`,
+      boxShadow: `inset 0 0 ${radius * 0.8}px rgba(0, 0, 0, 0.35)`,
     } satisfies Partial<CSSStyleDeclaration>);
+
+    const cv = this.lines;
+    cv.width = w;
+    cv.height = h;
+    const g = cv.getContext('2d');
+    if (!g) return;
+    g.clearRect(0, 0, w, h);
+    g.fillStyle = `rgba(0, 0, 0, ${c.scanlineAlpha})`;
+    const rowH = h / MONITOR.height;
+    const thick = Math.max(1, Math.round(rowH * c.scanlineThickness));
+    for (let k = 0; k < MONITOR.height; k++) {
+      const top = Math.round(k * rowH);
+      const bottom = Math.round((k + 1) * rowH);
+      // a row only a device pixel or two tall keeps at least one clear pixel
+      const line = Math.min(thick, Math.max(1, bottom - top - 1));
+      g.fillRect(0, bottom - line, w, line);
+    }
   }
 }

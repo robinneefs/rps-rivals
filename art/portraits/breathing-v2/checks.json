@@ -1,0 +1,83 @@
+{
+  "errors": [],
+  "results": [
+    {
+      "id": "riot",
+      "diff": {
+        "face": {
+          "changed": 2037,
+          "checked": 2049
+        },
+        "leftHand": {
+          "changed": 6023,
+          "checked": 6370
+        },
+        "rightHand": {
+          "changed": 990,
+          "checked": 1004
+        },
+        "waist": {
+          "changed": 0,
+          "checked": 121
+        },
+        "chest": {
+          "changed": 767,
+          "checked": 779
+        }
+      },
+      "reducedMotion": true
+    },
+    {
+      "id": "taiko",
+      "diff": {
+        "face": {
+          "changed": 1923,
+          "checked": 1954
+        },
+        "leftHand": {
+          "changed": 5943,
+          "checked": 6015
+        },
+        "rightHand": {
+          "changed": 807,
+          "checked": 809
+        },
+        "waist": {
+          "changed": 0,
+          "checked": 866
+        },
+        "chest": {
+          "changed": 777,
+          "checked": 779
+        }
+      },
+      "reducedMotion": true
+    },
+    {
+      "id": "anchor",
+      "diff": {
+        "face": {
+          "changed": 1872,
+          "checked": 1889
+        },
+        "leftHand": {
+          "changed": 5785,
+          "checked": 5899
+        },
+        "rightHand": {
+          "changed": 892,
+          "checked": 896
+        },
+        "waist": {
+          "changed": 0,
+          "checked": 1998
+        },
+        "chest": {
+          "changed": 777,
+          "checked": 779
+        }
+      },
+      "reducedMotion": true
+    }
+  ]
+}

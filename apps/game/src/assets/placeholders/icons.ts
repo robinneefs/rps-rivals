@@ -175,3 +175,26 @@ export function paintBadges(): PixelBuffer {
   });
   return b;
 }
+
+/**
+ * Pick chips: a move's symbol on its own with an ink outline, shown over a fighter's head while
+ * picking. `unknown` is the rival's locked-in "?"; `waiting` is the same "?" dimmed (no pick yet).
+ */
+export const PICK_CHIP = {
+  width: SYMBOL_SIZE.width + 2,
+  height: SYMBOL_SIZE.height + 2,
+  frames: ['rock', 'paper', 'scissors', 'unknown', 'waiting'] as const,
+};
+export type PickChip = (typeof PICK_CHIP.frames)[number];
+
+/** One column per chip frame. */
+export function paintPickChips(): PixelBuffer {
+  const { width: w, height: h } = PICK_CHIP;
+  const b = new PixelBuffer(w * PICK_CHIP.frames.length, h);
+  PICK_CHIP.frames.forEach((frame, i) => {
+    const name: IconName = frame === 'waiting' ? 'unknown' : frame;
+    drawSymbol(b, name, i * w + 1, 1, symbolTones(name, frame === 'waiting'));
+    b.outline(palette.ink, i * w, 0, w, h);
+  });
+  return b;
+}

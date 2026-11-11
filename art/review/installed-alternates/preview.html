@@ -1,0 +1,17 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>RPS Rivals · installed alternate colors</title>
+<style>
+body{margin:20px;background:#151421;color:#f7efdf;font:16px system-ui}h1{font-size:24px;margin:0 0 10px}p{max-width:850px;line-height:1.5}button{padding:10px 16px;margin:4px;border:1px solid #74677e;background:#2a263b;color:#fff;border-radius:5px;cursor:pointer}button[aria-pressed=true]{background:#672f55;border-color:#ffa6c5}iframe{display:block;width:min(100%,900px);height:850px;border:1px solid #4e455d;margin-top:16px;background:#09070f}a{color:#a6d6ff}
+</style>
+<h1>RPS Rivals · alternate colors in game</h1>
+<p>These are the live game scenes with the installed artwork. In combat, the original fighter is on the left and the alternate is on the right.</p>
+<div id="fighters"></div><div id="views"></div>
+<p><a id="direct" target="_blank">Open this game view in its own tab</a></p>
+<iframe id="game" title="Live game palette review" allow="autoplay; fullscreen"></iframe>
+<script>
+const base='http://127.0.0.1:5196';let fighter='taiko',view='alternate';
+function update(){const query=view==='fight'?`menuReview=stage&fighter=${fighter}&stage=sunset-harbor`:`menuReview=victory&fighter=${fighter}${view==='alternate'?'&palette=alternate':''}`;const url=base+'/?'+query;document.getElementById('game').src=url;document.getElementById('direct').href=url;for(const button of document.querySelectorAll('button'))button.setAttribute('aria-pressed',button.dataset.fighter?button.dataset.fighter===fighter:button.dataset.view===view);}
+for(const id of ['taiko','riot','anchor']){const button=document.createElement('button');button.textContent=id.toUpperCase();button.dataset.fighter=id;button.onclick=()=>{fighter=id;update()};document.getElementById('fighters').append(button)}
+for(const [id,label]of [['alternate','Alternate victory portrait'],['original','Original victory portrait'],['fight','Combat · original vs alternate']]){const button=document.createElement('button');button.textContent=label;button.dataset.view=id;button.onclick=()=>{view=id;update()};document.getElementById('views').append(button)}update();
+</script>

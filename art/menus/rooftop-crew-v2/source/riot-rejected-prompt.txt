@@ -1,0 +1,10 @@
+Create a FOUR-FRAME home-screen idle animation sheet of RIOT ONLY, the seated purple-clothed woman on the RIGHT of reference1. Reference2 is her flat game sprite style. Isolate her entire seated body, remove ALL environment, ledge/chair/stool, logo/menu and other characters. Actual transparent background, NO shadow or support furniture.
+EXACT TWO COLUMNS by TWO ROWS, four separate complete figures same physical scale, same seat/hip anchor and identical proportions. Large gutters, no clipping, no cell lines or text. Full seated-body height about75% cell height. Simple flat angular shapes, bold dark navy outline, broad 2-tone shadow, no painterly texture or microdetail; intended to reduce to about110 native pixels tall.
+Riot: athletic adult woman, short tousled spiky brown bob, white cheek tape, mischievous grin, purple cropped track jacket with white sleeve stripes over yellow crop top, purple white-trim shorts, black fingerless gloves and leggings, white shin guards, purple-white high tops.
+Pose like menu reference: sits sideways on an INVISIBLE parapet, one knee raised toward chest at right of picture, one gloved forearm draped casually over raised knee; other leg hangs DOWN toward bottom, face/torso turn slightly LEFT toward friends. Whole visible shoes included. Do not draw a seat. Stable hips throughout.
+ROW MAJOR:
+1 top-left resting seated grin eyes open.
+2 top-right tiny relaxed shoulder rise of ONE native pixel and slight hair-tip shift, seat and legs stationary.
+3 bottom-left same pose with brief blink eyes closed, grin preserved, NO wink/no peace sign.
+4 bottom-right shoulders settle ONE pixel lower, subtle hair-tip movement, same hips/legs.
+Almost identical four poses for a quiet breathing/blink loop. No full-body bounce, gestures, stepping or anatomy/size changes. All four stand-alone seated Riot cutouts, consistent2x2 transparent sheet.

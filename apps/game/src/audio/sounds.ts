@@ -28,22 +28,42 @@ export const SFX = {
 export type SfxKey = keyof typeof SFX;
 
 /**
- * Per-sound level trims, so every effect plays about as loud as the fight sounds (around -15 dB
- * average). Measured with ffmpeg volumedetect on the files; anything not listed plays at 1.
- * The menu blips, the ROUND sting and the result jingles came out of the generator much louder.
+ * Per-sound level trims, so every effect peaks about as loud as the others (around -11 dB over its
+ * loudest 50 ms, the K.O. a little louder). Measured from the files; anything not listed plays at 1.
+ * The generator's levels were up to 7 dB apart (the whoosh and K.O. loud, the menu blips quiet),
+ * which made the sound jump in volume from one effect to the next. The joystick click stays a soft
+ * mechanical click under the menu blips.
  */
 export const SFX_GAIN: Partial<Record<SfxKey, number>> = {
-  menuMove: 0.65,
-  menuSelect: 0.55,
-  menuBack: 0.5,
+  menuMove: 0.83,
+  menuSelect: 0.53,
+  menuBack: 0.54,
+  tick: 0.83,
   stickClick: 0.5,
-  roundStart: 0.5,
-  winJingle: 0.8,
-  loseJingle: 0.55,
+  timeUp: 0.68,
+  lockIn: 0.79,
+  whoosh: 0.52,
+  hitRock: 0.73,
+  hitPaper: 0.83,
+  hitScissors: 0.91,
+  clash: 0.78,
+  ko: 0.79,
+  roundStart: 0.58,
+  fight: 0.73,
+  winJingle: 0.75,
+  loseJingle: 0.64,
 };
 
-export const MUSIC = ['menu', 'fight'] as const;
+export const MUSIC = ['menu', 'fight', 'storm', 'harbor', 'courtyard', 'foundry'] as const;
 export type MusicKey = (typeof MUSIC)[number];
+const MUSIC_FILES: Record<MusicKey, string> = {
+  menu: 'menu-one-more-round',
+  fight: 'stage-ready-to-rival',
+  storm: 'stage-under-the-storm',
+  harbor: 'stage-golden-hour',
+  courtyard: 'stage-lantern-rush',
+  foundry: 'stage-pressure-point',
+};
 
 /** The hit sound for the move that landed. */
 export const HIT_SFX: Record<Move, SfxKey> = { rock: 'hitRock', paper: 'hitPaper', scissors: 'hitScissors' };
@@ -63,7 +83,7 @@ export function audioFiles(): { key: string; urls: string[] }[] {
   for (const key of MUSIC)
     files.push({
       key: musicFileKey(key),
-      urls: ['ogg', 'mp3'].map((ext) => `assets/audio/music/${key}.${ext}`),
+      urls: ['ogg', 'mp3'].map((ext) => `assets/audio/music/${MUSIC_FILES[key]}.${ext}`),
     });
   return files;
 }

@@ -6,7 +6,7 @@ import { RandomCpu } from './cpu/RandomCpu';
 import { LocalSession } from './LocalSession';
 import type { MatchSession, MatchSetup } from './MatchSession';
 import { OnlineSession } from './OnlineSession';
-import { openBrowserSocket } from './socket';
+import { openBrowserSocket } from './openBrowserSocket';
 
 /**
  * Builds the session a match setup describes.
@@ -22,6 +22,7 @@ export function createSession(setup: MatchSetup): MatchSession {
         browserClock,
         mathRandomRng,
         new RandomCpu(),
+        setup.fighters ? { ...setup.fighters } : undefined,
       );
     case 'online':
       return connectOnline(setup.roomCode, 'join');

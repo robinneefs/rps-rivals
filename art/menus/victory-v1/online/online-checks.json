@@ -1,0 +1,11 @@
+{
+  "realLocalWorker": true,
+  "mockedSockets": false,
+  "errors": [],
+  "checks": [
+    "Real Worker + two browsers: confirmation wait/cancel, synchronized riot mirrors, exact combat sheets.",
+    "Complete real online match + mutually accepted rematch retains both selected identities.",
+    "Opponent leaving during confirmation shows RIVAL LEFT and permits return Home.",
+    "Disconnect during the selection-to-fight transition recovers Home without a stuck match."
+  ]
+}

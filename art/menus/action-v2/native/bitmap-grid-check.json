@@ -1,0 +1,18 @@
+{
+  "sheet": [
+    176,
+    120
+  ],
+  "fontPixelBlock": [
+    2,
+    2
+  ],
+  "nonuniformBlocks": 0,
+  "source": "apps/game/src/assets/glyphs.ts",
+  "rasterizer": null,
+  "gradientStepRows": 2,
+  "shadowOffset": [
+    2,
+    2
+  ]
+}

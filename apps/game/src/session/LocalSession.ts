@@ -1,5 +1,8 @@
 import {
   Emitter,
+  DEFAULT_FIGHTERS,
+  rulesForFighters,
+  type Fighters,
   opponentOf,
   Referee,
   type Clock,
@@ -34,10 +37,12 @@ export class LocalSession implements MatchSession {
     baseClock: Clock,
     private readonly rng: Rng,
     private readonly opponent: MoveSource,
+    readonly fighters: Fighters = { ...DEFAULT_FIGHTERS },
   ) {
+    this.rules = rulesForFighters(rules, fighters);
     this.clock = new PausableClock(baseClock);
     const clock = this.clock;
-    this.referee = new Referee(rules, timings, clock, rng);
+    this.referee = new Referee(this.rules, timings, clock, rng);
     const them = opponentOf(this.me);
     this.unsubs.push(
       this.referee.on('phase', (e) => {

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "a",
+    "original": [
+      1536,
+      1024
+    ],
+    "bounds": {
+      "left": 469,
+      "top": 178,
+      "right": 1043,
+      "bottom": 955
+    },
+    "figure": [
+      55,
+      75
+    ],
+    "opaqueColours": 1493
+  },
+  {
+    "id": "b",
+    "original": [
+      1159,
+      1358
+    ],
+    "bounds": {
+      "left": 117,
+      "top": 78,
+      "right": 1031,
+      "bottom": 1332
+    },
+    "figure": [
+      55,
+      75
+    ],
+    "opaqueColours": 1069
+  },
+  {
+    "id": "c",
+    "original": [
+      1214,
+      1295
+    ],
+    "bounds": {
+      "left": 127,
+      "top": 12,
+      "right": 1110,
+      "bottom": 1269
+    },
+    "figure": [
+      59,
+      75
+    ],
+    "opaqueColours": 945
+  }
+]
