@@ -5,7 +5,7 @@ import { moveColors, palette, sideColors } from '../config/palette';
 import { tuning } from '../config/tuning';
 import { PixelText } from './PixelText';
 import { MenuText } from './MenuStyle';
-import { textInkOrigin } from '../util/textInkOrigin';
+import { MENU_TYPOGRAPHY } from '../config/menuTypography';
 
 interface BarState {
   shown: number;
@@ -13,12 +13,18 @@ interface BarState {
   max: number;
 }
 const SIDES = ['p1', 'p2'] as const;
+/** Whole-number enlargement of the menu font for the countdown digit. */
+const TIMER_SCALE = 2;
+/** Ink size of the menu font's digit glyphs, in font pixels. */
+const TIMER_DIGIT_INK = { width: 6, height: 11 } as const;
 
 /** Classic life bars with compact name ribbons; the stage stays visible between HUD elements. */
 export class HudView {
   private readonly gfx: Phaser.GameObjects.Graphics;
   private readonly bars: Record<Side, BarState>;
-  private readonly timer: Phaser.GameObjects.Text;
+  /** The countdown digit: a one-pixel ink outline (8 copies) under the coloured face, last. */
+  private readonly timer: Phaser.GameObjects.Container;
+  private readonly timerLayers: Phaser.GameObjects.BitmapText[] = [];
   private readonly prompt: Phaser.GameObjects.Container;
   private readonly arrows: Phaser.GameObjects.Container;
   private readonly triangles: Phaser.GameObjects.Graphics[] = [];
@@ -27,7 +33,6 @@ export class HudView {
   private readonly timerFace: Phaser.GameObjects.Graphics;
   private timerMs: number | null = null;
   private timerSecond = -1;
-  private readonly timerOrigins = new Map<string, { x: number; y: number }>();
   private readonly timerBeat = { kick: 0 };
   private readonly flashUntil: Record<Side, number> = { p1: 0, p2: 0 };
   private roundsWon: Record<Side, number> = { p1: 0, p2: 0 };
@@ -75,19 +80,27 @@ export class HudView {
       });
     }
     this.timerFace = scene.add.graphics();
-    // Draw a full-size typeface directly, rather than enlarging the tiny pixel glyphs.
-    this.timer = scene.add
-      .text(MONITOR.width / 2, 3, '', {
-        fontFamily: 'Arial, sans-serif',
-        fontSize: '26px',
-        fontStyle: 'bold',
-        color: '#ffffff',
-        stroke: '#100d1c',
-        strokeThickness: 1,
-        resolution: 2,
-      })
-      .setOrigin(0.5, 0)
-      .setVisible(false);
+    // The menu font at 2x: its 6 x 11 digits become 22 px, filling the 30 px dial on whole pixels.
+    // The outline stays one native pixel, so the digit reads crisp rather than chunky.
+    this.timer = scene.add.container(0, 0).setVisible(false);
+    for (const [dx, dy] of [
+      [-1, -1],
+      [0, -1],
+      [1, -1],
+      [-1, 0],
+      [1, 0],
+      [-1, 1],
+      [0, 1],
+      [1, 1],
+      [0, 0],
+    ]) {
+      const layer = scene.add
+        .bitmapText(dx!, dy!, MENU_TYPOGRAPHY.fontKey, '', MENU_TYPOGRAPHY.size)
+        .setScale(TIMER_SCALE)
+        .setTint(0x100d1c);
+      this.timer.add(layer);
+      this.timerLayers.push(layer);
+    }
     this.prompt = scene.add.container(MONITOR.width / 2, 56).setVisible(false);
     // Match the round title's native menu font, gold face and one-pixel outline.
     for (const [dx, dy, color] of [
@@ -195,7 +208,7 @@ export class HudView {
     this.slamHide = null;
     this.timerMs = Math.max(0, msLeft);
     const second = Math.ceil(this.timerMs / 1000);
-    this.timer.setText(String(second)).setVisible(true);
+    this.setTimerDigit(String(second));
     if (second !== this.timerSecond) {
       this.timerSecond = second;
       this.scene.tweens.killTweensOf(this.timerBeat);
@@ -233,16 +246,18 @@ export class HudView {
     if (kick > 0) {
       g.lineStyle(1, color, kick * 0.6).strokeCircle(x, y, 17 + (1 - kick) * 5);
     }
-    // Text-box height and bearings differ on mobile fallback fonts. Anchor the actual ink.
-    let origin = this.timerOrigins.get(this.timer.text);
-    if (!origin) {
-      origin = textInkOrigin(this.timer.canvas, this.timer.style.resolution);
-      this.timerOrigins.set(this.timer.text, origin);
-    }
-    this.timer
-      .setDisplayOrigin(origin.x, origin.y)
-      .setPosition(x, y - Math.round(kick * 2))
-      .setTint(kick > 0.65 ? 0xffffff : color);
+    // Every digit's ink is the same 6 x 11 box from the glyph's top-left (its 7 px advance adds a
+    // blank column), so centring that box centres any digit, on whole pixels.
+    this.timerLayers[this.timerLayers.length - 1]!.setTint(kick > 0.65 ? 0xffffff : color);
+    this.timer.setPosition(
+      x - (TIMER_DIGIT_INK.width * TIMER_SCALE) / 2,
+      y - Math.round((TIMER_DIGIT_INK.height * TIMER_SCALE) / 2) - Math.round(kick * 2),
+    );
+  }
+
+  private setTimerDigit(text: string): void {
+    for (const layer of this.timerLayers) layer.setText(text);
+    this.timer.setVisible(true);
   }
 
   slamTimer(): void {
@@ -251,7 +266,7 @@ export class HudView {
     this.timerMs = 0;
     this.timerSecond = 0;
     this.timerBeat.kick = 0;
-    this.timer.setText('0').setVisible(true);
+    this.setTimerDigit('0');
     this.drawTimer();
     this.slamHide = this.scene.time.delayedCall(tuning.hud.timerSlamHoldMs, () => {
       this.timer.setVisible(false);
