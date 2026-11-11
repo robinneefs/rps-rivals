@@ -22,8 +22,6 @@
 
 vs the CPU, or vs a friend online with a 4-letter room code
 
-<sub>The big revamp described below is on the <a href="https://robinneefs.github.io/rps-rivals/staging/">staging copy</a> for playtesting; the live game updates when it is released.</sub>
-
 </div>
 
 ---
