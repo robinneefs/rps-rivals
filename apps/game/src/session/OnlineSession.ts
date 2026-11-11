@@ -60,6 +60,7 @@ export class OnlineSession implements MatchSession {
   /** Matches started in this room before the current one (rematches both players count alike). */
   private rematches = 0;
   rivalRequestedRematch = false;
+  rivalRequestedCharacterSelect = false;
 
   constructor(private readonly opts: OnlineOptions) {
     this.socket = opts.openSocket(`${opts.serverUrl}/room/${opts.roomCode}`, {
@@ -87,6 +88,10 @@ export class OnlineSession implements MatchSession {
     if (this.phase !== 'picking' || this.ended) return;
     this.myPick = move;
     this.send({ type: 'pick', move });
+  }
+
+  requestCharacterSelect(): void {
+    this.send({ type: 'characterSelect' });
   }
 
   requestRematch(): void {
@@ -194,6 +199,21 @@ export class OnlineSession implements MatchSession {
           if (msg.side !== this.me) this.rivalRequestedRematch = true;
           this.events.emit('rematchRequested', { side: msg.side });
         }
+        break;
+      case 'characterSelectRequested':
+        if (seated) {
+          if (msg.side !== this.me) this.rivalRequestedCharacterSelect = true;
+          this.events.emit('characterSelectRequested', { side: msg.side });
+        }
+        break;
+      case 'characterSelectAccepted':
+        this.rivalRequestedRematch = this.rivalRequestedCharacterSelect = false;
+        this.rematches++;
+        this.phase = 'idle';
+        this.state = null;
+        this.myPick = null;
+        this.endsAt = null;
+        this.events.emit('characterSelectAccepted', {});
         break;
       case 'rematchAccepted':
         this.rivalRequestedRematch = false;

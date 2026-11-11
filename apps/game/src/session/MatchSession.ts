@@ -31,6 +31,8 @@ export interface SessionEvents extends Record<string, unknown> {
   // Online only (a CPU match never sends these):
   /** The opponent asked to play again; `side` is who asked. */
   rematchRequested: { side: Side };
+  characterSelectRequested: { side: Side };
+  characterSelectAccepted: Record<string, never>;
   /** The second player arrived in the room (lobby). */
   opponentJoined: Record<string, never>;
   /** The room refused this player (wrong code, full, other build...). The session is over. */
@@ -47,6 +49,7 @@ export interface SessionEvents extends Record<string, unknown> {
  */
 export interface MatchSession {
   readonly rivalRequestedRematch?: boolean;
+  readonly rivalRequestedCharacterSelect?: boolean;
   readonly endedReason?: 'refused' | 'opponentLeft' | 'disconnected' | null;
   readonly fighters: Fighters;
   readonly me: Side;

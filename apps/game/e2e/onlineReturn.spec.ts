@@ -94,7 +94,8 @@ for (const exit of [
       });
     }
     if (exit === 'main-menu') {
-      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('ArrowDown'); // CHARACTER SELECT
+      await page.keyboard.press('ArrowDown'); // MAIN MENU
       await page.keyboard.press('Enter');
     } else if (exit.startsWith('rival-left')) send({ type: 'opponentLeft' });
     else socket!.close({ code: 1001, reason: 'test connection loss' });

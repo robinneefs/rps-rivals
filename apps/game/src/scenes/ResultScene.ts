@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { OnlineSession } from '../session/OnlineSession';
 import { rematchNotice, showDisconnect } from '../views/OnlineNotice';
 import { resultMenu } from '../menus/resultMenu';
 import { MenuView } from '../views/MenuView';
@@ -47,6 +48,18 @@ export class ResultScene extends Phaser.Scene {
           if (setup.mode === 'online') notice(true);
           session.requestRematch(); // online: waits for the opponent; locally accepted at once
         },
+        characterSelect: () => {
+          if (leaving || asked) return;
+          if (session instanceof OnlineSession) {
+            asked = true;
+            notice(true, true);
+            session.requestCharacterSelect();
+          } else {
+            leaving = true;
+            menu.lock();
+            flow.toCharacterSelect(setup);
+          }
+        },
         mainMenu: () => {
           if (leaving) return;
           leaving = true;
@@ -54,7 +67,7 @@ export class ResultScene extends Phaser.Scene {
           flow.toHome();
         },
       }),
-      victory.menuY,
+      victory.menuY - 24,
       input,
       audio,
     );
@@ -71,6 +84,15 @@ export class ResultScene extends Phaser.Scene {
         menu.lock();
         flow.toFight(setup, session);
       }),
+      session.on('characterSelectAccepted', () => {
+        if (leaving || !(session instanceof OnlineSession)) return;
+        leaving = true;
+        menu.lock();
+        flow.toCharacterSelect(setup, session);
+      }),
+      session.on('characterSelectRequested', ({ side }) => {
+        if (!leaving && side !== session.me) notice(asked, true);
+      }),
       session.on('rematchRequested', ({ side }) => {
         if (!leaving && !asked && side !== session.me) notice(false);
       }),
@@ -85,6 +107,7 @@ export class ResultScene extends Phaser.Scene {
       }),
     ];
     if (!session.endedReason && session.rivalRequestedRematch) notice(false);
+    if (!session.endedReason && session.rivalRequestedCharacterSelect) notice(false, true);
     this.events.once('shutdown', () => offs.forEach((off) => off()));
   }
 }

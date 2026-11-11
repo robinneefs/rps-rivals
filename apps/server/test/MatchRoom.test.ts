@@ -148,6 +148,40 @@ describe('MatchRoom', () => {
     expect(a.of('phase').slice(phasesBefore)[0]).toMatchObject({ phase: 'roundIntro', round: 1 });
   });
 
+  it.each([
+    ['characterSelect', 'rematch'],
+    ['rematch', 'characterSelect'],
+    ['characterSelect', 'characterSelect'],
+  ])('returns both to selection for %s plus %s and starts with new fighters', (first, second) => {
+    startMatch();
+    for (let i = 0; i < 2000 && a.of('matchOver').length === 0; i++) clock.advance(1000);
+    send(room, a, { type: first });
+    expect(b.last).toEqual({
+      type: first === 'rematch' ? 'rematchRequested' : 'characterSelectRequested',
+      side: 'p1',
+    });
+    expect(a.of('characterSelectAccepted')).toHaveLength(0);
+    send(room, b, { type: second });
+    expect(a.last).toEqual({ type: 'characterSelectAccepted' });
+    expect(b.last).toEqual(a.last);
+    expect(a.of('selection').at(-1)?.confirmed).toEqual({ p1: false, p2: false });
+    send(room, a, { type: 'character', character: 'riot', confirmed: true });
+    send(room, b, { type: 'character', character: 'taiko', confirmed: true });
+    send(room, a, { type: 'ready' });
+    send(room, b, { type: 'ready' });
+    expect(a.of('phase').at(-1)?.state.health).toEqual({ p1: 80, p2: 100 });
+  });
+
+  it('quit ends the room while character select is pending', () => {
+    startMatch();
+    for (let i = 0; i < 2000 && a.of('matchOver').length === 0; i++) clock.advance(1000);
+    send(room, a, { type: 'characterSelect' });
+    room.leave(b);
+    expect(a.last).toEqual({ type: 'opponentLeft' });
+    expect(a.of('characterSelectAccepted')).toHaveLength(0);
+    expect(room.isEmpty).toBe(true);
+  });
+
   it('ignores a rematch request while the match is still running', () => {
     startMatch();
     send(room, a, { type: 'rematch' });

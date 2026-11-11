@@ -9,7 +9,7 @@ import { isPlayableCharacter, type PlayableCharacterId, type CharacterSelection 
  * WebSocket. Both sides import this file, so a renamed field is a type error on both ends.
  * Bump PROTOCOL_VERSION whenever a message changes shape: the room refuses clients on another one.
  */
-export const PROTOCOL_VERSION = 4;
+export const PROTOCOL_VERSION = 5;
 
 /**
  * Room codes: four consonants. No vowels, so a random code can't spell a word (rude or otherwise),
@@ -39,7 +39,8 @@ export type ClientMessage =
   | { type: 'character'; character: PlayableCharacterId; confirmed: boolean }
   | { type: 'pick'; move: Move }
   /** Play again; the room answers `rematchAccepted` once both players asked. */
-  | { type: 'rematch' };
+  | { type: 'rematch' }
+  | { type: 'characterSelect' };
 
 export type JoinError =
   /** The client speaks another protocol version. */
@@ -82,7 +83,9 @@ export type ServerMessage =
   | ({ type: 'matchOver' } & RefereeEvents['matchOver'])
   /** One player asked for a rematch (so the other can see it). */
   | { type: 'rematchRequested'; side: Side }
-  | { type: 'rematchAccepted' };
+  | { type: 'rematchAccepted' }
+  | { type: 'characterSelectRequested'; side: Side }
+  | { type: 'characterSelectAccepted' };
 
 /**
  * Checks a message from a client. Anything that isn't exactly a known message comes back as null,
@@ -114,6 +117,8 @@ export function parseClientMessage(raw: unknown): ClientMessage | null {
       return isPlayableCharacter(m.character) && typeof m.confirmed === 'boolean'
         ? { type: 'character', character: m.character, confirmed: m.confirmed }
         : null;
+    case 'characterSelect':
+      return { type: 'characterSelect' };
     case 'rematch':
       return { type: 'rematch' };
     case 'pick':
