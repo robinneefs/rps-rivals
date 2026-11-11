@@ -1,5 +1,13 @@
 # RPS Rivals: Project Context
 
+## 2.3.0 released — 11 November 2026
+
+- The revamp is live at robinneefs.github.io/rps-rivals as **2.3.0** (user chose 2.3.0 over 3.0.0). PR #35 merged main into production (391b56b): Pages publish, `rps-rivals-server` deploy (protocol 4) and the v2.3.0 tag/release all succeeded; the live bundle reports 2.3.0 and uses wss://rps-rivals-server.ggenie.workers.dev.
+- The user played online on the live game and server afterwards: "online works, all good". The final online playtest item is closed.
+- Hosting stays on the robinneefs account. chainshiftgames.github.io belongs to a personal account (ChainShiftGames), not an organization; the user's org is ChainShiftGamesOrg. Moving was considered and dropped.
+- CI pinned to ubuntu-24.04 (ubuntu-latest became 26.04, which Playwright 1.56 cannot install on). Browser tests still time out on GitHub's GPU-less runners (14/25, 9.2 min); locally on a clean main 24/25 passed, and the one timeout passes alone in 33-44 s. Hosted e2e stays red until timeouts are raised or the slowest tests are skipped there.
+- Still open in the release checklist: the dev pacing page, the full capture/motion review across stages and fighters, and the final phone/settings checks.
+
 ## New icons and link preview — 11 November 2026
 
 - User chose, from options in `art/brand/icons-v2/preview.html`, the cabinet's glossy Rock button on a marquee-style burst as the icon, and the logo-and-gameplay card (RPS RIVALS title, versus and K.O. monitors) as the link preview. Rejected options (Taiko portrait, title lettering icon, marquee-art card) are kept there.

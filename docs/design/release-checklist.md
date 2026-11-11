@@ -52,13 +52,13 @@ These are design/review tasks, not approval of particular replacement artwork or
 
 ## 4. Final verification and release preparation
 
-- [ ] Final online playtest remains pending and will be done last. User approved local combat feel/readability and phone controls/layout on 30 October; then check any changed online paths. The user's successful online playtest on 28 October remains valid evidence for the current implementation; do not reopen it merely because older notes still list it.
+- [x] Final online playtest done last, on the live 2.3.0 game and match server (11 November): the user reported "online works, all good". Individual devices and scenarios were not enumerated.
 - [x] Final local checks pass (30 October): formatting, lint, typecheck, 186 unit tests, production build and all 16 browser checks using installed Chrome. Main script remains 1.66 MB minified / 403 KB gzip; no loading-time claim is made for an actual phone network. Generated artwork studies/asset metadata are excluded from source formatting.
 - [x] Updated browser tests for default Online selection, full transition timing, mirror alternates, two-canvas rendering, stage-specific music and current visual-only Home entrance. Corrected missing base URL and constant-random fixture texture collisions. All 16 pass.
 - [ ] Check phone touch input, browser viewport changes, sound/background behavior, settings persistence, Pixel Perfect mode and reduced motion after the final changes. Record actual-device versus emulated evidence accurately.
 - [x] Refresh README/screenshots and relevant design, architecture, tuning and audio notes to describe the shipped game (30 October). New seeded production-build captures (desktop, phone and all five stages, WebP) by `sources/screenshots/capture.mjs`; README, architecture (current section), audio, tuning and the Play Store listing text updated. Play Store screenshots remain from 1.x while Android is parked. Source artwork, prompts and licences preserved.
-- [ ] Assign the release's plain x.y.z version and write its changelog once the candidate is ready.
-- [ ] Prepare matching browser/server rollout: the current protocol and character rules require compatible versions. Confirm target and rollback plan, then obtain the user's release instruction before deploying.
+- [x] Version 2.3.0 assigned by the user (11 November), following the changelog's minor-bump rule; CHANGELOG entry finalised as 2.3.0 (2026-11-11).
+- [x] Matching browser/server rollout done on the user's instruction (11 November): PR #35 merged main into production, which published the game, deployed `rps-rivals-server` (protocol 4) and tagged v2.3.0. Hosting stays on robinneefs.github.io (moving to ChainShiftGames was considered and dropped). Rollback: revert the merge on production, which republishes 1.1.1 and its server.
 
 ## Completed foundations — retain, do not re-plan
 
