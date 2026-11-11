@@ -168,7 +168,7 @@ rps-rivals/
 │   │       └── util/            snap, gfx
 │   └── server/                  the online match server: a Cloudflare Worker, MatchRoom Durable Object per room code, using @rps/core
 ├── config/                      tsconfig.base.json, vitest.config.ts
-├── tools/                       make-logo.py, make-marquee.py, make-icons.mjs, audio/make-audio.mjs (every sound)
+├── tools/                       make-logo.py, make-marquee.py, make-icons.mjs (README play button), art/ (art prep, including prepare-brand-icons.py for every icon), audio/
 ├── docs/  sources/              design docs, mock-ups, art direction, the scripts that draw them
 ├── .github/workflows/           ci.yml (checks), pages.yml (publishes staging and live), deploy-server.yml (Workers), release.yml (tags each version)
 └── package.json                 workspaces, shared lint/format/test scripts

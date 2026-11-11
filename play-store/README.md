@@ -23,5 +23,5 @@ The privacy policy is a page of the game itself (`apps/game/public/privacy.html`
 
 ## Remaking the art
 
-- Icon and feature graphic: `node tools/make-icons.mjs` (also makes the app's launcher icons and splash screens).
+- Icon and feature graphic: `python tools/art/prepare-brand-icons.py --install` (also makes the browser icons, the link-preview card and the app's launcher icons and splash screens).
 - Screenshots: `node sources/play-store/capture.mjs`. It plays a seeded match against the CPU the way the Android app shows it and saves the shots here.

@@ -1,5 +1,11 @@
 # RPS Rivals: Project Context
 
+## New icons and link preview — 11 November 2026
+
+- User chose, from options in `art/brand/icons-v2/preview.html`, the cabinet's glossy Rock button on a marquee-style burst as the icon, and the logo-and-gameplay card (RPS RIVALS title, versus and K.O. monitors) as the link preview. Rejected options (Taiko portrait, title lettering icon, marquee-art card) are kept there.
+- `python tools/art/prepare-brand-icons.py --install` writes favicon, Apple touch icon (full square), `share-v2.png` (renamed so Discord and others drop their cached copy), Android launcher icons/splash screens in every density (adaptive background now #1A0B2E) and Play Store icon/feature graphic. `tools/make-icons.mjs` now only makes the README PLAY button (and runs on Windows). index.html description, og and twitter tags updated.
+- Shared links point at the live site, which still runs 1.1.1, so chat previews change only after release.
+
 ## Documentation and screenshot refresh — 30 October 2026
 
 - User asked to bring all docs, the README and screenshots up to date with the revamp before weekend staging playtests. Work is on branch `docs/release-refresh` from origin/main (96b8be5). The local `main` branch was stale (old 2.2.0 marquee commits) and was not used.

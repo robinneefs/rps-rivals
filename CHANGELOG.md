@@ -2,7 +2,10 @@
 
 Every build that goes online gets a new version number (in `apps/game/package.json`, shown small on the home screen) and an entry here. Version numbers follow semver: a new feature bumps the middle number (1.0.0 → 1.1.0), a fix-only build bumps the last (1.0.0 → 1.0.1). Each version that goes live is tagged `vX.Y.Z` with a GitHub release, made automatically from its entry here when it reaches the `production` branch.
 
-## Unreleased — staging update (2026-10-30)
+## 2.3.0 (2026-11-11)
+
+- New icon and link preview. The browser tab, home-screen, Android and Play Store icons are now the cabinet's glossy Rock button on a marquee-style burst, and links shared in chat apps show the RPS RIVALS title beside the versus screen and a K.O., with an updated description. The image has a new file name, so apps that cached the old preview pick up the new one.
+- The countdown digits use the menu font at 2x, matching the other pixel lettering.
 
 - Documentation refresh: new README, screenshots of every screen and all five stages from the production build (`sources/screenshots/capture.mjs`, now WebP), a current-architecture section, and updated audio, tuning and store-listing notes.
 
